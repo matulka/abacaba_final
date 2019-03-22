@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    </head>
+
+    <body>
+        {% include "menu.html" %}
+
+        {% block content %}
+        {% endblock %}
+        <div style="position: absolute; bottom: 0;">
+            © 2019-2019 Abacaba.Inc
+        </div>
+    </body>
+</html>
