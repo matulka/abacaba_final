@@ -23,6 +23,10 @@ from finale import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index_page),
+    path('is_auth', views.is_auth),
+    path('profile', views.profile),
+    path('login_to_account', views.login_to),
+    path('cart', views.cart),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
