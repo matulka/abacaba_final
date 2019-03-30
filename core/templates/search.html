@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+Search
+    {% if none == True %}
+        Поиск не дал результатов
+    {% endif %}
+    {% if none == False %}
+        Результаты поиска:
+        {% for ans in result %}
+
+        {% endfor %}
+    {% endif %}
+{% endblock %}
