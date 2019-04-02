@@ -3,14 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from core.forms import SearchForm
 from core.models import Product
 
+
 def index_page(request):
-    if request.method == 'POST':
-        form = SearchForm(request.POST)
-        if form.is_valid():
-            text = form.cleaned_data['input']
-            print(text)
-            url = '/search?text=' + text
-            return HttpResponseRedirect(url)
     context = dict()
     return render(request, 'index.html', context)
 
@@ -41,10 +35,11 @@ def cart(request):
 
 
 def search(request):
-    if (request.method == 'GET'):
-        context = {}
+    context = dict()
+    if request.method == 'GET':
         context['text'] = request.GET.get('text')
-        if context['text'] != None:
+        print(context['text'])
+        if context['text'] is not None:
             context['result'] = search_in_base(context['text'])
         else:
             context['result'] = []
@@ -53,8 +48,7 @@ def search(request):
         else:
             context['none'] = False
         return render(request, 'search.html', context)
-    else:
-        pass ####SOME GOOD CODE HERE
+    return render(request, 'search.html', context)
 
 
 def search_in_base(text):
