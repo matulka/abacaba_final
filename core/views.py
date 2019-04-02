@@ -40,6 +40,7 @@ def activate(request, uidb64, token):
         messages.error(request, 'Ссылка для регистрации устарела')
         return redirect('home')
 
+
 def signup(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
