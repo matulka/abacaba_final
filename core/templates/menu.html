@@ -13,9 +13,7 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <span class="nav-item active popover-dismissible"  data-toggle="popover"  id = "kek"   data-trigger = "focus" onmouseenter="pop_active()">
-          <a class="nav-link " href="/is_auth" name = "lk" id = "lk" >Личный кабинет</a>
-        </span>
+        <a class="nav-link" href="/is_auth">Личный кабинет</a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" href="/cart">Корзина</a>
@@ -28,28 +26,4 @@
     </form>
   </div>
 </nav>
-
-
-<a tabindex="0" class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus" title="Dismissible popover"
-  data-content="And here's some amazing content. It's very engaging. Right?">Dismissible popover</a>
-
-<script>
-$(document).ready(function(){
-$('.popover-dismiss').popover({
-trigger: 'focus'
-})
-})
-  function pop_active(){
-    $('#kek').popover({
-      html: true,
-      trigger: 'focus',
-      placement: 'bottom',
-      content: 'Выход' + '\n' + 'Пользователь',
-
-    })
-    $('#kek').popover('show')
-  }
-
-
-</script>
 
