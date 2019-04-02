@@ -125,4 +125,12 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'assets/'),)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
 
+LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'abacabamain@gmail.com'
+EMAIL_HOST_PASSWORD = 'Abacabafinal'
+EMAIL_PORT = 587
