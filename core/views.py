@@ -44,10 +44,10 @@ def search(request):
         context['text'] = request.GET.get('text')
         print(context['text'])
         if context['text'] is not None:
-            context['result'] = search_in_base(context['text'])
+            context['products'] = search_in_base(context['text'])
         else:
-            context['result'] = []
-        if len(context['result']) == 0:
+            context['products'] = []
+        if len(context['products']) == 0:
             context['none'] = True
         else:
             context['none'] = False
@@ -88,3 +88,19 @@ def delete_category(name): #Returns True if removal was successful
         return True
     except ObjectDoesNotExist:
         return False
+
+
+def categories(request):
+    context = dict()
+    if request.method == 'GET':
+        context['cat'] = request.GET.get('cat')
+        if context['cat'] is not None:
+            context['products'] = Category.products.all()
+        else:
+            context['products'] = []
+        if len(context['products']) == 0:
+            context['none'] = True
+        else:
+            context['none'] = False
+        return render(request, 'search.html', context)
+    return render(request, 'search.html', context)
