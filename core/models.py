@@ -55,6 +55,10 @@ class Order(models.Model):
                                 related_name='orders')
 
 
+class Cart(models.Model):
+    author = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+
+
 class OrderProduct(models.Model):
     size = models.IntegerField()
     quantity = models.IntegerField()
@@ -70,6 +74,12 @@ class OrderProduct(models.Model):
         null=True,
         related_name='products'
     )
+    cart = models.ForeignKey(
+        to=Cart,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='products'
+    )
 
 
 class Question(models.Model):
@@ -81,3 +91,4 @@ class Question(models.Model):
     topic = models.TextField()
     content = models.TextField()
     admin_login = models.TextField(null=True)
+

@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from core.forms import SearchForm
-from core.models import Product, Category
+from django.http import HttpResponseRedirect
+from core.models import Product, Category, Cart, OrderProduct
 from django.core.exceptions import ObjectDoesNotExist
+from core.classes import OrderProductInformation
 
 
 def index_page(request):
@@ -71,7 +71,7 @@ def return_categories(context):
     context['cat'] = Category.objects.all()
 
 
-def add_category(name): #Returns True if adding was successful
+def add_category(name):  # #Returns True if adding was successful
     try:
         cat = Category.objects.get(name=str(name))
         return False
@@ -81,7 +81,7 @@ def add_category(name): #Returns True if adding was successful
         return True
 
 
-def delete_category(name): #Returns True if removal was successful
+def delete_category(name):  # #Returns True if removal was successful
     try:
         cat = Category.objects.get(name=str(name))
         cat.delete()
@@ -104,3 +104,29 @@ def categories(request):
             context['none'] = False
         return render(request, 'search.html', context)
     return render(request, 'search.html', context)
+
+
+def add_to_cart(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            try:
+                current_cart = user.cart
+            except ObjectDoesNotExist:
+                current_cart = Cart(user=user)
+                current_cart.save()
+
+            order_product = OrderProduct()
+            order_product.size = request.POST.get('size')
+            order_product.quantity = request.POST.get('quantity')
+            order_product.product = Product.objects.get(id=request.POST.get('product_id'))
+            # #Необходимо, чтобы в запросе передавался айди продукта через скрытое поле
+            order_product.cart = current_cart
+        else:
+            pass
+
+    # #Дописать добавление в корзину неавторизованного пользователя
+    # #Дописать удаление из корзины
+    # #Дописать формирование заказа
+
+    return redirect('/')
