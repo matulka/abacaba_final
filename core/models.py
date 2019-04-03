@@ -4,6 +4,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
+class Category(models.Model):
+    name = models.TextField(primary_key=True)
+
+
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
@@ -11,6 +15,10 @@ class Product(models.Model):
     information = models.TextField()
     rating = models.FloatField(null=True)
     image = models.ImageField(upload_to='images', blank=True) # #product.image.url
+    category = models.ForeignKey(to=Category,
+                                on_delete=models.CASCADE,
+                                null=True,
+                                related_name='products')
 
 
 class ProductFeedback(models.Model):

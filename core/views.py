@@ -1,11 +1,15 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from core.forms import SearchForm
-from core.models import Product
+from core.models import Product, Category
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def index_page(request):
     context = dict()
+    add_category("OLL")
+    add_category("ekk")
+    return_categories(context)
     return render(request, 'index.html', context)
 
 
@@ -63,4 +67,24 @@ def search_in_base(text):
     return search_result
 
 
+def return_categories(context):
+    context['cat'] = Category.objects.all()
 
+
+def add_category(name): #Returns True if adding was successful
+    try:
+        cat = Category.objects.get(name=str(name))
+        return False
+    except ObjectDoesNotExist:
+        new_cat = Category(name = str(name))
+        new_cat.save()
+        return True
+
+
+def delete_category(name): #Returns True if removal was successful
+    try:
+        cat = Category.objects.get(name=str(name))
+        cat.delete()
+        return True
+    except ObjectDoesNotExist:
+        return False
