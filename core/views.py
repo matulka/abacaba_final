@@ -107,6 +107,7 @@ def categories(request):
 
 
 def add_to_cart(request):
+    context = dict()
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
@@ -122,11 +123,17 @@ def add_to_cart(request):
             order_product.product = Product.objects.get(id=request.POST.get('product_id'))
             # #Необходимо, чтобы в запросе передавался айди продукта через скрытое поле
             order_product.cart = current_cart
+            order_product.save()
         else:
-            pass
+            if 'cart' not in request.session:
+                request.session['cart'] = []
+            size = request.POST.get('size')
+            quantity = request.POST.get('quantity')
+            product_id = request.POST.get('product_id')
+            order_product = OrderProductInformation(size=size, quantity=quantity, product_id=product_id)
+            request.session['cart'].append(order_product)
+        return render(request, 'cart.html', context)
+    return redirect('/')
 
-    # #Дописать добавление в корзину неавторизованного пользователя
     # #Дописать удаление из корзины
     # #Дописать формирование заказа
-
-    return redirect('/')
