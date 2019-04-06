@@ -107,7 +107,6 @@ def categories(request):
 
 
 def add_to_cart(request):
-    context = dict()
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
@@ -132,8 +131,20 @@ def add_to_cart(request):
             product_id = request.POST.get('product_id')
             order_product = OrderProductInformation(size=size, quantity=quantity, product_id=product_id)
             request.session['cart'].append(order_product)
-        return render(request, 'cart.html', context)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
     return redirect('/')
 
     # #Дописать удаление из корзины
     # #Дописать формирование заказа
+
+
+def delete_from_cart(request):  # #Необходимо передать айди OrderProduct или индекс в массиве
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            order_product_id = request.POST.get('order_product_id')
+            OrderProduct.objects.filter(id=order_product_id).delete()
+        else:
+            pass  # #Дописать удаление для неавторизованного пользователя
+
+
+

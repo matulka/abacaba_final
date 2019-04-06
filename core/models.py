@@ -60,6 +60,7 @@ class Cart(models.Model):
 
 
 class OrderProduct(models.Model):
+    id = models.AutoField(primary_key=True)
     size = models.IntegerField()
     quantity = models.IntegerField()
     product = models.ForeignKey(
