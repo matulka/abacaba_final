@@ -2,9 +2,12 @@
     .dropdown-toggle::after {
         display:none;
     }
+    ul.nav li.dropdown:hover {
+        display: block;
+    }
 </style>
 
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
   <a class="navbar-brand" href="/">
     <img src= "/static/logo.png" width="30" height="30" class="d-inline-block align-top border border-dark rounded" alt="M">
     Abacaba
@@ -14,21 +17,21 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle active" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="sr-only">(current)</span>
+      <li class="nav-item dropdown" id="cabinet">
+        <a class="nav-link dropdown-toggle active" id="navbarDropdown_personal_cabinet" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 110%;">
             {% if request.user.is_authenticated %}
                 {{ user.username }}
              {% else %}
                 Личный кабинет
             {% endif %}
+            <span class="sr-only">(current)</span>
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown_personal_cabinet" id="expand_cabinet">
             {% if request.user.is_authenticated %}
                  <a class="dropdown-item" href="#">Профиль</a>
                  <a class="dropdown-item" href="/accounts/logout">Выйти</a>
             {% else %}
-                <a class="dropdown-item" href="/login">Войти</a>
+                <a class="dropdown-item" href="/accounts/login">Войти</a>
                 <a class="dropdown-item" href="/sign-up">Регистарция</a>
             {% endif %}
         </div>

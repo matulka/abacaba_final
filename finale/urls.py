@@ -25,8 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index_page, name='home'),
 
+    url('accounts/', include('django.contrib.auth.urls')),
     url(r'^sign-up/$', views.signup, name='signup'),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.activate, name='activate')
 ]

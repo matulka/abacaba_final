@@ -19,11 +19,6 @@ def index_page(request):
     return render(request, 'index.html', context)
 
 #Authentication
-
-@login_required
-def logout(request):
-    pass
-
 def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -39,7 +34,6 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Ссылка для регистрации устарела')
         return redirect('home')
-
 
 def signup(request):
     if request.method == 'POST':
@@ -67,5 +61,4 @@ def signup(request):
         form = SignupForm()
 
     return render(request, 'registration/signup.html', {'form': form})
-
 #
