@@ -134,7 +134,6 @@ def add_to_cart(request):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
     return redirect('/')
 
-    # #Дописать удаление из корзины
     # #Дописать формирование заказа
 
 
@@ -144,7 +143,7 @@ def delete_from_cart(request):  # #Необходимо передать айд�
             order_product_id = request.POST.get('order_product_id')
             OrderProduct.objects.filter(id=order_product_id).delete()
         else:
-            pass  # #Дописать удаление для неавторизованного пользователя
+            del(request.session['cart'][request.POST.get('order_product_id')])
 
 
 
