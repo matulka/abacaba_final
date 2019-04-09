@@ -16,9 +16,9 @@ class Product(models.Model):
     rating = models.FloatField(null=True)
     image = models.ImageField(upload_to='images', blank=True) # #product.image.url
     category = models.ForeignKey(to=Category,
-                                on_delete=models.CASCADE,
-                                null=True,
-                                related_name='products')
+                                 on_delete=models.CASCADE,
+                                 null=True,
+                                 related_name='products')
 
 
 class ProductFeedback(models.Model):
@@ -37,6 +37,7 @@ class ProductFeedback(models.Model):
 
 
 class Addresses(models.Model):
+    id = models.AutoField(primary_key=True)
     customers = models.ManyToManyField(User)
     address = models.TextField()
 
@@ -48,11 +49,12 @@ class Order(models.Model):
                                on_delete=models.CASCADE,
                                null=True,
                                related_name='orders')
-    order_date = models.DateTimeField()
+    order_date = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(to=Addresses,
                                 on_delete=models.CASCADE,
                                 null=True,
                                 related_name='orders')
+    email = models.TextField(null=True)  # #Электронная почта для заказов от незарегистрированных пользователей
 
 
 class Cart(models.Model):
