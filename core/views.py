@@ -7,8 +7,6 @@ from core.classes import OrderProductInformation
 
 def index_page(request):
     context = dict()
-    add_category("OLL")
-    add_category("ekk")
     return_categories(context)
     return render(request, 'index.html', context)
 
