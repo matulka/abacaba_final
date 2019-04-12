@@ -299,8 +299,18 @@ def make_question(request):
 
 
 @login_required
-def view_questions_user(request):
+def view_questions_user(request):  # #Впоследствии надо сделать отдельное отображение отвеченных и неотвеченных вопросов
     context = dict()
     user = request.user
     context['questions'] = user.questions.all()
     return render(request, 'questions.html', context)
+
+
+@login_required
+def view_questions_admin(request):
+    user = request.user
+    if user.is_staff:
+        context = dict()
+        context['questions'] = Question.objects.filter(status='Рассматривается')
+        return render(request, 'admin_view_questions.html', context)
+    return redirect('/')
