@@ -1,8 +1,9 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product
 from django.core.exceptions import ObjectDoesNotExist
 from core.classes import OrderProductInformation
+from django.contrib.auth.decorators import login_required
 
 
 def index_page(request):
@@ -14,13 +15,6 @@ def index_page(request):
 def is_auth(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/profile')
-    else:
-        return HttpResponseRedirect('/login_to_account')
-
-
-def profile(request):
-    if request.user.is_authenticated:
-        return render(request, 'profile.html')
     else:
         return HttpResponseRedirect('/login_to_account')
 
@@ -196,3 +190,48 @@ def make_order(request):
             return redirect('/')
     return redirect('/')
 
+
+def profile_info(request):
+    if request.user.is_authenticated:
+        return render(request, 'profile.html')
+    else:
+        return HttpResponseRedirect('/login_to_account')
+
+
+'''
+Передается тип POST запроса - delete или add
+'''
+
+@login_required
+def profile_addresses(request):
+    user = request.user
+    if request.method == 'POST':
+        type = request.POST.get('type')
+        if type == 'delete':
+            address_id = request.POST.get('id')
+            address = Addresses.objects.get(id=address_id)
+            user.addresses_set.remove(address) # # Have some doubts about this line
+        elif type == 'add':
+            city = request.POST.get('city')
+            street = request.POST.get('street')
+            building = request.POST.get('building')
+            flat = request.POST.get('flat')
+            entrence = request.POST.get('entrance')
+            if Addresses.objects.filter(city=city, street= street, building=building, flat=flat, entrence=entrence).exists():
+                ad = Addresses.objects.get(city=city, street= street, building=building, flat=flat, entrence=entrence)
+                ad.customers.add(user) # # Может быть стоит проверить, нет ли уже связи
+            else:
+                new_ad = Addresses(city=city,
+                               street= street,
+                               building=building,
+                               flat=flat,
+                               entrence=entrence)
+                new_ad.save()
+                new_ad.customers.add(user)
+    else:
+        addresses = user.addresses_set.all() # # Have some doubts about this line
+        context = {}
+        context['addresses'] = addresses
+        return render(request, 'addresses.html')
+
+    

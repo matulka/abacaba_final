@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class Category(models.Model):
     name = models.TextField(primary_key=True)
-    parent = models.TextField(default=None)
+    parent = models.TextField(null=True)
 
 
 class Product(models.Model):
@@ -40,7 +40,11 @@ class ProductFeedback(models.Model):
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
     customers = models.ManyToManyField(User)
-    address = models.TextField()
+    city = models.TextField(default='Москва')
+    street = models.TextField(default='Довженко')
+    building = models.IntegerField(default=1)
+    flat = models.IntegerField(default=1)
+    entrance = models.TextField(null=True)
 
 
 class Order(models.Model):
