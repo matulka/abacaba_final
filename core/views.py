@@ -223,6 +223,47 @@ def profile_info(request):
         return HttpResponseRedirect('/login_to_account')
 
 
+@login_required
+def add_address(request):
+    if request.method == 'POST':
+        user = request.user
+        city = request.POST.get('city')
+        street = request.POST.get('street')
+        building = request.POST.get('building')
+        flat = request.POST.get('flat')
+        entrance = request.POST.get('entrance')
+        if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
+            ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
+            ad.customers.add(user)
+        else:
+            new_ad = Addresses(city=city,
+                               street=street,
+                               building=building,
+                               flat=flat,
+                               entrance=entrance)
+            new_ad.save()
+            new_ad.customers.add(user)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        return redirect('/')
+
+
+'''
+В этот метод необходимо передать id адреса, подлежащего удаления
+'''
+
+
+@login_required
+def delete_address(request):
+    user = request.user
+    if request.method == 'POST':
+        address_id = request.POST.get('id')
+        address = Addresses.objects.get(id=address_id)
+        user.addresses_set.remove(address)
+    else:
+        return redirect('/')
+
+
 '''
 Передается тип POST запроса - delete или add
 '''
@@ -231,31 +272,7 @@ def profile_info(request):
 @login_required
 def profile_addresses(request):
     user = request.user
-    if request.method == 'POST':
-        type = request.POST.get('type')
-        if type == 'delete':
-            address_id = request.POST.get('id')
-            address = Addresses.objects.get(id=address_id)
-            user.addresses_set.remove(address)  # # Have some doubts about this line
-        elif type == 'add':
-            city = request.POST.get('city')
-            street = request.POST.get('street')
-            building = request.POST.get('building')
-            flat = request.POST.get('flat')
-            entrance = request.POST.get('entrance')
-            if Addresses.objects.filter(city=city, street= street, building=building, flat=flat, entrance=entrance).exists():
-                ad = Addresses.objects.get(city=city, street= street, building=building, flat=flat, entrance=entrance)
-                ad.customers.add(user)  # # Может быть стоит проверить, нет ли уже связи
-            else:
-                new_ad = Addresses(city=city,
-                                   street=street,
-                                   building=building,
-                                   flat=flat,
-                                   entrance=entrance)
-                new_ad.save()
-                new_ad.customers.add(user)
-    else:
-        addresses = user.addresses_set.all()  # # Have some doubts about this line
-        context = dict()
-        context['addresses'] = addresses
-        return render(request, 'addresses.html')
+    addresses = user.addresses_set.all()  # # Have some doubts about this line
+    context = dict()
+    context['addresses'] = addresses
+    return render(request, 'addresses.html')
