@@ -98,5 +98,6 @@ class Question(models.Model):
                                related_name='questions')
     topic = models.TextField()
     content = models.TextField()
+    status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
 
