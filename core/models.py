@@ -6,6 +6,7 @@ from django.dispatch import receiver
 
 class Category(models.Model):
     name = models.TextField(primary_key=True)
+    parent = models.TextField(default=None)
 
 
 class Product(models.Model):
