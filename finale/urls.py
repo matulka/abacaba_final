@@ -27,7 +27,7 @@ urlpatterns = [
     path('profile/info', views.profile_info),
     path('profile/addresses', views.profile_addresses),
     path('login_to_account', views.login_to),
-    path('cart', views.cart),
+    path('cart', views.cart_page),
     path('search', views.search),
     path('categories', views.categories),
 

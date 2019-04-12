@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect, JsonResponse
-from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product
+from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product, Question
 from django.core.exceptions import ObjectDoesNotExist
 from core.classes import OrderProductInformation
 from django.contrib.auth.decorators import login_required
@@ -26,7 +26,19 @@ def login_to(request):
         return render(request, 'login_to_account.html')
 
 
-def cart(request):
+"""
+Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
+Если пользователь не авторизован, в контексте лежат OrderProductInformation
+"""
+
+
+def cart_page(request):
+    context = dict()
+    if request.user.is_authenticated:
+        user = request.user
+        context['cart'] = user.cart.products.all()
+    else:
+        context['cart'] = request.session['cart']
     return render(request, 'cart.html')
 
 
@@ -249,7 +261,7 @@ def add_address(request):
 
 
 '''
-В этот метод необходимо передать id адреса, подлежащего удаления
+В этот метод необходимо передать id адреса, подлежащего удалению
 '''
 
 
@@ -264,11 +276,6 @@ def delete_address(request):
         return redirect('/')
 
 
-'''
-Передается тип POST запроса - delete или add
-'''
-
-
 @login_required
 def profile_addresses(request):
     user = request.user
@@ -276,3 +283,24 @@ def profile_addresses(request):
     context = dict()
     context['addresses'] = addresses
     return render(request, 'addresses.html')
+
+
+@login_required
+def make_question(request):
+    if request.method == 'POST':
+        author = request.user
+        topic = request.POST.get('topic')
+        content = request.POST.get('content')
+        question = Question(author=author, topic=topic, content=content)
+        question.save()
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        return redirect('/')
+
+
+@login_required
+def view_questions_user(request):
+    context = dict()
+    user = request.user
+    context['questions'] = user.questions.all()
+    return render(request, 'questions.html', context)
