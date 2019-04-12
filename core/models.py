@@ -15,7 +15,7 @@ class Product(models.Model):
     price = models.IntegerField()
     information = models.TextField()
     rating = models.FloatField(null=True)
-    image = models.ImageField(upload_to='images', blank=True) # #product.image.url
+    image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
     category = models.ForeignKey(to=Category,
                                  on_delete=models.CASCADE,
                                  null=True,
@@ -101,8 +101,4 @@ class Question(models.Model):
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
 
-
-class ProductType(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.TextField()
 

@@ -98,6 +98,26 @@ def categories(request):
     return render(request, 'search.html', context)
 
 
+def __add_to_cart_authenticated__(user, size, quantity, product_id):
+    try:
+        current_cart = user.cart
+    except ObjectDoesNotExist:
+        current_cart = Cart(user=user)
+        current_cart.save()
+
+    order_product = OrderProduct()
+    order_product.size = size
+    order_product.quantity = quantity
+    order_product.product = Product.objects.get(id=product_id)
+    order_product.cart = current_cart
+    order_product.save()
+
+
+def __add_to_cart_unauthenticated__(size, quantity, product_id, cart):
+    order_product = OrderProductInformation(size=size, quantity=quantity, product_id=product_id)
+    cart.append(order_product)
+
+
 """
 В запросе через скрытое поле должне передаваться id продукта
 """
@@ -107,26 +127,17 @@ def add_to_cart(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
-            try:
-                current_cart = user.cart
-            except ObjectDoesNotExist:
-                current_cart = Cart(user=user)
-                current_cart.save()
-
-            order_product = OrderProduct()
-            order_product.size = request.POST.get('size')
-            order_product.quantity = request.POST.get('quantity')
-            order_product.product = Product.objects.get(id=request.POST.get('product_id'))
-            order_product.cart = current_cart
-            order_product.save()
+            size = request.POST.get('size')
+            quantity = request.POST.get('quantity')
+            product_id = request.POST.get('product_id')
+            __add_to_cart_authenticated__(user, size, quantity, product_id)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
             size = request.POST.get('size')
             quantity = request.POST.get('quantity')
             product_id = request.POST.get('product_id')
-            order_product = OrderProductInformation(size=size, quantity=quantity, product_id=product_id)
-            request.session['cart'].append(order_product)
+            __add_to_cart_unauthenticated__(size, quantity, product_id, request.session['cart'])
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
     return redirect('/')
 
@@ -144,6 +155,20 @@ def delete_from_cart(request):
             OrderProduct.objects.filter(id=order_product_id).delete()
         else:
             del(request.session['cart'][request.POST.get('order_product_id')])
+
+
+"""
+Этот метод необходим для того, чтобы при входе в систему корзина пользователя, которая хранилась
+в куки, сохранялась в базе данных
+"""
+
+
+def __cart_from_session_to_db__(current_cart, user):
+    for information in current_cart:
+        size = information.size
+        quantity = information.quantity
+        product_id = information.product_id
+        __add_to_cart_authenticated__(user, size, quantity, product_id)
 
 
 """
