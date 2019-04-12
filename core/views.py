@@ -68,7 +68,7 @@ def add_category(name):  # #Returns True if adding was successful
         cat = Category.objects.get(name=str(name))
         return False
     except ObjectDoesNotExist:
-        new_cat = Category(name = str(name))
+        new_cat = Category(name=str(name))
         new_cat.save()
         return True
 
@@ -202,6 +202,7 @@ def profile_info(request):
 Передается тип POST запроса - delete или add
 '''
 
+
 @login_required
 def profile_addresses(request):
     user = request.user
@@ -210,28 +211,26 @@ def profile_addresses(request):
         if type == 'delete':
             address_id = request.POST.get('id')
             address = Addresses.objects.get(id=address_id)
-            user.addresses_set.remove(address) # # Have some doubts about this line
+            user.addresses_set.remove(address)  # # Have some doubts about this line
         elif type == 'add':
             city = request.POST.get('city')
             street = request.POST.get('street')
             building = request.POST.get('building')
             flat = request.POST.get('flat')
-            entrence = request.POST.get('entrance')
-            if Addresses.objects.filter(city=city, street= street, building=building, flat=flat, entrence=entrence).exists():
-                ad = Addresses.objects.get(city=city, street= street, building=building, flat=flat, entrence=entrence)
-                ad.customers.add(user) # # Может быть стоит проверить, нет ли уже связи
+            entrance = request.POST.get('entrance')
+            if Addresses.objects.filter(city=city, street= street, building=building, flat=flat, entrance=entrance).exists():
+                ad = Addresses.objects.get(city=city, street= street, building=building, flat=flat, entrance=entrance)
+                ad.customers.add(user)  # # Может быть стоит проверить, нет ли уже связи
             else:
                 new_ad = Addresses(city=city,
-                               street= street,
-                               building=building,
-                               flat=flat,
-                               entrence=entrence)
+                                   street=street,
+                                   building=building,
+                                   flat=flat,
+                                   entrance=entrance)
                 new_ad.save()
                 new_ad.customers.add(user)
     else:
-        addresses = user.addresses_set.all() # # Have some doubts about this line
-        context = {}
+        addresses = user.addresses_set.all()  # # Have some doubts about this line
+        context = dict()
         context['addresses'] = addresses
         return render(request, 'addresses.html')
-
-    

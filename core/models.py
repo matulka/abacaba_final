@@ -49,7 +49,7 @@ class Addresses(models.Model):
 
 class Order(models.Model):
     id = models.AutoField(primary_key=True)
-    status = models.TextField(default = 'Ожидает подтверждения')
+    status = models.TextField(default='Ожидает подтверждения')
     author = models.ForeignKey(to=User,
                                on_delete=models.CASCADE,
                                null=True,
@@ -100,4 +100,9 @@ class Question(models.Model):
     content = models.TextField()
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
+
+
+class ProductType(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.TextField()
 
