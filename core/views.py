@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect, JsonResponse
-from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product, Question
+from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product, Question, StockProduct
 from django.core.exceptions import ObjectDoesNotExist
 from core.classes import OrderProductInformation
 from django.contrib.auth.decorators import login_required
+from ast import literal_eval
 
 
 def index_page(request):
@@ -91,12 +92,12 @@ def delete_category(name):  # #Returns True if removal was successful
         return False
 
 
-def categories(request):
+def categories(request):  # #Передаем сюда айди категории
     context = dict()
     if request.method == 'GET':
         context['cat'] = request.GET.get('cat')
         if context['cat'] is not None:
-            context['products'] = Category.products.all()
+            context['products'] = context['cat'].products.all()
         else:
             context['products'] = []
         if len(context['products']) == 0:
@@ -107,7 +108,7 @@ def categories(request):
     return render(request, 'search.html', context)
 
 
-def __add_to_cart_authenticated__(user, size, quantity, product_id):
+def __add_to_cart_authenticated__(user, quantity, stock_product_id):
     try:
         current_cart = user.cart
     except ObjectDoesNotExist:
@@ -115,15 +116,14 @@ def __add_to_cart_authenticated__(user, size, quantity, product_id):
         current_cart.save()
 
     order_product = OrderProduct()
-    order_product.size = size
     order_product.quantity = quantity
-    order_product.product = Product.objects.get(id=product_id)
+    order_product.stock_product = StockProduct.objects.get(id=stock_product_id)
     order_product.cart = current_cart
     order_product.save()
 
 
-def __add_to_cart_unauthenticated__(size, quantity, product_id, cart):
-    order_product = OrderProductInformation(size=size, quantity=quantity, product_id=product_id)
+def __add_to_cart_unauthenticated__(quantity, stock_product_id, cart):
+    order_product = OrderProductInformation(quantity=quantity, stock_product_id=stock_product_id)
     cart.append(order_product)
 
 
@@ -136,10 +136,14 @@ def add_to_cart(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
-            size = request.POST.get('size')
             quantity = request.POST.get('quantity')
             product_id = request.POST.get('product_id')
-            __add_to_cart_authenticated__(user, size, quantity, product_id)
+            product = Product.objects.get(id=product_id)
+            sample_modification = product.modifications.all()[0]
+            characteristics = sample_modification.characteristics
+            char_dict = literal_eval(characteristics)
+            stock_product_id = None
+            __add_to_cart_authenticated__(user, quantity, stock_product_id)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []

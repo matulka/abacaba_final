@@ -1,5 +1,4 @@
 class OrderProductInformation:  # #A class for storing information for an order product
-    def __init__(self, size, quantity, product_id):
-        self.size = size
+    def __init__(self, quantity, stock_product_id):
         self.quantity = quantity
-        self.product_id = product_id
+        self.stock_product_id = stock_product_id

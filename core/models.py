@@ -1,20 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 
 class Category(models.Model):
-    name = models.TextField(primary_key=True)
-    parent = models.TextField(null=True)
+    id = models.AutoField(primary_key=True)
+    name = models.TextField()
+    parent_id = models.IntegerField(null=True)
 
 
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    # #price = models.IntegerField()
-    # #information = models.TextField()
-    # #image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
+    price = models.IntegerField()
     rating = models.FloatField(null=True)
     category = models.ForeignKey(to=Category,
                                  on_delete=models.CASCADE,
@@ -27,6 +24,7 @@ class Modification(models.Model):
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
                                 related_name='modifications')
+    image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
     characteristics = models.TextField()
 
 
@@ -88,6 +86,7 @@ class Cart(models.Model):
 
 class OrderProduct(models.Model):
     id = models.AutoField(primary_key=True)
+    quantity = models.IntegerField()
     stock_product = models.ForeignKey(to=StockProduct,
                                       on_delete=models.CASCADE,
                                       related_name='order_products')
