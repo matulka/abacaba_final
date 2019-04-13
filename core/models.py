@@ -22,7 +22,27 @@ class Product(models.Model):
                                  related_name='products')
 
 
+class Modification(models.Model):
+    id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(to=Product,
+                                on_delete=models.CASCADE,
+                                related_name='modifications')
+    characteristics = models.TextField()
+    
+
+class StockProduct(models.Model):
+    id = models.AutoField(primary_key=True)
+    product = models.OneToOneField(to=Product,
+                                   on_delete=models.CASCADE,
+                                   related_name='stock_product')
+    modification = models.OneToOneField(to=Modification,
+                                        on_delete=models.CASCADE,
+                                        related_name='stock_product')
+    quantity = models.IntegerField()
+
+
 class ProductFeedback(models.Model):
+    id = models.AutoField(primary_key=True)
     comment = models.TextField(null=True)
     score = models.IntegerField(default=5)
     product = models.ForeignKey(
@@ -100,5 +120,3 @@ class Question(models.Model):
     content = models.TextField()
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
-
-
