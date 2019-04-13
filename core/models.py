@@ -12,10 +12,10 @@ class Category(models.Model):
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    price = models.IntegerField()
-    information = models.TextField()
+    # #price = models.IntegerField()
+    # #information = models.TextField()
+    # #image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
     rating = models.FloatField(null=True)
-    image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
     category = models.ForeignKey(to=Category,
                                  on_delete=models.CASCADE,
                                  null=True,
@@ -28,7 +28,7 @@ class Modification(models.Model):
                                 on_delete=models.CASCADE,
                                 related_name='modifications')
     characteristics = models.TextField()
-    
+
 
 class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
@@ -88,14 +88,9 @@ class Cart(models.Model):
 
 class OrderProduct(models.Model):
     id = models.AutoField(primary_key=True)
-    size = models.IntegerField()
-    quantity = models.IntegerField()
-    product = models.ForeignKey(
-        to=Product,
-        on_delete=models.CASCADE,
-        null=True,
-        related_name='orders'
-    )
+    stock_product = models.ForeignKey(to=StockProduct,
+                                      on_delete=models.CASCADE,
+                                      related_name='order_products')
     order = models.ForeignKey(
         to=Order,
         on_delete=models.CASCADE,

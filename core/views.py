@@ -63,26 +63,23 @@ def search_in_base(text):
     products = Product.objects.all()
     search_result = []
     for i in range(len(products)):
-        name = products[i].name
-        name.lower()
+        name = products[i].name.lower()
         new_text = text.lower()
         if name.find(new_text) != -1:
             search_result.append(products[i])
     return search_result
 
 
-def return_categories(context):
+def return_categories(context):  # #May need refactoring: context passed by value and not by pointer
     context['cat'] = Category.objects.all()
 
 
 def add_category(name):  # #Returns True if adding was successful
-    try:
-        cat = Category.objects.get(name=str(name))
-        return False
-    except ObjectDoesNotExist:
+    if not Category.objects.get(name=str(name)).exists():
         new_cat = Category(name=str(name))
         new_cat.save()
         return True
+    return False
 
 
 def delete_category(name):  # #Returns True if removal was successful
