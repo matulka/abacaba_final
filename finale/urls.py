@@ -30,7 +30,6 @@ urlpatterns = [
     path('cart', views.cart_page),
     path('search', views.search),
     path('categories', views.categories),
-
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

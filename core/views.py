@@ -1,10 +1,12 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect, JsonResponse
-from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product, Question, StockProduct
+from core.models import Product, Category, Cart, OrderProduct, Order,\
+    Addresses, Product, Question, StockProduct, Modification
 from django.core.exceptions import ObjectDoesNotExist
 from core.classes import OrderProductInformation
 from django.contrib.auth.decorators import login_required
 from ast import literal_eval
+from json import dumps
 
 
 def index_page(request):
@@ -108,7 +110,32 @@ def categories(request):  # #Передаем сюда айди категори
     return render(request, 'search.html', context)
 
 
-def __add_to_cart_authenticated__(user, quantity, stock_product_id):
+def find_modification(product, modification_dict):
+    modifications = Modification.objects.get(product=product)
+    for modification in modifications:
+        current_modification_dict = literal_eval(modification.characteristics)
+        if current_modification_dict == modification_dict:
+            return modification
+    return None
+
+
+def find_stock_product(product, modification_dict):
+    modification = find_modification(product, modification_dict)
+    stock_product = StockProduct.get(product=product, modification=modification)
+    return stock_product
+
+
+def get_product_modification_parameters(product):
+    sample_modification = product.modification.all()[0]
+    sample_characteristics = sample_modification.characteristics
+    sample_char_dict = literal_eval(sample_characteristics)
+    parameters_list = list()
+    for key, value in sample_char_dict.items():
+        parameters_list.append(key)
+    return parameters_list
+
+
+def __add_to_cart_authenticated__(user, quantity, stock_product):
     try:
         current_cart = user.cart
     except ObjectDoesNotExist:
@@ -117,71 +144,80 @@ def __add_to_cart_authenticated__(user, quantity, stock_product_id):
 
     order_product = OrderProduct()
     order_product.quantity = quantity
-    order_product.stock_product = StockProduct.objects.get(id=stock_product_id)
+    order_product.stock_product = stock_product
     order_product.cart = current_cart
     order_product.save()
 
 
-def __add_to_cart_unauthenticated__(quantity, stock_product_id, cart):
-    order_product = OrderProductInformation(quantity=quantity, stock_product_id=stock_product_id)
-    cart.append(order_product)
+def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
+    order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
+    cart.append(order_product_info)
 
 
 """
 В запросе через скрытое поле должне передаваться id продукта
+
+Необходимо добавить:
+1) Проверку на то, что в корзине уже не лежит такой StockProduct. Если лежит, то добавить новый заказ к старому.
+2) Проверить, есть ли на складе (StockProduct.quantity) нужное количество вещей.
 """
 
 
 def add_to_cart(request):
     if request.method == 'POST':
+        quantity = request.POST.get('quantity')
+        product_id = request.POST.get('product_id')
+        product = Product.objects.get(id=product_id)
+        parameters_list = get_product_modification_parameters(product)  # #Список параметров модификаций продукта
+        modification_dict = dict()  # #Словарь модификаций конкретного экземпляра
+        for parameter in parameters_list:
+            if parameter in request.POST:
+                modification_dict[parameter] = request.POST.get(parameter)
+            else:
+                raise NotImplementedError
+        stock_product = find_stock_product(product, modification_dict)
         if request.user.is_authenticated:
             user = request.user
-            quantity = request.POST.get('quantity')
-            product_id = request.POST.get('product_id')
-            product = Product.objects.get(id=product_id)
-            sample_modification = product.modifications.all()[0]
-            characteristics = sample_modification.characteristics
-            char_dict = literal_eval(characteristics)
-            stock_product_id = None
-            __add_to_cart_authenticated__(user, quantity, stock_product_id)
+            __add_to_cart_authenticated__(user, quantity, stock_product)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
-            size = request.POST.get('size')
-            quantity = request.POST.get('quantity')
-            product_id = request.POST.get('product_id')
-            __add_to_cart_unauthenticated__(size, quantity, product_id, request.session['cart'])
+            __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
     return redirect('/')
 
 
 """
-В этот метод необходимо передать id соответствующего OrderProduct или его индекс в массиве (для
-незарегистрированных пользователей)
+В этот метод необходимо передать id соответствующего StockProduct
 """
 
 
 def delete_from_cart(request):
     if request.method == 'POST':
+        stock_product_id = request.POST.get('stock_product_id')
+        stock_product = StockProduct.objects.get(id=stock_product_id)
         if request.user.is_authenticated:
-            order_product_id = request.POST.get('order_product_id')
-            OrderProduct.objects.filter(id=order_product_id).delete()
+            user = request.user
+            order_product = user.cart.products.get(stock_product=stock_product)
+            order_product.delete()
         else:
-            del(request.session['cart'][request.POST.get('order_product_id')])
+            for order_product_info in request.session['cart']:
+                if order_product_info.stock_product == stock_product:
+                    request.session['cart'].remove(order_product_info)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    return redirect('/')
 
 
 """
-Этот метод необходим для того, чтобы при входе в систему корзина пользователя, которая хранилась
-в куки, сохранялась в базе данных
+Этот метод необходим для того, чтобы перенести корзину из кукей в базу данных
 """
 
 
 def __cart_from_session_to_db__(current_cart, user):
     for information in current_cart:
-        size = information.size
         quantity = information.quantity
-        product_id = information.product_id
-        __add_to_cart_authenticated__(user, size, quantity, product_id)
+        stock_product = information.stock_product
+        __add_to_cart_authenticated__(user, quantity, stock_product)
 
 
 """
@@ -190,6 +226,7 @@ def __cart_from_session_to_db__(current_cart, user):
 Если пользователь не авторизован, то прежде чем отправлять на этот метод, надо чтобы он
 указал свою электронную почту для связи (вероятно, это придется делать на отдельной странице).
 Также стоит добавить в этом методе оповещение пользователя об успешном заказе по электронной почте.
+Необходимо добавить уменьшение числа вещей на складе после заказа.
 """
 
 
@@ -219,10 +256,9 @@ def make_order(request):
             if address is None or email is None:
                 raise ValueError
             for order_product_information in current_cart:
-                order_product = OrderProduct(size=order_product_information.size,
-                                             quantity=order_product_information.quantity,
-                                             product=Product.objects.get(id=order_product_information.product_id))
-                order_product.order = order
+                order_product = OrderProduct(quantity=order_product_information.quantity,
+                                             stock_product=order_product_information.stock_product,
+                                             order=order)
                 order_product.save()
             order.save()
             return redirect('/')
