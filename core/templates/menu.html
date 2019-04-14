@@ -1,8 +1,14 @@
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+<style>
+    .dropdown-toggle::after {
+        display:none;
+    }
+    ul.nav li.dropdown:hover {
+        display: block;
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #e3f2fd;">
   <a class="navbar-brand" href="/">
     <img src= "/static/logo.png" width="30" height="30" class="d-inline-block align-top border border-dark rounded" alt="M">
     Abacaba
@@ -12,16 +18,33 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="/is_auth">Личный кабинет</a>
+      <li class="nav-item dropdown" id="cabinet">
+        <a class="nav-link dropdown-toggle active" id="navbarDropdown_personal_cabinet" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 110%;">
+            {% if request.user.is_authenticated %}
+                {{ user.username }}
+             {% else %}
+                Личный кабинет
+            {% endif %}
+            <span class="sr-only">(current)</span>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown_personal_cabinet" id="expand_cabinet">
+            {% if request.user.is_authenticated %}
+                 <a class="dropdown-item" href="#">Профиль</a>
+                 <a class="dropdown-item" href="/accounts/logout">Выйти</a>
+            {% else %}
+                <a class="dropdown-item" href="/accounts/login">Войти</a>
+                <a class="dropdown-item" href="/sign-up">Регистарция</a>
+            {% endif %}
+        </div>
       </li>
-      <li class="nav-item active">
+        <li class="nav-item active">
         <a class="nav-link" href="/cart">Корзина</a>
       </li>
     </ul>
-    <form class="form-inline" method="GET" action="/search" id="search_form">
-        <input class="form-control mr-sm-2" type="search" placeholder="Поиск" aria-label="Search" id="input" name="text">
-        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" action="submit">Поиск</button>
+    <form class="form-inline">
+        {% csrf_token %}
+        <input class="form-control mr-sm-2" type="search" placeholder="Найти" aria-label="Search">
+        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Поиск</button>
     </form>
   </div>
 </nav>
