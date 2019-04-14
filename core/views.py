@@ -26,20 +26,6 @@ def index_page(request):
     return render(request, 'index.html', context)
 
 
-def is_auth(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/profile')
-    else:
-        return HttpResponseRedirect('/login_to_account')
-
-
-def login_to(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/profile')
-    else:
-        return render(request, 'login_to_account.html')
-
-
 """
 Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
 Если пользователь не авторизован, в контексте лежат OrderProductInformation
@@ -67,10 +53,6 @@ def search(request):
             context['products'] = search_in_base(context['text'])
         else:
             context['products'] = []
-        if len(context['products']) == 0:
-            context['none'] = True
-        else:
-            context['none'] = False
         return render(request, 'search.html', context)
     return render(request, 'search.html', context)
 
@@ -79,8 +61,8 @@ def search_in_base(text):
     products = Product.objects.all()
     search_result = []
     for i in range(len(products)):
-        name = products[i].name.lower()
-        new_text = text.lower()
+        name = str(products[i].name).lower()
+        new_text = str(text).lower()
         if name.find(new_text) != -1:
             search_result.append(products[i])
     return search_result
@@ -90,35 +72,15 @@ def return_categories(context):  # #May need refactoring: context passed by valu
     context['cat'] = Category.objects.all()
 
 
-def add_category(name):  # #Returns True if adding was successful
-    if not Category.objects.get(name=str(name)).exists():
-        new_cat = Category(name=str(name))
-        new_cat.save()
-        return True
-    return False
-
-
-def delete_category(name):  # #Returns True if removal was successful
-    try:
-        cat = Category.objects.get(name=str(name))
-        cat.delete()
-        return True
-    except ObjectDoesNotExist:
-        return False
-
-
 def categories(request):  # #Передаем сюда айди категории
     context = dict()
     if request.method == 'GET':
         context['cat'] = request.GET.get('cat')
-        if context['cat'] is not None:
-            context['products'] = context['cat'].products.all()
-        else:
+        try:
+            cat = Category.objects.get(name=context['cat'])
+            context['products'] = cat.products.all()
+        except ObjectDoesNotExist:
             context['products'] = []
-        if len(context['products']) == 0:
-            context['none'] = True
-        else:
-            context['none'] = False
         return render(request, 'search.html', context)
     return render(request, 'search.html', context)
 
@@ -278,11 +240,9 @@ def make_order(request):
     return redirect('/')
 
 
+@login_required
 def profile_info(request):
-    if request.user.is_authenticated:
-        return render(request, 'profile.html')
-    else:
-        return HttpResponseRedirect('/login_to_account')
+    return render(request, 'profile.html')
 
 
 @login_required
