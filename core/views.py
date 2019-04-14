@@ -52,6 +52,8 @@ def cart_page(request):
         user = request.user
         context['cart'] = user.cart.products.all()
     else:
+        if 'cart' not in request.session:
+            request.session['cart'] = list()
         context['cart'] = request.session['cart']
     return render(request, 'cart.html')
 
