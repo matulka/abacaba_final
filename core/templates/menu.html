@@ -18,7 +18,7 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item dropdown" id="cabinet">
-        <a class="nav-link dropdown-toggle active" id="navbarDropdown_personal_cabinet" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 110%;">
+        <a class="nav-link dropdown-toggle active" id="navbarDropdown_personal_cabinet" role="button" href="/" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 110%;">
             {% if request.user.is_authenticated %}
                 {{ user.username }}
              {% else %}

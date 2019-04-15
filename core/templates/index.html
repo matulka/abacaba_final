@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container-fluid">
-            <div class="row">
-              {% include 'sidebar.html' %}
+    <div class="container" style="margin-left: 0%;padding: 0px;">
+        <div class="row">
+            <div class="col-auto">
+                 {% include 'sidebar.html' %}
             </div>
+             <div class="col-sm-9" style="padding: 0;">
+                 {% include 'items.html' %}
+            </div>
+        </div>
     </div>
-{#    {% include 'items.html' %}#}
 {% endblock %}
