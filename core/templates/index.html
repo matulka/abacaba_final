@@ -1,10 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container-fluid">
-            <div class="row">
-              {% include 'sidebar.html' %}
+    <div class="container-fluid" style="padding:0px;">
+            <div class="row no-gutters">
+                <div class="col-auto">
+                    {% include 'sidebar.html' %}
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            {% include 'product_preview.html' %}
+                        </div>
+                        <div class="col">B</div>
+                        <div class="col">C</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">A</div>
+                        <div class="col">B</div>
+                        <div class="col">C</div>
+                    </div>
+                    <div class="row">
+                        <div class="col">A</div>
+                        <div class="col">B</div>
+                        <div class="col">C</div>
+                    </div>
+                </div>
             </div>
     </div>
-{#    {% include 'items.html' %}#}
 {% endblock %}
