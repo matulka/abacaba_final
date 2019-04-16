@@ -81,7 +81,7 @@ class Order(models.Model):
 
 
 class Cart(models.Model):
-    author = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+    author = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
 
 class OrderProduct(models.Model):

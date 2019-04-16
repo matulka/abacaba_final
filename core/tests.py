@@ -1,6 +1,9 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
-from core.models import Product, Category, Cart, OrderProduct, Order, Addresses, Product
+from core.models import Product, Category, Cart, OrderProduct, Order,\
+    Addresses, Product, Question, StockProduct, Modification
+from django.core.exceptions import ObjectDoesNotExist
+from core import views
 
 
 class TestUserCanSeePages(TestCase):
@@ -94,4 +97,36 @@ class TestAddresses(TestCase):
         self.user = User.objects.create_user('a', '[removed_emai]', 'a')
         self.c = Client()
 
+    def test_adding(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_address', {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        self.assertEqual(len(Addresses.objects.all()), 1)
+
+
+class TestAddToCart(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user('a', '[removed_emai]', 'a')
+        self.c = Client()
+        self.cat1 = Category.objects.create(name='b')
+        self.cat2 = Category.objects.create(name='d')
+        self.prod1 = Product.objects.create(name='abacaba',
+                                            price='1',
+                                            category=self.cat1)
+        self.prod2 = Product.objects.create(name='c',
+                                            price='1',
+                                            category=self.cat1)
+        self.prod3 = Product.objects.create(name='c',
+                                            price='1',
+                                            category=self.cat2)
+        self.mod1 = Modification.objects.create(product=self.prod1,
+                                            characteristics="{'a': '2', 'b': '3'}")
+        self.sp = StockProduct.objects.create(product=self.prod1,
+                                                modification=self.mod1,
+                                              quantity=5)
+
+    def test_make_new_cart(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        self.assertEqual(len(self.user.cart.products.all()), 1)
 

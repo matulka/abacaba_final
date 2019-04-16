@@ -86,7 +86,7 @@ def categories(request):  # #Передаем сюда айди категори
 
 
 def find_modification(product, modification_dict):
-    modifications = Modification.objects.get(product=product)
+    modifications = Modification.objects.filter(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)
         if current_modification_dict == modification_dict:
@@ -96,12 +96,12 @@ def find_modification(product, modification_dict):
 
 def find_stock_product(product, modification_dict):
     modification = find_modification(product, modification_dict)
-    stock_product = StockProduct.get(product=product, modification=modification)
+    stock_product = StockProduct.objects.get(product=product, modification=modification)
     return stock_product
 
 
 def get_product_modification_parameters(product):
-    sample_modification = product.modification.all()[0]
+    sample_modification = product.modifications.all()[0]
     sample_characteristics = sample_modification.characteristics
     sample_char_dict = literal_eval(sample_characteristics)
     parameters_list = list()
@@ -114,7 +114,7 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
     try:
         current_cart = user.cart
     except ObjectDoesNotExist:
-        current_cart = Cart(user=user)
+        current_cart = Cart(author=user)
         current_cart.save()
 
     order_product = OrderProduct()
@@ -139,6 +139,7 @@ def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
 
 
 def add_to_cart(request):
+    context = dict()
     if request.method == 'POST':
         quantity = request.POST.get('quantity')
         product_id = request.POST.get('product_id')
@@ -150,6 +151,7 @@ def add_to_cart(request):
                 modification_dict[parameter] = request.POST.get(parameter)
             else:
                 raise NotImplementedError
+        context['d'] = modification_dict
         stock_product = find_stock_product(product, modification_dict)
         if request.user.is_authenticated:
             user = request.user
