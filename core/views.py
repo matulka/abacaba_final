@@ -22,7 +22,8 @@ from django.core.mail import EmailMessage
 
 def index_page(request):
     context = dict()
-    return_categories(context)
+    context['cat'] = return_categories()
+    context['products'] = return_products()
     return render(request, 'index.html', context)
 
 
@@ -68,8 +69,12 @@ def search_in_base(text):
     return search_result
 
 
-def return_categories(context):  # #May need refactoring: context passed by value and not by pointer
-    context['cat'] = Category.objects.all()
+def return_categories():  # #May need refactoring: context passed by value and not by pointer
+    return Category.objects.all()
+
+
+def return_products():
+    return Product.objects.all()
 
 
 def categories(request):  # #Передаем сюда айди категории

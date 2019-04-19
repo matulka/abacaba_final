@@ -5,18 +5,23 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    parent_id = models.IntegerField(null=True)
+    parent_id = models.IntegerField(blank=True,
+                                    null=True)
 
 
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
     price = models.IntegerField()
-    rating = models.FloatField(null=True)
+    rating = models.FloatField(blank=True,
+                               null=True)
     category = models.ForeignKey(to=Category,
                                  on_delete=models.CASCADE,
+                                 blank=True,
                                  null=True,
                                  related_name='products')
+    sample_image = models.ImageField(upload_to='images',
+                                     null=True)
 
 
 class Modification(models.Model):
@@ -24,7 +29,6 @@ class Modification(models.Model):
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
                                 related_name='modifications')
-    image = models.ImageField(upload_to='images', blank=True)  # #product.image.url
     characteristics = models.TextField()
 
 
@@ -36,6 +40,9 @@ class StockProduct(models.Model):
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
+    image = models.ImageField(upload_to='images',
+                              blank=True,
+                              null=True)  # #product.image.url
     quantity = models.IntegerField()
 
 

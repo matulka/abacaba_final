@@ -1,14 +1,14 @@
-<div class="row">
-    <div class="col"></div>
-    <div class="col-auto">
-        <div class="thumbnail" style="padding:20px;">
-            <img class="img-thumbnail" src="/static/product.jpg" alt="Product">
-            <div class="caption">
-                <p style="margin-bottom:0px; color:gray;">Категория</p>
-                <h3 style="margin-top:10px;">Название</h3>
-                <h4>Цена</h4>
-            </div>
+<div class="col-xl-4 col-md-6 col-12" style="margin-bottom: 10px;">
+    <a id="prod_preview_block" class="thumbnail" href='/products?id={{product.id}}'>
+        <img class="img-thumbnail" src="static/product.jpg" alt="Product">
+        <div class="caption">
+            {% if product.category %}
+            <h5 style="margin-bottom:0px; color:gray;">{{ product.category }}</h5>
+            {% else %}
+            <h5 style="margin-bottom:0px; color:gray;">Без категории</h5>
+            {% endif %}
+            <h3 style="margin-top:10px;">{{ product.name }}</h3>
+            <h4>{{ product.price }} рублей</h4>
         </div>
-    </div>
-    <div class="col"></div>
+    </a>
 </div>
