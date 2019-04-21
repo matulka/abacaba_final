@@ -1,6 +1,8 @@
 <div class="col-xl-4 col-md-6 col-12" style="margin-bottom: 10px;">
     <a id="prod_preview_block" class="thumbnail" href='/products?id={{product.id}}'>
-        <img class="img-thumbnail" src="{{product.sample_image.url}}" alt="Product">
+        <div class="square-box">
+            <img id="preview_img" class="img-fluid" src="{{product.sample_image.url}}" alt="Product">
+        </div>
         <div class="caption">
             {% if product.category %}
             <h5 style="margin-bottom:0px; color:gray;">{{ product.category }}</h5>
