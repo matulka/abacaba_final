@@ -1,9 +1,8 @@
 from django.shortcuts import redirect, render
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
-    Addresses, Product, Question, StockProduct, Modification
+    Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
 from django.core.exceptions import ObjectDoesNotExist
-from core.classes import OrderProductInformation
 from ast import literal_eval
 from json import dumps
 from django.contrib.auth.decorators import login_required
@@ -18,7 +17,8 @@ from django.template.loader import render_to_string
 from core.token import account_activation_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
-
+from django.forms.models import model_to_dict
+from django.core import serializers
 
 def index_page(request):
     context = dict()
@@ -126,7 +126,7 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
-    cart.append(order_product_info)
+    cart.append(model_to_dict(order_product_info))
 
 
 """
@@ -172,16 +172,19 @@ def add_to_cart(request):
 def delete_from_cart(request):
     if request.method == 'POST':
         stock_product_id = request.POST.get('stock_product_id')
-        stock_product = StockProduct.objects.get(id=stock_product_id)
-        if request.user.is_authenticated:
-            user = request.user
-            order_product = user.cart.products.get(stock_product=stock_product)
-            order_product.delete()
-        else:
-            for order_product_info in request.session['cart']:
-                if order_product_info.stock_product == stock_product:
-                    request.session['cart'].remove(order_product_info)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        try:
+            stock_product = StockProduct.objects.get(id=stock_product_id)
+            if request.user.is_authenticated:
+                user = request.user
+                order_product = user.cart.products.get(stock_product=stock_product)
+                order_product.delete()
+            else:
+                for order_product_info in request.session['cart']:
+                    if StockProduct.objects.get(id=order_product_info['stock_product']) == stock_product:
+                        request.session['cart'].remove(order_product_info)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        except ObjectDoesNotExist:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     return redirect('/')
 
 
@@ -192,8 +195,8 @@ def delete_from_cart(request):
 
 def __cart_from_session_to_db__(current_cart, user):
     for information in current_cart:
-        quantity = information.quantity
-        stock_product = information.stock_product
+        quantity = information['quantity']
+        stock_product = StockProduct.objects.get(id=information['stock_product'])
         __add_to_cart_authenticated__(user, quantity, stock_product)
 
 
@@ -246,6 +249,9 @@ def make_order(request):
 def profile_info(request):
     return render(request, 'profile.html')
 
+'''
+Переработать с формой
+'''
 
 @login_required
 def add_address(request):

@@ -4,6 +4,7 @@ from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification
 from django.core.exceptions import ObjectDoesNotExist
 from core import views
+from django.test.client import RequestFactory
 
 
 class TestUserCanSeePages(TestCase):
@@ -124,9 +125,76 @@ class TestAddToCart(TestCase):
         self.sp = StockProduct.objects.create(product=self.prod1,
                                                 modification=self.mod1,
                                               quantity=5)
+        self.factory = RequestFactory()
 
-    def test_make_new_cart(self):
+    def test_auth_make_new_cart(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
         self.assertEqual(len(self.user.cart.products.all()), 1)
 
+    def test_auth_add_two_products(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        self.assertEqual(len(self.user.cart.products.all()), 2)
+
+    def test_unauth_make_new_cart(self):
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        request = response.wsgi_request
+        self.assertEqual(len(request.session['cart']), 1)
+
+    def test_unauth_add_two_prod(self):
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        request = response.wsgi_request
+        self.assertEqual(len(request.session['cart']), 2)
+
+    def test_cart_from_session_to_db(self):
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        request = response.wsgi_request
+        views.__cart_from_session_to_db__(request.session['cart'], self.user)
+        self.assertEqual(len(self.user.cart.products.all()), 2)
+
+
+class TestDelFromCart(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user('a', '[removed_emai]', 'a')
+        self.c = Client()
+        self.cat1 = Category.objects.create(name='b')
+        self.cat2 = Category.objects.create(name='d')
+        self.prod1 = Product.objects.create(name='abacaba',
+                                            price='1',
+                                            category=self.cat1)
+        self.prod2 = Product.objects.create(name='c',
+                                            price='1',
+                                            category=self.cat1)
+        self.prod3 = Product.objects.create(name='c',
+                                            price='1',
+                                            category=self.cat2)
+        self.mod1 = Modification.objects.create(product=self.prod1,
+                                            characteristics="{'a': '2', 'b': '3'}")
+        self.sp = StockProduct.objects.create(product=self.prod1,
+                                                modification=self.mod1,
+                                              quantity=5)
+        self.factory = RequestFactory()
+
+    def test_auth_del_one_prod(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/del_from_cart', {'stock_product_id': 1})
+        self.assertEqual(len(self.user.cart.products.all()), 0)
+
+    def test_auth_del_nonexistent_prod(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/del_from_cart', {'stock_product_id': 2})
+        self.assertEqual(len(self.user.cart.products.all()), 1)
+
+    def test_unauth_del_one_prod(self):
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        request = response.wsgi_request
+        response = self.c.post('/del_from_cart', {'stock_product_id': 1})
+        request = response.wsgi_request
+        self.assertEqual(len(request.session['cart']), 0)

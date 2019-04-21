@@ -114,3 +114,10 @@ class Question(models.Model):
     content = models.TextField()
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
+
+
+class OrderProductInformation(models.Model):
+    quantity = models.IntegerField()
+    stock_product = models.ForeignKey(to=StockProduct,
+                                      on_delete=models.CASCADE,
+                                      related_name='opi')
