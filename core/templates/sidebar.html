@@ -1,50 +1,53 @@
-
-<div class="navbar-nav">
-    <nav id="navbar-example3" class="navbar navbar-light" style="align-items: flex-start;">
-      <nav class="nav flex-column" style="height: 100vh;">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle active" id="navbarDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="font-size: 110%;">
-                    Верхняя одежда
-                    <span class="sr-only"></span>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <nav class="nav nav-pills flex-column">
-                        <a class="nav-link ml-3 my-1" href="#item-1-1" style='color:black'>Куртки</a>
-                        <a class="nav-link ml-3 my-1" href="#item-1-2" style='color:black'>Пальто</a>
-                        <a class="nav-link ml-3 my-1" href="#item-1-2" style='color:black'>Парки</a>
-                        <a class="nav-link ml-3 my-1" href="#item-1-2" style='color:black'>Флисы</a>
-                        <a class="nav-link ml-3 my-1" href="#item-1-2" style='color:black'>Ветровки</a>
-                    </nav>
-                </div>
-              </li>
+<nav class="navbar navbar-light bg-light">
+    <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown link
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Action</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li class="dropdown-submenu">
+                    <a class="dropdown-item dropdown-toggle" href="#">Submenu</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Submenu action</a></li>
+                        <li><a class="dropdown-item" href="#">Another submenu action</a></li>
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#">Subsubmenu</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Subsubmenu action</a></li>
+                                <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown-submenu"><a class="dropdown-item dropdown-toggle" href="#">Second subsubmenu</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Subsubmenu action</a></li>
+                                <li><a class="dropdown-item" href="#">Another subsubmenu action</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
             </ul>
-            <a class="nav-link" href="#item-2" style='color:black'>Штаны</a>
-            <nav class="nav nav-pills flex-column">
-                <a class="nav-link ml-3 my-1" href="#item-3-1" style='color:black'>Джинсы</a>
-                <a class="nav-link ml-3 my-1" href="#item-3-2" style='color:black'>Брюки</a>
-                <a class="nav-link ml-3 my-1" href="#item-3-2" style='color:black'>Спортинвые штаны</a>
-            </nav>
-            <a class="nav-link" href="#item-2" style='color:black'>Толстовки</a>
-            <nav class="nav nav-pills flex-column">
-                <a class="nav-link ml-3 my-1" href="#item-3-1" style='color:black'>С капюшоном</a>
-                <a class="nav-link ml-3 my-1" href="#item-3-2" style='color:black'>Свитера</a>
-                <a class="nav-link ml-3 my-1" href="#item-3-2" style='color:black'>Привет</a>
-            </nav>
-      </nav>
-    </nav>
-</div>
+        </li>
+    </ul>
+</nav>
+
+<script>
+    $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {
+        if (!$(this).next().hasClass('show')) {
+            $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+        }
+        var $subMenu = $(this).next(".dropdown-menu");
+        $subMenu.toggleClass('show');
 
 
+        $(this).parents('li.nav-item.dropdown.show').on('hidden.bs.dropdown', function(e) {
+            $('.dropdown-submenu .show').removeClass("show");
+        });
 
 
-{#<script>#}
-{#$(document).ready(function(){#}
-{#  $('.dropdown-submenu a.test').on("click", function(e){#}
-{#    $(this).next('ul').toggle();#}
-{#    e.stopPropagation();#}
-{#    e.preventDefault();#}
-{#  });#}
-{#});#}
-{#</script>#}
-
+        return false;
+    });
+    
+    
+</script>
