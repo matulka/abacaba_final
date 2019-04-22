@@ -5,8 +5,11 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    parent_id = models.IntegerField(blank=True,
-                                    null=True)
+    parent_category = models.ForeignKey('self',
+                                        on_delete=models.CASCADE,
+                                        blank=True,
+                                        null=True,
+                                        related_name='child_categories')
 
 
 class Product(models.Model):

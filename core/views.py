@@ -22,7 +22,7 @@ from django.core.mail import EmailMessage
 
 def index_page(request):
     context = dict()
-    context['cat'] = return_categories()
+    context['cat'] = 'lol'
     context['products'] = return_products()
     return render(request, 'index.html', context)
 
@@ -71,6 +71,20 @@ def search_in_base(text):
 
 def return_categories():  # #May need refactoring: context passed by value and not by pointer
     return Category.objects.all()
+
+
+def return_categories_http(request):
+    string = str()
+    for category in Category.objects.all():
+        string = string + (str(category.id) + ',' + category.name + ',')
+        if category.parent_category:
+            string = string + (str(category.parent_category.id) + ';')
+        else:
+            string = string + 'None;'
+    string = string[:(len(string) - 1)]
+    d = dict()
+    d['1'] = string
+    return JsonResponse(d)
 
 
 def return_products():

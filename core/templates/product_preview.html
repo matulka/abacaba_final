@@ -5,7 +5,7 @@
         </div>
         <div class="caption">
             {% if product.category %}
-            <h5 style="margin-bottom:0px; color:gray;">{{ product.category }}</h5>
+            <h5 style="margin-bottom:0px; color:gray;">{{ product.category.name }}</h5>
             {% else %}
             <h5 style="margin-bottom:0px; color:gray;">Без категории</h5>
             {% endif %}
