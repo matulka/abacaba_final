@@ -13,6 +13,7 @@
 
 </style>
 
+
     {% if form.errors %}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             Неверный логин или пароль
@@ -22,16 +23,6 @@
         </div>
     {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            Вы уже вошли в свой аккаунт
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-    {% endif %}
-{% endif %}
 
 <div class="form-login">
     <form method="post" action="{% url 'login' %}" >

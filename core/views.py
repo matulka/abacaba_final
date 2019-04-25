@@ -387,4 +387,14 @@ def signup(request):
         form = SignupForm()
 
     return render(request, 'registration/signup.html', {'form': form})
+
+@login_required
+def profile(request):
+    return render(request, 'registration/profile.html')
+
+@login_required
+def profile_orders(request):
+    return render(request, 'registration/profile_orders.html')
+
+
 #
