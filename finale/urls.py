@@ -21,6 +21,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 from finale import settings
 
+handler500 = views.e_handler500
 urlpatterns = [
     path('admin/', admin.site.urls),
 

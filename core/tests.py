@@ -122,8 +122,13 @@ class TestAddToCart(TestCase):
                                             category=self.cat2)
         self.mod1 = Modification.objects.create(product=self.prod1,
                                             characteristics="{'a': '2', 'b': '3'}")
+        self.mod2 = Modification.objects.create(product=self.prod2,
+                                                characteristics="{'a': '2', 'b': '3'}")
         self.sp = StockProduct.objects.create(product=self.prod1,
                                                 modification=self.mod1,
+                                              quantity=5)
+        self.sp1 = StockProduct.objects.create(product=self.prod2,
+                                              modification=self.mod2,
                                               quantity=5)
         self.factory = RequestFactory()
 
@@ -135,7 +140,13 @@ class TestAddToCart(TestCase):
     def test_auth_add_two_products(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 1, 'product_id': 1, 'a': 2, 'b': 3})
+        self.assertEqual(len(self.user.cart.products.all()), 1)
+
+    def test_auth_add_two_diff_products(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 1, 'product_id': 2, 'a': 2, 'b': 3})
         self.assertEqual(len(self.user.cart.products.all()), 2)
 
     def test_unauth_make_new_cart(self):
@@ -151,7 +162,7 @@ class TestAddToCart(TestCase):
 
     def test_cart_from_session_to_db(self):
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 2, 'b': 3})
         request = response.wsgi_request
         views.__cart_from_session_to_db__(request.session['cart'], self.user)
         self.assertEqual(len(self.user.cart.products.all()), 2)

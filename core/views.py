@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, render_to_response
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
@@ -20,6 +20,7 @@ from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
 from core.forms import AddressForm
+from django.template import RequestContext
 
 def index_page(request):
     context = dict()
@@ -27,6 +28,12 @@ def index_page(request):
     context['products'] = return_products()
     return render(request, 'index.html', context)
 
+
+def e_handler500(request):
+    context = RequestContext(request)
+    response = render_to_response('error500html', context)
+    response.status_code = 500
+    return response
 
 """
 Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
@@ -136,12 +143,22 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
     except ObjectDoesNotExist:
         current_cart = Cart(author=user)
         current_cart.save()
-
-    order_product = OrderProduct()
-    order_product.quantity = quantity
-    order_product.stock_product = stock_product
-    order_product.cart = current_cart
-    order_product.save()
+    if OrderProduct.objects.filter(cart=current_cart, stock_product=stock_product).exists():
+        prod = OrderProduct.objects.get(cart=current_cart, stock_product=stock_product)
+        if int(quantity) + prod.quantity > stock_product.quantity:
+            raise ValueError
+        else:
+            prod.quantity += int(quantity)
+            prod.save()
+    else:
+        if int(quantity) > stock_product.quantity:
+            raise ValueError
+        else:
+            order_product = OrderProduct()
+            order_product.quantity = int(quantity)
+            order_product.stock_product = stock_product
+            order_product.cart = current_cart
+            order_product.save()
 
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
@@ -175,7 +192,10 @@ def add_to_cart(request):
         stock_product = find_stock_product(product, modification_dict)
         if request.user.is_authenticated:
             user = request.user
-            __add_to_cart_authenticated__(user, quantity, stock_product)
+            try:
+                __add_to_cart_authenticated__(user, quantity, stock_product)
+            except ValueError:
+                e_handler500(request)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
