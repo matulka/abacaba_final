@@ -62,7 +62,7 @@ class Addresses(models.Model):
     street = models.TextField(default='Довженко')
     building = models.IntegerField(default=1)
     flat = models.IntegerField(default=1)
-    entrance = models.TextField(null=True)
+    entrance = models.TextField(null=True, blank=True)
 
 
 class Order(models.Model):
