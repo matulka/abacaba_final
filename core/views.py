@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
+from core.forms import AddressForm
 
 def index_page(request):
     context = dict()
@@ -268,33 +269,34 @@ def make_order(request):
 def profile_info(request):
     return render(request, 'profile.html')
 
-'''
-Переработать с формой
-'''
 
 @login_required
 def add_address(request):
     if request.method == 'POST':
-        user = request.user
-        city = request.POST.get('city')
-        street = request.POST.get('street')
-        building = request.POST.get('building')
-        flat = request.POST.get('flat')
-        entrance = request.POST.get('entrance')
-        if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
-            ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
-            ad.customers.add(user)
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            city = form.cleaned_data['city']
+            street = form.cleaned_data['street']
+            building = form.cleaned_data['building']
+            flat = form.cleaned_data['flat']
+            entrance = form.cleaned_data['entrance']
+            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
+                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
+                ad.customers.add(user)
+            else:
+                new_ad = Addresses(city=city,
+                                   street=street,
+                                   building=building,
+                                   flat=flat,
+                                   entrance=entrance)
+                new_ad.save()
+                new_ad.customers.add(user)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
-            new_ad = Addresses(city=city,
-                               street=street,
-                               building=building,
-                               flat=flat,
-                               entrance=entrance)
-            new_ad.save()
-            new_ad.customers.add(user)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
-        return redirect('/')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 '''
@@ -309,6 +311,7 @@ def delete_address(request):
         address_id = request.POST.get('id')
         address = Addresses.objects.get(id=address_id)
         user.addresses_set.remove(address)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         return redirect('/')
 
@@ -319,7 +322,8 @@ def profile_addresses(request):
     addresses = user.addresses_set.all()  # # Have some doubts about this line
     context = dict()
     context['addresses'] = addresses
-    return render(request, 'addresses.html')
+    context['form'] = AddressForm()
+    return render(request, 'addresses.html', context)
 
 
 @login_required
