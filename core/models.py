@@ -18,11 +18,14 @@ class Product(models.Model):
     price = models.IntegerField()
     rating = models.FloatField(blank=True,
                                null=True)
-    category = models.ForeignKey(to=Category,
-                                 on_delete=models.CASCADE,
-                                 blank=True,
-                                 null=True,
-                                 related_name='products')
+    categories = models.ManyToManyField(to=Category,
+                                        blank=True,
+                                        null=True,
+                                        related_name='products')
+    main_category = models.ForeignKey(to=Category,
+                                      blank=True,
+                                      null=True,
+                                      on_delete=models.CASCADE)
     sample_image = models.ImageField(upload_to='images',
                                      null=True)
 

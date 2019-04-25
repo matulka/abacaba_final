@@ -4,8 +4,8 @@
             <img id="preview_img" class="img-fluid" src="{{product.sample_image.url}}" alt="Product">
         </div>
         <div class="caption">
-            {% if product.category %}
-            <h5 style="margin-bottom:0px; color:gray;">{{ product.category.name }}</h5>
+            {% if product.main_category %}
+            <h5 style="margin-bottom:0px; color:gray;">{{ product.main_category.name }}</h5>
             {% else %}
             <h5 style="margin-bottom:0px; color:gray;">Без категории</h5>
             {% endif %}

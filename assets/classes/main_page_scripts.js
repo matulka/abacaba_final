@@ -103,7 +103,6 @@ $(document).ready(function () {
             }
             $('#main_navbar').append(string_to_add);
             $('.dropdown-menu a.dropdown-toggle').on('click', function (e) {
-                console.log('triggered');
                 if (!$(this).next().hasClass('show')) {
                     $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
                 }

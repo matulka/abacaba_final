@@ -22,8 +22,10 @@ from django.core.mail import EmailMessage
 
 def index_page(request):
     context = dict()
-    context['cat'] = 'lol'
-    context['products'] = return_products()
+    if request.method == 'GET' and 'category_id' in request.GET:
+        context['products'] = return_products(request.GET.get('category_id'))
+    else:
+        context['products'] = return_products()
     return render(request, 'index.html', context)
 
 
@@ -87,21 +89,13 @@ def return_categories_http(request):
     return JsonResponse(d)
 
 
-def return_products():
-    return Product.objects.all()
-
-
-def categories(request):  # #Передаем сюда айди категории
-    context = dict()
-    if request.method == 'GET':
-        context['cat'] = request.GET.get('cat')
-        try:
-            cat = Category.objects.get(name=context['cat'])
-            context['products'] = cat.products.all()
-        except ObjectDoesNotExist:
-            context['products'] = []
-        return render(request, 'search.html', context)
-    return render(request, 'search.html', context)
+def return_products(category_id=None):
+    if category_id is None:
+        return Product.objects.all()
+    category = Category.objects.get(id=category_id)
+    if category is None:
+        return []
+    return category.products.objects.all()
 
 
 def find_modification(product, modification_dict):

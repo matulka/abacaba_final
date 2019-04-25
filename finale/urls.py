@@ -29,7 +29,6 @@ urlpatterns = [
     path('accounts/addresses', views.profile_addresses),
     path('cart', views.cart_page),
     path('search', views.search),
-    path('categories', views.categories),
     path('add_to_cart', views.add_to_cart),
     path('add_address', views.add_address),
     path('get_http_categories', views.return_categories_http),
