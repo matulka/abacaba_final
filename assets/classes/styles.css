@@ -1,0 +1,56 @@
+#prod_preview_block {
+    display: block;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: black;
+    padding: 20px;
+    border: 3px solid transparent;
+    border-radius: 20px;
+    transition: 0.1s linear;
+}
+
+#prod_preview_block:hover {
+    border: 3px solid lightblue;
+}
+
+.square-box {
+    position: relative;
+    width: 80%;
+    overflow: hidden;
+    left: 10%;
+}
+
+.square-box:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+}
+
+#preview_img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu a::after {
+    transform: rotate(-90deg);
+    position: absolute;
+    right: 6px;
+    top: .8em;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-left: .1rem;
+    margin-right: .1rem;
+}

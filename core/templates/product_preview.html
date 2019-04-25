@@ -1,0 +1,16 @@
+<div class="col-xl-4 col-md-6 col-12" style="margin-bottom: 10px;">
+    <a id="prod_preview_block" class="thumbnail" href='/products?id={{product.id}}'>
+        <div class="square-box">
+            <img id="preview_img" class="img-fluid" src="{{product.sample_image.url}}" alt="Product">
+        </div>
+        <div class="caption">
+            {% if product.category %}
+            <h5 style="margin-bottom:0px; color:gray;">{{ product.category.name }}</h5>
+            {% else %}
+            <h5 style="margin-bottom:0px; color:gray;">Без категории</h5>
+            {% endif %}
+            <h3 style="margin-top:10px;">{{ product.name }}</h3>
+            <h4>{{ product.price }} рублей</h4>
+        </div>
+    </a>
+</div>
