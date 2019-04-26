@@ -57,8 +57,8 @@ function end_child_dropdown() {
     string_to_add += string;
 }
 
-function insert_action(name) {
-    var string = "<li><a class=\"dropdown-item\" href=\"#\">" + name + "</a></li>";
+function insert_action(name, id) {
+    var string = "<li><a class=\"dropdown-item\" href=\"/?category_id=" + id + "\">" + name + "</a></li>";
     string_to_add += string;
 }
 
@@ -86,8 +86,18 @@ function load_category(category) {
         end_parent_dropdown();
     }
     if (!is_parent) {
-        insert_action(category.name);
+        insert_action(category.name, category.id);
     }
+}
+
+function get_id_category(categories_list, name) {
+    id = null;
+    for (var i = 0; i < categories_list.length; i += 1) {
+        if (categories_list[i].name == name) {
+            id = categories_list[i].id;
+        }
+    }
+    return id;
 }
 
 $(document).ready(function () {
@@ -102,9 +112,16 @@ $(document).ready(function () {
                 }
             }
             $('#main_navbar').append(string_to_add);
+            $('a.nav-link').on('click', function(e) {
+                if ($(this).attr('aria-expanded') == 'true') {
+                    id = get_id_category(categories, $(this).html());
+                    window.location.replace('/?category_id=' + id);
+                }
+            });
             $('.dropdown-menu a.dropdown-toggle').on('click', function (e) {
-                if (!$(this).next().hasClass('show')) {
-                    $(this).parents('.dropdown-menu').first().find('.show').removeClass("show");
+                if ($(this).next().hasClass('show')) {
+                    id = get_id_category(categories, $(this).html());
+                    window.location.replace('/?category_id=' + id);
                 }
                 var $subMenu = $(this).next(".dropdown-menu");
                 $subMenu.toggleClass('show');
