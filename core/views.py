@@ -95,7 +95,7 @@ def return_products(category_id=None):
     category = Category.objects.get(id=category_id)
     if category is None:
         return []
-    return category.products.objects.all()
+    return category.products.all()
 
 
 def find_modification(product, modification_dict):
