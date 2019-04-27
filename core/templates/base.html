@@ -15,6 +15,7 @@
 
 <body>
     <header>
+        {% include "menu.html" %}
         {% if messages %}
         {% for message in messages %}
         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}" role="alert">{{ message }}
@@ -24,7 +25,6 @@
         </div>
         {% endfor %}
         {% endif %}
-        {% include "menu.html" %}
     </header>
 
     {% block content %}

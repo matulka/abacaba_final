@@ -1,25 +1,53 @@
 {% extends 'registration/profile_navigation.html' %}
 
 {% block data %}
-    <form>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="firstname">Имя</label>
-              <input type="text" class="form-control" id="firstname" value={{ request.user.first_name }}>
-            </div>
-            <div class="form-group col-md-4">
-              <label for="surname">Фамилия</label>
-              <input type="text" class="form-control" id="surname" value={{ request.user.last_name }}>
-            </div>
-        </div>
-        <div class="form-group">
-            <fieldset disabled>
-                <div class="form-group">
-                  <label for="email"></label>
-                  <input type="text" id="email" class="form-control" value={{ request.user.email }}>
+    {% load widget_tweaks %}
+    <div style="margin-top: 7%;">
+        <form method="post" action={% url 'profile' %}>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-5">
+                  <label for="firstname">Имя</label>
+                    {{ form_name.first_name|add_class:'form-control' }}
                 </div>
-            </fieldset>
-        </div>
-    </form>
-{% endblock %}
+                <div class="form-group col-md-5">
+                  <label for="surname">Фамилия</label>
+                    {{ form_name.last_name|add_class:'form-control' }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10">
+                    <fieldset disabled>
+                      <label for="email">Email</label>
+                      <input type="text" class="form-control" id="email" style="text-align: center; " value={{ request.user.email }}>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="form-row" style="margin-top: 2%;">
+                <div class="form-group col-md-10">
+                    <button type="submit" class="btn btn-primary btn-block">Сохранить изменения</button>
+                </div>
+            </div>
+        </form>
 
+        <form style="margin-top: 5%;" method="post" action={% url 'profile' %}>
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-5">
+                    <label>Введите старый пароль</label>
+                    {{ form_password.password1|add_class:'form-control' }}
+                </div>
+                <div class="form-group col-md-5">
+                    <label>Введите новый пароль</label>
+                    {{ form_password.password2|add_class:'form-control' }}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10">
+                    <button type="submit" class="btn btn-primary btn-block">Изменить пароль</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

@@ -13,13 +13,14 @@ from core.forms import SignupForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.hashers import check_password
 from django.template.loader import render_to_string
 from core.token import account_activation_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
-from core.forms import AddressForm
+from core.forms import AddressForm, ProfileForm, PasswordProfileForm
 from django.template import RequestContext
 
 def index_page(request):
@@ -422,7 +423,29 @@ def signup(request):
 
 @login_required
 def profile(request):
-    return render(request, 'registration/profile.html')
+
+    if request.method == 'POST':
+        if "first_name" in request.POST:
+            form_name = ProfileForm(request.POST)
+            user = User.objects.get(username=request.user.username)
+            user.first_name = form_name['first_name'].data
+            user.last_name = form_name['last_name'].data
+            user.save()
+            messages.success(request, 'Вы успешно изменили свои данные')
+        else:
+            form_password = PasswordProfileForm(request.POST)
+            password1 = form_password['password1']
+            password2 = form_password['password2']
+
+        return redirect('profile')
+
+    else:
+        form_password = PasswordProfileForm()
+        form_name = ProfileForm()
+        form_name.fields["first_name"].initial = request.user.first_name
+        form_name.fields["last_name"].initial = request.user.last_name
+
+    return render(request, 'registration/profile.html', {'form_name':form_name, 'form_password':form_password})
 
 @login_required
 def profile_orders(request):
