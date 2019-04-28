@@ -338,16 +338,6 @@ def delete_address(request):
 
 
 @login_required
-def profile_addresses(request):
-    user = request.user
-    addresses = user.addresses_set.all()  # # Have some doubts about this line
-    context = dict()
-    context['addresses'] = addresses
-    context['form'] = AddressForm()
-    return render(request, 'addresses.html', context)
-
-
-@login_required
 def make_question(request):
     if request.method == 'POST':
         author = request.user
@@ -434,8 +424,18 @@ def profile(request):
             messages.success(request, 'Вы успешно изменили свои данные')
         else:
             form_password = PasswordProfileForm(request.POST)
-            password1 = form_password['password1']
-            password2 = form_password['password2']
+            password1 = form_password['password1'].data
+            password2 = form_password['password2'].data
+            user = User.objects.get(username=request.user.username)
+
+            if not user.check_password(password1):
+                messages.error(request, 'Вы ввели неверный пароль', extra_tags='danger')
+
+            else:
+                user.set_password(password2)
+                user.save()
+                login(request, user)
+                messages.success(request, 'Вы успешно изменили пароль')
 
         return redirect('profile')
 
@@ -449,7 +449,8 @@ def profile(request):
 
 @login_required
 def profile_orders(request):
+    user = User.objects.get(username=request.user.username)
+    orders = user.orders.all()
     return render(request, 'registration/profile_orders.html')
 
 
-#

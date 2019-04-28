@@ -41,7 +41,7 @@ class Modification(models.Model):
     characteristics = models.TextField()
 
     def __str__(self):
-        return self.name
+        return self.product
 
 
 class StockProduct(models.Model):
@@ -56,6 +56,9 @@ class StockProduct(models.Model):
                               blank=True,
                               null=True)  # #product.image.url
     quantity = models.IntegerField()
+
+    def __str__(self):
+        return self.product
 
 
 class ProductFeedback(models.Model):
@@ -73,6 +76,8 @@ class ProductFeedback(models.Model):
                                null=True,
                                related_name='feedbacks')
 
+    def __str__(self):
+        return self.product
 
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
@@ -82,6 +87,9 @@ class Addresses(models.Model):
     building = models.IntegerField(default=1)
     flat = models.IntegerField(default=1)
     entrance = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.street
 
 
 class Order(models.Model):
@@ -97,6 +105,9 @@ class Order(models.Model):
                                 null=True,
                                 related_name='orders')
     email = models.TextField(null=True)  # #Электронная почта для заказов от незарегистрированных пользователей
+
+    def __str__(self):
+        return self.author.username
 
 
 class Cart(models.Model):
@@ -122,6 +133,9 @@ class OrderProduct(models.Model):
         related_name='products'
     )
 
+    def __str__(self):
+        return self.stock_product
+
 
 class Question(models.Model):
     id = models.AutoField(primary_key=True)
@@ -134,9 +148,15 @@ class Question(models.Model):
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
 
+    def __str__(self):
+        return self.content
+
 
 class OrderProductInformation(models.Model):
     quantity = models.IntegerField()
     stock_product = models.ForeignKey(to=StockProduct,
                                       on_delete=models.CASCADE,
                                       related_name='opi')
+
+    def __str__(self):
+        return self.stock_product
