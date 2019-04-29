@@ -89,6 +89,16 @@ def return_categories_http(request):
     return JsonResponse(d)
 
 
+def browse_product(request):
+    context = dict()
+    if request.method == 'GET':
+        if 'id' in request.GET:
+            product = Product.objects.get(id=request.GET['id'])
+            context['product'] = product
+            return render(request, 'product_page.html', context)
+    return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
+
+
 def return_products(category_id=None):
     if category_id is None:
         return Product.objects.all()
@@ -354,6 +364,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Ссылка для регистрации устарела')
         return redirect('home')
+
 
 def signup(request):
     if request.method == 'POST':

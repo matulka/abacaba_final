@@ -38,7 +38,7 @@ function decode_categories(string) {
 }
 
 function begin_parent_dropdown(name) {
-    var string = "<li class=\"nav-item dropdown\"><a class=\"nav-link dropdown-toggle\" href=\"#\" id=\"navbarDropdownMenuLink\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + name + "</a><ul class=\"dropdown-menu\">";
+    var string = "<li class=\"nav-item dropdown\"><a class=\"nav-link dropdown-toggle category_parent_dropdown\" href=\"#\" id=\"navbarDropdownMenuLink\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" + name + "</a><ul class=\"dropdown-menu\">";
     string_to_add += string;
 }
 
@@ -112,7 +112,7 @@ $(document).ready(function () {
                 }
             }
             $('#main_navbar').append(string_to_add);
-            $('a.nav-link').on('click', function(e) {
+            $('a.category_parent_dropdown').on('click', function(e) {
                 if ($(this).attr('aria-expanded') == 'true') {
                     id = get_id_category(categories, $(this).html());
                     window.location.replace('/?category_id=' + id);

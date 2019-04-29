@@ -11,6 +11,9 @@ class Category(models.Model):
                                         null=True,
                                         related_name='child_categories')
 
+    def __str__(self):
+        return 'Категория: ' + self.name
+
 
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
@@ -20,14 +23,14 @@ class Product(models.Model):
                                null=True)
     categories = models.ManyToManyField(to=Category,
                                         blank=True,
-                                        null=True,
                                         related_name='products')
     main_category = models.ForeignKey(to=Category,
                                       blank=True,
                                       null=True,
                                       on_delete=models.CASCADE)
-    sample_image = models.ImageField(upload_to='images',
-                                     null=True)
+
+    def __str__(self):
+        return 'Продукт: ' + self.name
 
 
 class Modification(models.Model):
@@ -46,9 +49,6 @@ class StockProduct(models.Model):
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
-    image = models.ImageField(upload_to='images',
-                              blank=True,
-                              null=True)  # #product.image.url
     quantity = models.IntegerField()
 
 
@@ -127,3 +127,24 @@ class Question(models.Model):
     content = models.TextField()
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
+
+
+class Image(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='images',
+                              null=True)
+    description = models.TextField(null=True,
+                                   blank=True)
+    stock_product = models.ForeignKey(to=StockProduct,
+                                      on_delete=models.CASCADE,
+                                      related_name='images',
+                                      null=True,
+                                      blank=True)
+    product = models.OneToOneField(Product,
+                                   on_delete=models.CASCADE,
+                                   null=True,
+                                   blank=True)
+
+    def __str__(self):
+        return 'Изображение: ' + self.description
+
