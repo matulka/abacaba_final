@@ -451,6 +451,7 @@ def profile(request):
 def profile_orders(request):
     user = User.objects.get(username=request.user.username)
     orders = user.orders.all()
-    return render(request, 'registration/profile_orders.html')
+    print(orders.values())
+    return render(request, 'registration/profile_orders.html', {'orders': orders})
 
 

@@ -1,7 +1,31 @@
 {% extends 'registration/profile_navigation.html' %}
 
 {% block data %}
+    <div style="margin-top: 10%;padding-right: 20%;padding-left: 10%;">
+        {% load widget_tweaks %}
+        <table class="table">
+          <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Дата заказа</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Адрес доставки</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for key in orders %}
+                <tr>
+                  <th scope="row">{{ key.id }}</th>
+                  <td>{{ key.order_date }}</td>
+                  <td>{{ key.status }}</td>
+                  <td>{{ key.address }}</td>
+                    <td>{{ key.address }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
 
-    привет
+
 
 {% endblock %}
