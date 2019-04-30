@@ -46,7 +46,7 @@ function edit_button_action(event) {
 
 function select_image(this_image) {
     $('img').each(function() {
-        $(this).attr('style', 'border: none;');
+        $(this).attr('style', '');
     })
     this_image.style = 'border: 2px solid red; border-radius: 5px;';
     $('#main-image').attr('src', this_image.src);

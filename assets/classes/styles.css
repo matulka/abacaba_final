@@ -73,3 +73,7 @@
 .mini-image {
     
 }
+
+.mini-image:hover {
+    border: 3px solid lightblue;
+}
