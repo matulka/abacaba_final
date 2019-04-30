@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification
@@ -26,6 +27,7 @@ def arr_to_str(arr):
         string += str(element) + ','
     string = string[:(len(string) - 1)]
     return string
+
 
 def index_page(request):
     context = dict()
@@ -82,7 +84,7 @@ def return_categories():  # #May need refactoring: context passed by value and n
     return Category.objects.all()
 
 
-def return_categories_http(request):  # #Возвращает данные о категориях в виде JSON
+def return_categories_json(request):  # #Возвращает данные о категориях в виде JSON
     string = str()
     for category in Category.objects.all():
         string = string + (str(category.id) + ',' + category.name + ',')
@@ -116,7 +118,7 @@ def return_products(category_id=None):  # #Возвращает список п�
 
 
 def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
-    modifications = Modification.objects.get(product=product)
+    modifications = Modification.objects.filter(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)
         if current_modification_dict == modification_dict:
@@ -126,8 +128,22 @@ def find_modification(product, modification_dict):  # #Ищет конкретн
 
 def find_stock_product(product, modification_dict):  # #Ищет сток продукт по набору параметров и продукту
     modification = find_modification(product, modification_dict)
-    stock_product = StockProduct.get(product=product, modification=modification)
+    stock_product = StockProduct.objects.get(product=product, modification=modification)
     return stock_product
+
+
+@csrf_exempt
+def get_images_of_stock_product(request):
+    if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
+        raise NotImplementedError
+    product = Product.objects.get(id=request.POST.get('product_id'))
+    modification_dict = literal_eval(request.POST.get('modification_dict_str'))
+    stock_product = find_stock_product(product, modification_dict)
+    images = stock_product.images.all()
+    data = dict()
+    for i in range(len(images)):
+        data[str(i)] = images[i].image.url
+    return JsonResponse(data)
 
 
 def get_product_modification_parameters(product):  # #Передает параметры модификаций данного продукта
