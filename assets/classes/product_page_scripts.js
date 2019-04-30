@@ -14,10 +14,10 @@ function string_to_array(string) {
 
 function add_select_str(parameter, values) {
     var str_to_add = '';
-    str_to_add += '<div class=\"col-sm-6\"><p>' + parameter.toString() + '</p></div>';
-    str_to_add += '<div class=\"col-sm-6\"><select name=\"' + parameter.toString() + '\">';
+    str_to_add += '<div class="col-sm-6"><p>' + parameter.toString() + '</p></div>';
+    str_to_add += '<div class="col-sm-6"><select name="' + parameter.toString() + '" disabled>';
     for (var i = 0; i < values.length; i += 1) {
-        str_to_add += '<option value=\"' + values[i].toString() + '\">' + values[i].toString() + '</option>';
+        str_to_add += '<option value="' + values[i].toString() + '">' + values[i].toString() + '</option>';
     }
     str_to_add += '</select></div>';
     return str_to_add;
@@ -31,7 +31,7 @@ function initialize_modifications(product_id) {
             for (var parameter in response) {
                 html_str += add_select_str(parameter, response[parameter]);
             }
-            $('#edit-div').html(html_str);
+            $('#edit-div').prepend(html_str);      
         }
     });
 }
@@ -39,4 +39,16 @@ function initialize_modifications(product_id) {
 $(document).ready(function(){
     var product_id = get_product_id();
     initialize_modifications(product_id);
+    $('#edit-button').on('click', function(e) {
+        console.log('success');
+        if ($('#edit-button').html() == 'Редактировать') {
+            $('select').attr('disabled', false);
+            $('#edit-button').html('Сохранить');
+        }
+        else if ($('#edit-button').html() == 'Сохранить') {
+            $('select').attr('disabled', true);
+            $('#edit-button').html('Редактировать');
+        }
+        
+    });
 });
