@@ -20,6 +20,13 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 
 
+def arr_to_str(arr):
+    string = str()
+    for element in arr:
+        string += str(element) + ','
+    string = string[:(len(string) - 1)]
+    return string
+
 def index_page(request):
     context = dict()
     if request.method == 'GET' and 'category_id' in request.GET:
@@ -75,7 +82,7 @@ def return_categories():  # #May need refactoring: context passed by value and n
     return Category.objects.all()
 
 
-def return_categories_http(request):
+def return_categories_http(request):  # #Возвращает данные о категориях в виде JSON
     string = str()
     for category in Category.objects.all():
         string = string + (str(category.id) + ',' + category.name + ',')
@@ -89,7 +96,7 @@ def return_categories_http(request):
     return JsonResponse(d)
 
 
-def browse_product(request):
+def browse_product(request):  # #Возвращает контекст для отображения страницы товара
     context = dict()
     if request.method == 'GET':
         if 'id' in request.GET:
@@ -99,7 +106,7 @@ def browse_product(request):
     return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
 
 
-def return_products(category_id=None):
+def return_products(category_id=None):  # #Возвращает список продуктов для главной страницы
     if category_id is None:
         return Product.objects.all()
     category = Category.objects.get(id=category_id)
@@ -108,7 +115,7 @@ def return_products(category_id=None):
     return category.products.all()
 
 
-def find_modification(product, modification_dict):
+def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
     modifications = Modification.objects.get(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)
@@ -117,20 +124,49 @@ def find_modification(product, modification_dict):
     return None
 
 
-def find_stock_product(product, modification_dict):
+def find_stock_product(product, modification_dict):  # #Ищет сток продукт по набору параметров и продукту
     modification = find_modification(product, modification_dict)
     stock_product = StockProduct.get(product=product, modification=modification)
     return stock_product
 
 
-def get_product_modification_parameters(product):
-    sample_modification = product.modification.all()[0]
+def get_product_modification_parameters(product):  # #Передает параметры модификаций данного продукта
+    sample_modification = product.modifications.all()[0]
     sample_characteristics = sample_modification.characteristics
     sample_char_dict = literal_eval(sample_characteristics)
     parameters_list = list()
     for key, value in sample_char_dict.items():
         parameters_list.append(key)
     return parameters_list
+
+
+def get_modification_parameter_values(product, parameter):  # #Возвращает все возможные значения параметра модификации
+    modifications = product.modifications.all()
+    values = []
+    for modification in modifications:
+        modification_dict = literal_eval(modification.characteristics)
+        if parameter not in modification_dict:
+            raise NotImplementedError
+        value = modification_dict[parameter]
+        if value not in values:
+            values.append(value)
+    return values
+
+
+def get_modifications_dict(product):  # #Возвращает параметры модификации и их возможные значения в виде словаря
+    mod_dict = dict()
+    parameters = get_product_modification_parameters(product)
+    for parameter in parameters:
+        mod_dict[parameter] = get_modification_parameter_values(product, parameter)
+    return mod_dict
+
+
+def get_modifications_json(request):  # #Возвращает параметры модификации и их возможные значения в JSON
+    if not request.method == 'GET' or 'product_id' not in request.GET:
+        raise NotImplementedError
+    product = Product.objects.get(id=request.GET.get('product_id'))
+    mod_dict = get_modifications_dict(product)
+    return JsonResponse(mod_dict)
 
 
 def __add_to_cart_authenticated__(user, quantity, stock_product):

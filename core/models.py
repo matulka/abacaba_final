@@ -40,16 +40,22 @@ class Modification(models.Model):
                                 related_name='modifications')
     characteristics = models.TextField()
 
+    def __str__(self):
+        return 'Модификация: ' + self.characteristics
+
 
 class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
-    product = models.OneToOneField(to=Product,
-                                   on_delete=models.CASCADE,
-                                   related_name='stock_product')
+    product = models.ForeignKey(to=Product,
+                                on_delete=models.CASCADE,
+                                related_name='stock_products')
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
     quantity = models.IntegerField()
+
+    def __str__(self):
+        return 'Складовый продукт: ' + str(self.modification)
 
 
 class ProductFeedback(models.Model):
