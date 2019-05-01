@@ -98,10 +98,55 @@ class TestAddresses(TestCase):
         self.user = User.objects.create_user('a', '[removed_emai]', 'a')
         self.c = Client()
 
+    def test_del(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/del_address',
+                               {'id': 1})
+        self.assertEqual(len(self.user.addresses_set.all()), 0)
+
     def test_adding(self):
         self.c.login(username='a', password='a')
-        response = self.c.post('/add_address', {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        self.assertEqual(len(self.user.addresses_set.all()), 1)
+
+    def test_add_two_simillar_1(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        self.assertEqual(len(self.user.addresses_set.all()), 1)
+
+    def test_add_two_simillar_2(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
         self.assertEqual(len(Addresses.objects.all()), 1)
+
+    def can_see_addresses(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/accounts/addresses')
+        self.assertEqual(response.status_code, 200)
+
+
+class TestQuestions(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user('a', '[removed_emai]', 'a')
+        self.c = Client()
+
+    def test_add_question(self):
+        self.c.login(username='a', password='a')
+        response = self.c.post('/make_question',
+                               {'topic': 'test', 'content': 'text'})
+        self.assertEqual(len(Question.objects.all()), 1)
 
 
 class TestAddToCart(TestCase):
@@ -123,7 +168,7 @@ class TestAddToCart(TestCase):
         self.mod1 = Modification.objects.create(product=self.prod1,
                                             characteristics="{'a': '2', 'b': '3'}")
         self.mod2 = Modification.objects.create(product=self.prod2,
-                                                characteristics="{'a': '2', 'b': '3'}")
+                                                characteristics="{'a': '3', 'b': '3'}")
         self.sp = StockProduct.objects.create(product=self.prod1,
                                                 modification=self.mod1,
                                               quantity=5)
@@ -146,7 +191,7 @@ class TestAddToCart(TestCase):
     def test_auth_add_two_diff_products(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-        response = self.c.post('/add_to_cart', {'quantity': 1, 'product_id': 2, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 1, 'product_id': 2, 'a': 3, 'b': 3})
         self.assertEqual(len(self.user.cart.products.all()), 2)
 
     def test_unauth_make_new_cart(self):
@@ -156,13 +201,13 @@ class TestAddToCart(TestCase):
 
     def test_unauth_add_two_prod(self):
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 1, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 1, 'product_id': 1, 'a': 2, 'b': 3})
         request = response.wsgi_request
-        self.assertEqual(len(request.session['cart']), 2)
+        self.assertEqual(len(request.session['cart']), 1)
 
     def test_cart_from_session_to_db(self):
         response = self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 2, 'b': 3})
+        response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
         request = response.wsgi_request
         views.__cart_from_session_to_db__(request.session['cart'], self.user)
         self.assertEqual(len(self.user.cart.products.all()), 2)

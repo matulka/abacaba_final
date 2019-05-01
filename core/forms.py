@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from core.models import Addresses
+from core.models import Addresses, Question
 
 class SearchForm(forms.Form):
     input = forms.CharField(label='Поиск',
@@ -40,4 +40,10 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = Addresses
         fields = ['city', 'street', 'building', 'flat', 'entrance']
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['topic', 'content']
 

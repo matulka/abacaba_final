@@ -19,7 +19,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
-from core.forms import AddressForm
+from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
 def index_page(request):
@@ -57,7 +57,6 @@ def search(request):
     context = dict()
     if request.method == 'GET':
         context['text'] = request.GET.get('text')
-        print(context['text'])
         if context['text'] is not None:
             context['products'] = search_in_base(context['text'])
         else:
@@ -163,15 +162,21 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
+    for products in cart:
+        print(str(products['stock_product']) + ' ' + str(stock_product.id))
+        if int(products['stock_product']) == int(stock_product.id):
+            if int(quantity) + int(products['quantity']) > stock_product.quantity:
+                raise ValueError
+            else:
+                products['quantity'] = int(quantity) + int(products['quantity'])
+                return
+    if int(quantity) > stock_product.quantity:
+        raise ValueError
     cart.append(model_to_dict(order_product_info))
 
 
 """
 В запросе через скрытое поле должне передаваться id продукта
-
-Необходимо добавить:
-1) Проверку на то, что в корзине уже не лежит такой StockProduct. Если лежит, то добавить новый заказ к старому.
-2) Проверить, есть ли на складе (StockProduct.quantity) нужное количество вещей.
 """
 
 
@@ -199,7 +204,10 @@ def add_to_cart(request):
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
-            __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
+            try:
+                __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
+            except ValueError:
+                e_handler500(request)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
     return redirect('/')
 
@@ -328,7 +336,7 @@ def add_address(request):
 def delete_address(request):
     user = request.user
     if request.method == 'POST':
-        address_id = request.POST.get('id')
+        address_id = int(request.POST.get('id'))
         address = Addresses.objects.get(id=address_id)
         user.addresses_set.remove(address)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -339,7 +347,7 @@ def delete_address(request):
 @login_required
 def profile_addresses(request):
     user = request.user
-    addresses = user.addresses_set.all()  # # Have some doubts about this line
+    addresses = user.addresses_set.all()
     context = dict()
     context['addresses'] = addresses
     context['form'] = AddressForm()
@@ -349,12 +357,14 @@ def profile_addresses(request):
 @login_required
 def make_question(request):
     if request.method == 'POST':
-        author = request.user
-        topic = request.POST.get('topic')
-        content = request.POST.get('content')
-        question = Question(author=author, topic=topic, content=content)
-        question.save()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            topic = form.cleaned_data['topic']
+            author = request.user
+            content = form.cleaned_data['content']
+            question = Question(author=author, topic=topic, content=content)
+            question.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         return redirect('/')
 
