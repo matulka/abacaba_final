@@ -269,10 +269,10 @@ def make_order(request):
             address = Addresses.objects.get(id=address_id)
             order = Order(author=user,
                           address=address)
+            order.save()
             for order_product in order_products:
                 order_product.order = order
                 order_product.save()
-            order.save()
             return redirect('/profile')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
