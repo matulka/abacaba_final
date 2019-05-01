@@ -284,7 +284,7 @@ class TestMakeOrder(TestCase):
                                                quantity=5)
         self.factory = RequestFactory()
 
-    def test_auth_make_order(self):
+    def test_auth_make_order_1(self):
         self.c.login(username='a', password='a')
         self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
         self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
@@ -293,3 +293,13 @@ class TestMakeOrder(TestCase):
         response = self.c.post('/make_order',
                                {'address_id': 1})
         self.assertEqual(len(Order.objects.filter(author=self.user)), 1)
+
+    def test_auth_make_order_2(self):
+        self.c.login(username='a', password='a')
+        self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
+        self.c.post('/add_address',
+                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/make_order',
+                               {'address_id': 1})
+        self.assertEqual(len(Order.objects.filter(author=self.user)[0].products.all()), 2)
