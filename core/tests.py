@@ -5,6 +5,7 @@ from core.models import Product, Category, Cart, OrderProduct, Order,\
 from django.core.exceptions import ObjectDoesNotExist
 from core import views
 from django.test.client import RequestFactory
+from django.forms.models import model_to_dict
 
 
 class TestUserCanSeePages(TestCase):
@@ -282,6 +283,7 @@ class TestMakeOrder(TestCase):
         self.sp1 = StockProduct.objects.create(product=self.prod2,
                                                modification=self.mod2,
                                                quantity=5)
+        self.ad = Addresses.objects.create(city= 'city', street= 'street', building= 1, flat= 1, entrance= 1)
         self.factory = RequestFactory()
 
     def test_auth_make_order_1(self):
@@ -303,3 +305,12 @@ class TestMakeOrder(TestCase):
         response = self.c.post('/make_order',
                                {'address_id': 1})
         self.assertEqual(len(Order.objects.filter(author=self.user)[0].products.all()), 2)
+
+    # def test_unauth_make_order_1(self):
+    #     self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+    #     response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
+    #     request = response.wsgi_request
+    #     request.session['address'] = model_to_dict(self.ad)
+    #     response = self.c.post('/make_order',
+    #                            {'email': 'lol@kek.su'})
+    #     self.assertEqual(len(Order.objects.filter(email='lol@kek.su')), 1)

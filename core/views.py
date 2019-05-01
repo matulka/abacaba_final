@@ -248,6 +248,7 @@ def __cart_from_session_to_db__(current_cart, user):
         __add_to_cart_authenticated__(user, quantity, stock_product)
 
 
+
 """
 В этот метод необходимо передать, какой адрес выбрал пользователь. Если пользователь зарегистрирован,
 передается id адреса; в противном случае передается сам адрес (в виде строки?).
@@ -281,15 +282,15 @@ def make_order(request):
             address = request.POST.get('address')
             email = request.POST.get('email')
             current_cart = request.session['cart']
-            order = Order(email=email, address=address)
             if address is None or email is None:
                 raise ValueError
+            order = Order(email=email, address=address)
+            order.save()
             for order_product_information in current_cart:
-                order_product = OrderProduct(quantity=order_product_information.quantity,
-                                             stock_product=order_product_information.stock_product,
+                order_product = OrderProduct(quantity=order_product_information['quantity'],
+                                             stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
                 order_product.save()
-            order.save()
             return redirect('/')
     return redirect('/')
 
