@@ -12,7 +12,7 @@ class Category(models.Model):
                                         related_name='child_categories')
 
     def __str__(self):
-        return self.name
+        return 'Категория: ' + self.name
 
 
 class Product(models.Model):
@@ -21,13 +21,16 @@ class Product(models.Model):
     price = models.IntegerField()
     rating = models.FloatField(blank=True,
                                null=True)
-    category = models.ForeignKey(to=Category,
-                                 on_delete=models.CASCADE,
-                                 blank=True,
-                                 null=True,
-                                 related_name='products')
-    sample_image = models.ImageField(upload_to='images',
-                                     null=True)
+    categories = models.ManyToManyField(to=Category,
+                                        blank=True,
+                                        related_name='products')
+    main_category = models.ForeignKey(to=Category,
+                                      blank=True,
+                                      null=True,
+                                      on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Продукт: ' + self.name
 
     def __str__(self):
         return self.name
@@ -41,21 +44,21 @@ class Modification(models.Model):
     characteristics = models.TextField()
 
     def __str__(self):
-        return self.name
+        return 'Модификация: ' + self.characteristics
 
 
 class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
-    product = models.OneToOneField(to=Product,
-                                   on_delete=models.CASCADE,
-                                   related_name='stock_product')
+    product = models.ForeignKey(to=Product,
+                                on_delete=models.CASCADE,
+                                related_name='stock_products')
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
-    image = models.ImageField(upload_to='images',
-                              blank=True,
-                              null=True)  # #product.image.url
     quantity = models.IntegerField()
+
+    def __str__(self):
+        return 'Складовый продукт: ' + str(self.modification)
 
 
 class ProductFeedback(models.Model):
@@ -135,8 +138,29 @@ class Question(models.Model):
     admin_login = models.TextField(null=True)
 
 
+
 class OrderProductInformation(models.Model):
     quantity = models.IntegerField()
     stock_product = models.ForeignKey(to=StockProduct,
                                       on_delete=models.CASCADE,
                                       related_name='opi')
+class Image(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='images',
+                              null=True)
+    description = models.TextField(null=True,
+                                   blank=True)
+    stock_product = models.ForeignKey(to=StockProduct,
+                                      on_delete=models.CASCADE,
+                                      related_name='images',
+                                      null=True,
+                                      blank=True)
+    product = models.OneToOneField(Product,
+                                   on_delete=models.CASCADE,
+                                   null=True,
+                                   blank=True)
+
+    def __str__(self):
+        return 'Изображение: ' + self.description
+
+

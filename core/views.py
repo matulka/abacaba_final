@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render, render_to_response
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
@@ -22,10 +23,20 @@ from django.core import serializers
 from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
+def arr_to_str(arr):
+    string = str()
+    for element in arr:
+        string += str(element) + ','
+    string = string[:(len(string) - 1)]
+    return string
+
+
 def index_page(request):
     context = dict()
-    context['cat'] = 'lol'
-    context['products'] = return_products()
+    if request.method == 'GET' and 'category_id' in request.GET:
+        context['products'] = return_products(request.GET.get('category_id'))
+    else:
+        context['products'] = return_products()
     return render(request, 'index.html', context)
 
 
@@ -80,7 +91,7 @@ def return_categories():  # #May need refactoring: context passed by value and n
     return Category.objects.all()
 
 
-def return_categories_http(request):
+def return_categories_json(request):  # #Возвращает данные о категориях в виде JSON
     string = str()
     for category in Category.objects.all():
         string = string + (str(category.id) + ',' + category.name + ',')
@@ -94,24 +105,27 @@ def return_categories_http(request):
     return JsonResponse(d)
 
 
-def return_products():
-    return Product.objects.all()
-
-
-def categories(request):  # #Передаем сюда айди категории
+def browse_product(request):  # #Возвращает контекст для отображения страницы товара
     context = dict()
     if request.method == 'GET':
-        context['cat'] = request.GET.get('cat')
-        try:
-            cat = Category.objects.get(name=context['cat'])
-            context['products'] = cat.products.all()
-        except ObjectDoesNotExist:
-            context['products'] = []
-        return render(request, 'search.html', context)
-    return render(request, 'search.html', context)
+        if 'id' in request.GET:
+            product = Product.objects.get(id=request.GET['id'])
+            context['product'] = product
+            return render(request, 'product_page.html', context)
+    return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
 
 
-def find_modification(product, modification_dict):
+def return_products(category_id=None):  # #Возвращает список продуктов для главной страницы
+    if category_id is None:
+        return Product.objects.all()
+    category = Category.objects.get(id=category_id)
+    if category is None:
+        return []
+    return category.products.all()
+
+
+
+def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
     modifications = Modification.objects.filter(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)
@@ -120,13 +134,27 @@ def find_modification(product, modification_dict):
     return None
 
 
-def find_stock_product(product, modification_dict):
+def find_stock_product(product, modification_dict):  # #Ищет сток продукт по набору параметров и продукту
     modification = find_modification(product, modification_dict)
     stock_product = StockProduct.objects.get(product=product, modification=modification)
     return stock_product
 
 
-def get_product_modification_parameters(product):
+@csrf_exempt
+def get_images_of_stock_product(request):
+    if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
+        raise NotImplementedError
+    product = Product.objects.get(id=request.POST.get('product_id'))
+    modification_dict = literal_eval(request.POST.get('modification_dict_str'))
+    stock_product = find_stock_product(product, modification_dict)
+    images = stock_product.images.all()
+    data = dict()
+    for i in range(len(images)):
+        data[str(i)] = images[i].image.url
+    return JsonResponse(data)
+
+
+def get_product_modification_parameters(product):  # #Передает параметры модификаций данного продукта
     sample_modification = product.modifications.all()[0]
     sample_characteristics = sample_modification.characteristics
     sample_char_dict = literal_eval(sample_characteristics)
@@ -134,6 +162,35 @@ def get_product_modification_parameters(product):
     for key, value in sample_char_dict.items():
         parameters_list.append(key)
     return parameters_list
+
+
+def get_modification_parameter_values(product, parameter):  # #Возвращает все возможные значения параметра модификации
+    modifications = product.modifications.all()
+    values = []
+    for modification in modifications:
+        modification_dict = literal_eval(modification.characteristics)
+        if parameter not in modification_dict:
+            raise NotImplementedError
+        value = modification_dict[parameter]
+        if value not in values:
+            values.append(value)
+    return values
+
+
+def get_modifications_dict(product):  # #Возвращает параметры модификации и их возможные значения в виде словаря
+    mod_dict = dict()
+    parameters = get_product_modification_parameters(product)
+    for parameter in parameters:
+        mod_dict[parameter] = get_modification_parameter_values(product, parameter)
+    return mod_dict
+
+
+def get_modifications_json(request):  # #Возвращает параметры модификации и их возможные значения в JSON
+    if not request.method == 'GET' or 'product_id' not in request.GET:
+        raise NotImplementedError
+    product = Product.objects.get(id=request.GET.get('product_id'))
+    mod_dict = get_modifications_dict(product)
+    return JsonResponse(mod_dict)
 
 
 def __add_to_cart_authenticated__(user, quantity, stock_product):
@@ -404,6 +461,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Ссылка для регистрации устарела')
         return redirect('home')
+
 
 def signup(request):
     if request.method == 'POST':
