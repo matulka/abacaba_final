@@ -1,0 +1,4 @@
+django-widget-tweaks==1.4.3
+Jinja2==2.10
+django==2.1.4
+Pillow==6.0.0

@@ -1,0 +1,25 @@
+{% extends 'registration/profile_navigation.html' %}
+
+{% block data %}
+    <form>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="firstname">Имя</label>
+              <input type="text" class="form-control" id="firstname" value={{ request.user.first_name }}>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="surname">Фамилия</label>
+              <input type="text" class="form-control" id="surname" value={{ request.user.last_name }}>
+            </div>
+        </div>
+        <div class="form-group">
+            <fieldset disabled>
+                <div class="form-group">
+                  <label for="email"></label>
+                  <input type="text" id="email" class="form-control" value={{ request.user.email }}>
+                </div>
+            </fieldset>
+        </div>
+    </form>
+{% endblock %}
+
