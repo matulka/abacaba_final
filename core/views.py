@@ -23,6 +23,7 @@ from django.core import serializers
 from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
@@ -122,7 +123,6 @@ def return_products(category_id=None):  # #Возвращает список п�
     if category is None:
         return []
     return category.products.all()
-
 
 
 def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту

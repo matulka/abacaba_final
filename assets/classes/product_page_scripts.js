@@ -37,10 +37,13 @@ function initialize_modifications(product_id) {
 function edit_button_action(event) {
     if ($('#edit-button').html() == 'Редактировать') {
         $('select').attr('disabled', false);
+        $('#cart-button').attr('disabled', true);
         $('#edit-button').html('Сохранить');
     } else if ($('#edit-button').html() == 'Сохранить') {
+        $('#cart-button').attr('disabled', false);
         $('select').attr('disabled', true);
         $('#edit-button').html('Редактировать');
+        get_current_images();
     }
 }
 
@@ -65,6 +68,9 @@ function get_current_images() {
         url: '/get_images',
         data: data,
         success: function(response) {
+            $('#subimages_row').empty();
+            $('#main-image').attr('src', '');
+            console.log(response);
             for (var index in response) {
                 var url = response[index];
                 var string_to_add = '';
@@ -76,7 +82,7 @@ function get_current_images() {
                     $('img[src="' + url + '"]').each(function() {
                         if ($(this).hasClass('mini-image')) {
                             $(this).attr('style', 'border: 2px solid red; border-radius: 5px;');
-                            $('#main_image').attr('src', $(this).attr('src'));
+                            $('#main-image').attr('src', $(this).attr('src'));
                         }
                     });
                 }
