@@ -57,12 +57,13 @@ function select_image(this_image) {
 
 function get_current_images() {
     var modification_dict = {};
-    $('select').each(function(index){
+    $('select').each(function(){
         modification_dict[$(this).attr('name')] = $(this).val();
     });
     data = {};
     data['product_id'] = get_product_id();
     data['modification_dict_str'] = JSON.stringify(modification_dict);
+    data['csrfmiddlewaretoken'] = window.kek;
     $.ajax({
         type: 'POST',
         url: '/get_images',
@@ -70,9 +71,8 @@ function get_current_images() {
         success: function(response) {
             $('#subimages_row').empty();
             $('#main-image').attr('src', '');
-            console.log(response);
-            for (var index in response) {
-                var url = response[index];
+            for (var index = 0; index < response['images'].length; index += 1) {
+                var url = response['images'][index];
                 var string_to_add = '';
                 string_to_add += '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"><div class="square-box" style="width: 100%">';
                 string_to_add += '<img class="centered-div mini-image" src="' + url + '" onclick="select_image(this)">';
@@ -87,13 +87,38 @@ function get_current_images() {
                     });
                 }
             }
-            $()
+            $('#quantity').attr('max', response['quantity'])
         }
     });
+}
+
+function cart_button_action(event) {
+    if (quantity.checkValidity()) {
+        data = {};
+        $('select').each(function() {
+            data[$(this).attr('name')] = $(this).val();
+        });
+        data['quantity'] = $('#quantity').val();
+        console.log(data['quantity']);
+        data['product_id'] = get_product_id();
+        data['csrfmiddlewaretoken'] = window.kek;
+        $.ajax({
+            type: 'POST',
+            url: '/add_to_cart',
+            data: data,
+            success: function(response) {
+                console.log('success');
+            }
+        });
+    }
+    else {
+        alert('К сожалению, у нас не такого количества этого товара! Пожалуйста, выберите количество меньше.');
+    }
 }
 
 $(document).ready(function(){
     var product_id = get_product_id();
     initialize_modifications(product_id);
     $('#edit-button').on('click', edit_button_action);
+    $('#cart-button').on('click', cart_button_action);
 });

@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render, render_to_response
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
@@ -47,6 +46,7 @@ def e_handler500(request):
     response.status_code = 500
     return response
 
+
 """
 Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
 Если пользователь не авторизован, в контексте лежат OrderProductInformation
@@ -62,6 +62,7 @@ def cart_page(request):
         if 'cart' not in request.session:
             request.session['cart'] = list()
         context['cart'] = request.session['cart']
+    print(context)
     return render(request, 'cart.html')
 
 
@@ -140,7 +141,6 @@ def find_stock_product(product, modification_dict):  # #Ищет сток про
     return stock_product
 
 
-@csrf_exempt
 def get_images_of_stock_product(request):
     if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
         raise NotImplementedError
@@ -149,8 +149,10 @@ def get_images_of_stock_product(request):
     stock_product = find_stock_product(product, modification_dict)
     images = stock_product.images.all()
     data = dict()
+    data['images'] = list()
     for i in range(len(images)):
-        data[str(i)] = images[i].image.url
+        data['images'].append(images[i].image.url)
+    data['quantity'] = stock_product.quantity
     return JsonResponse(data)
 
 
@@ -303,7 +305,6 @@ def __cart_from_session_to_db__(current_cart, user):
         quantity = information['quantity']
         stock_product = StockProduct.objects.get(id=information['stock_product'])
         __add_to_cart_authenticated__(user, quantity, stock_product)
-
 
 
 """
@@ -475,8 +476,8 @@ def signup(request):
             message = render_to_string('registration/account_activate_email.html', {
                 'user': user,
                 'domain': current_site.domain,
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token':account_activation_token.make_token(user),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token': account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(
@@ -490,9 +491,11 @@ def signup(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
+
 @login_required
 def profile(request):
     return render(request, 'registration/profile.html')
+
 
 @login_required
 def profile_orders(request):

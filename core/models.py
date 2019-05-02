@@ -105,6 +105,9 @@ class Order(models.Model):
 class Cart(models.Model):
     author = models.OneToOneField(to=User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return 'Корзина пользователя ' + self.author.username
+
 
 class OrderProduct(models.Model):
     id = models.AutoField(primary_key=True)
@@ -138,12 +141,13 @@ class Question(models.Model):
     admin_login = models.TextField(null=True)
 
 
-
 class OrderProductInformation(models.Model):
     quantity = models.IntegerField()
     stock_product = models.ForeignKey(to=StockProduct,
                                       on_delete=models.CASCADE,
                                       related_name='opi')
+
+
 class Image(models.Model):
     id = models.AutoField(primary_key=True)
     image = models.ImageField(upload_to='images',
