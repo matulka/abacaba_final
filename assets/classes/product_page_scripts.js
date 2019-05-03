@@ -50,7 +50,7 @@ function edit_button_action(event) {
 function select_image(this_image) {
     $('img').each(function() {
         $(this).attr('style', '');
-    })
+    });
     this_image.style = 'border: 2px solid red; border-radius: 5px;';
     $('#main-image').attr('src', this_image.src);
 }
@@ -107,7 +107,7 @@ function cart_button_action(event) {
             url: '/add_to_cart',
             data: data,
             success: function(response) {
-                console.log('success');
+                alert('Товар успешно добавлен в корзину.');
             }
         });
     }
