@@ -100,6 +100,7 @@ def return_categories_json(request):  # #Возвращает данные о к
             string = string + (str(category.parent_category.id) + ';')
         else:
             string = string + 'None;'
+        print(string)
     string = string[:(len(string) - 1)]
     d = dict()
     d['1'] = string
@@ -119,7 +120,10 @@ def browse_product(request):  # #Возвращает контекст для о
 def return_products(category_id=None):  # #Возвращает список продуктов для главной страницы
     if category_id is None:
         return Product.objects.all()
-    category = Category.objects.get(id=category_id)
+    if Category.objects.filter(id=category_id).exists():
+        category = Category.objects.get(id=category_id)
+    else:
+        return []
     if category is None:
         return []
     return category.products.all()
@@ -336,12 +340,28 @@ def make_order(request):
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
                 raise NotImplementedError
-            address = request.POST.get('address')
+            try:
+                address = request.session['address']
+            except KeyError:
+                raise KeyError # # Лучше переработать
             email = request.POST.get('email')
             current_cart = request.session['cart']
             if address is None or email is None:
-                raise ValueError
-            order = Order(email=email, address=address)
+                raise ValueError # # Лучше переработать
+            city = address['city']
+            street = address['street']
+            building = address['building']
+            flat = address['flat']
+            entrance = address['entrance']
+            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
+                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
+            else:
+                ad = Addresses(city=city,
+                               street=street,
+                               building=building,
+                               flat=flat,
+                               entrance=entrance)
+            order = Order(email=email, address=ad)
             order.save()
             for order_product_information in current_cart:
                 order_product = OrderProduct(quantity=order_product_information['quantity'],
@@ -380,6 +400,33 @@ def add_address(request):
                 new_ad.save()
                 new_ad.customers.add(user)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def add_address_unauth(request):
+    if request.method == 'POST' and not request.user.is_authenticated:
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            city = form.cleaned_data['city']
+            street = form.cleaned_data['street']
+            building = form.cleaned_data['building']
+            flat = form.cleaned_data['flat']
+            entrance = form.cleaned_data['entrance']
+            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
+                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
+                request.session['address'] = model_to_dict(ad)
+            else:
+                new_ad = Addresses(city=city,
+                                   street=street,
+                                   building=building,
+                                   flat=flat,
+                                   entrance=entrance)
+                request.session['address'] = model_to_dict(new_ad)
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # #Возможно, редерикт на страницу оформления заказа
         else:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:

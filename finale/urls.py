@@ -30,6 +30,7 @@ urlpatterns = [
     path('search', views.search),
     path('add_to_cart', views.add_to_cart),
     path('add_address', views.add_address),
+    path('add_address_unauth', views.add_address_unauth),
     path('del_address', views.delete_address),
     path('del_from_cart', views.delete_from_cart),
     path('accounts/profile', views.profile),
