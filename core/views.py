@@ -361,6 +361,7 @@ def make_order(request):
                                building=building,
                                flat=flat,
                                entrance=entrance)
+                ad.save()
             order = Order(email=email, address=ad)
             order.save()
             for order_product_information in current_cart:
