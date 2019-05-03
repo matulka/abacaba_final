@@ -1,5 +1,37 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<div class="row">
+    <div class="col-sm-12 col-cart">
+        <div class="cart-product">
+            <div class="row no-gutters" style="padding: 20px;">
+                <div class="col-sm-5">
+                    <div class="row no-gutters" style="height: 100%;">
+                        <div class="col-sm-12">
+                            <div class="square-box">
+                                <img class="centered-div">
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                            <p style="margin: 0;">Стоимость: </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center;">
+                        <div class="col-sm-auto">
+                            <div class="row">
+                                <div class="col-sm-6"><p>Параметр:</p></div>
+                                <div class="col-sm-6"><p style="text-align: right;">Значение</p></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                            <button class="btn btn-outline-danger btn-block">Удалить из корзины</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
