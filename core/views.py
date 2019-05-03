@@ -47,23 +47,42 @@ def e_handler500(request):
     return response
 
 
-"""
-Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
-Если пользователь не авторизован, в контексте лежат OrderProductInformation
-"""
-
-
 def cart_page(request):
     context = dict()
+    cart = list()
     if request.user.is_authenticated:
         user = request.user
-        context['cart'] = user.cart.products.all()
+        cart = user.cart.products.all()
     else:
         if 'cart' not in request.session:
             request.session['cart'] = list()
-        context['cart'] = request.session['cart']
-    print(context)
-    return render(request, 'cart.html')
+        cart = request.session['cart']
+    context['ids'] = []
+    context['order_products'] = cart
+
+    for i in range(len(cart)):
+        context['ids'].append(cart[i].id)
+
+    return render(request, 'cart.html', context)
+
+
+def get_order_product_info_json(request):  # #Передается массив из order_product.id
+    if request.method != 'POST' or 'order_product_id' not in request.POST:
+        raise NotImplementedError
+    info_dict = dict()
+    ids_string = request.POST.get('order_product_id')
+    ids_string = ids_string[1:(len(ids_string) - 1)]
+    ids_array = ids_string.split(',')
+    for order_product_id in ids_array:
+        order_product = OrderProduct.objects.get(id=order_product_id)
+        modifications = order_product.stock_product.modification.characteristics
+        info_dict[order_product_id] = dict()
+        info_dict[order_product_id]['modifications'] = literal_eval(modifications)
+        info_dict[order_product_id]['quantity'] = order_product.quantity
+        info_dict[order_product_id]['name'] = order_product.stock_product.product.name
+        info_dict[order_product_id]['price'] = order_product.stock_product.product.price
+        info_dict[order_product_id]['image_url'] = order_product.stock_product.product.image.image.url
+    return JsonResponse(info_dict)
 
 
 def search(request):

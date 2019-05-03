@@ -41,6 +41,7 @@ urlpatterns = [
     path('get_modifications', views.get_modifications_json),
     path('get_images', views.get_images_of_stock_product),
     path('add_to_cart', views.add_to_cart),
+    path('get_order_product_modifications', views.get_order_product_info_json),
     path('products', views.browse_product),
     url('accounts/', include('django.contrib.auth.urls')),
     url(r'^sign-up/$', views.signup, name='signup'),
