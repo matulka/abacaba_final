@@ -3,8 +3,9 @@
 {% block content %}
 <div class="row">
     <div class="col-sm-12 col-cart">
-        <div class="cart-product">
-            <div class="row no-gutters" style="padding: 20px;">
+        <div class="cart-product border border-info" style="padding: 20px;">
+            <h2 style="text-align: center;">Название продукта</h2>
+            <div class="row no-gutters">
                 <div class="col-sm-5">
                     <div class="row no-gutters" style="height: 100%;">
                         <div class="col-sm-12">
@@ -13,20 +14,20 @@
                             </div>
                         </div>
                         <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
-                            <p style="margin: 0;">Стоимость: </p>
+                            <p class="lead" style="margin: 0;">Стоимость: </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-7">
                     <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center;">
-                        <div class="col-sm-auto">
+                        <div class="col-sm-auto" style="padding: 10px;">
                             <div class="row">
-                                <div class="col-sm-6"><p>Параметр:</p></div>
-                                <div class="col-sm-6"><p style="text-align: right;">Значение</p></div>
+                                <div class="col-sm-6"><input readonly class="form-control-plaintext" value="Параметр:"></div>
+                                <div class="col-sm-6"><input readonly class="form-control-plaintext" value="Значение" style="text-align: right;"></div>
                             </div>
                         </div>
                         <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
-                            <button class="btn btn-outline-danger btn-block">Удалить из корзины</button>
+                            <button type="button" class="btn btn-outline-danger btn-block">Удалить из корзины</button>
                         </div>
                     </div>
                 </div>
