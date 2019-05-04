@@ -4,7 +4,7 @@
 
 {% for order_product in order_products %}
 <div class="row">
-    <div class="col-sm-12 col-cart">
+    <div id="container-{{ order_product.id }}" class="col-sm-12 col-cart">
         <div class="cart-product border border-info" style="padding: 20px;">
             <h2 id="name-{{ order_product.id }}" style="text-align: center;">Название продукта</h2>
             <div class="row no-gutters">
@@ -15,17 +15,15 @@
                                 <img id="img-{{ order_product.id }}" class="centered-div">
                             </div>
                         </div>
-                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
                             <p id="cost-{{ order_product.id }}" class="lead" style="margin: 0;">Стоимость: </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-7">
-                    <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center;">
+                    <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center; width: auto;">
                         <div class="col-sm-auto" style="padding: 10px;">
-                            <div id="parameters-{{ order_product.id }}" class="row">
-                                <div class="col-sm-6"><input readonly class="form-control-plaintext" value="Параметр:"></div>
-                                <div class="col-sm-6"><input readonly class="form-control-plaintext" value="Значение" style="text-align: right;"></div>
+                            <div id="parameters-{{ order_product.id }}" class="row" style="width: auto;">
                             </div>
                         </div>
                         <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
@@ -41,6 +39,7 @@
 
 <script>
     window.order_product_ids = '{{ ids }}';
+    window.prices = {};
 </script>
 
 <script type="text/javascript" src="static/classes/cart_scripts.js"></script>
