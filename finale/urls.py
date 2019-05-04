@@ -23,7 +23,7 @@ from finale import settings
 
 handler500 = views.e_handler500
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', views.admin_page),
 
     path('', views.index_page, name='home'),
     path('cart', views.cart_page),

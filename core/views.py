@@ -24,6 +24,11 @@ from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
 
+def admin_page(request):
+    if request.user.is_staff:
+        return render(request, 'admin/admin_index.html')
+    return redirect('/')
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
@@ -73,8 +78,8 @@ def search(request):
             context['products'] = search_in_base(context['text'])
         else:
             context['products'] = []
-        return render(request, 'search.html', context)
-    return render(request, 'search.html', context)
+        return render(request, 'index.html', context)
+    return render(request, 'index.html', context)
 
 
 def search_in_base(text):
