@@ -10,6 +10,7 @@ function initialize_products() {
             for (var i = 0; i < response['order_product_ids'].length; i += 1) {
                 var id = response['order_product_ids'][i];
                 window.prices[id] = response[id]['price'];
+                window.stock_product_ids[id] = response[id]['stock_product_id'];
                 $('#name-' + id.toString()).html(response[id]['name']);
                 $('#img-' + id.toString()).attr('src', response[id]['image_url']);
                 $('#cost-' + id.toString()).append((response[id]['price'] * response[id]['quantity']).toString() + '₽');
@@ -26,10 +27,26 @@ function initialize_products() {
                         $('#cost-' + cur_id.toString()).html('Стоимость: ' + new_price.toString() + '₽');
                     }
                 });
+                $('#delete-' + id.toString()).on('click', function(event) {
+                    var data = {};
+                    var cur_id = this.id.toString().split('-')[1];
+                    data['csrfmiddlewaretoken'] = window.kek;
+                    data['stock_product_id'] = window.stock_product_ids[cur_id];
+                    $.ajax({
+                        type: 'POST',
+                        url: '/del_from_cart',
+                        data: data,
+                        success: function(response) {
+                            $('#container-' + cur_id.toString()).remove();
+                            alert('Товар успешно удален из корзины');
+                        }
+                    });
+                });
             }
         }
     });
 }
+
 
 $('document').ready(function() {
     initialize_products();

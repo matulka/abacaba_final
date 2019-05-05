@@ -72,7 +72,7 @@ def get_order_product_info_json(request):  # #Передается массив 
     info_dict = dict()
     ids_string = request.POST.get('order_product_id')
     ids_string = ids_string[1:(len(ids_string) - 1)]
-    ids_array = ids_string.split(',')
+    ids_array = ids_string.split(', ')
     info_dict['order_product_ids'] = ids_array
     for order_product_id in ids_array:
         order_product = OrderProduct.objects.get(id=order_product_id)
@@ -84,6 +84,7 @@ def get_order_product_info_json(request):  # #Передается массив 
         info_dict[order_product_id]['name'] = order_product.stock_product.product.name
         info_dict[order_product_id]['price'] = order_product.stock_product.product.price
         info_dict[order_product_id]['image_url'] = order_product.stock_product.product.image.image.url
+        info_dict[order_product_id]['stock_product_id'] = order_product.stock_product.id
     return JsonResponse(info_dict)
 
 
@@ -299,12 +300,13 @@ def add_to_cart(request):
 
 def delete_from_cart(request):
     if request.method == 'POST':
-        stock_product_id = request.POST.get('stock_product_id')
+        stock_product_id = int(request.POST.get('stock_product_id'))
         try:
             stock_product = StockProduct.objects.get(id=stock_product_id)
             if request.user.is_authenticated:
                 user = request.user
                 order_product = user.cart.products.get(stock_product=stock_product)
+                print(order_product)
                 order_product.delete()
             else:
                 for order_product_info in request.session['cart']:

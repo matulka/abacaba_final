@@ -99,7 +99,6 @@ function cart_button_action(event) {
             data[$(this).attr('name')] = $(this).val();
         });
         data['quantity'] = $('#quantity').val();
-        console.log(data['quantity']);
         data['product_id'] = get_product_id();
         data['csrfmiddlewaretoken'] = window.kek;
         $.ajax({
