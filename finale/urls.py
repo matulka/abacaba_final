@@ -43,6 +43,7 @@ urlpatterns = [
     path('add_to_cart', views.add_to_cart),
     path('get_order_product_modifications', views.get_order_product_info_json),
     path('products', views.browse_product),
+    path('clear_session', views.clear_session),
     url('accounts/', include('django.contrib.auth.urls')),
     url(r'^sign-up/$', views.signup, name='signup'),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',

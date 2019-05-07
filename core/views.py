@@ -23,6 +23,18 @@ from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
 
+def clear_session(request):
+    request.session.flush()
+    return redirect('/')
+
+
+def print_unauth_cart(request):
+    if 'cart' not in request.session:
+        print('cart: None')
+    else:
+        print('cart: ', request.session['cart'])
+
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
@@ -33,6 +45,7 @@ def arr_to_str(arr):
 
 def index_page(request):
     context = dict()
+    print_unauth_cart(request)
     if request.method == 'GET' and 'category_id' in request.GET:
         context['products'] = return_products(request.GET.get('category_id'))
     else:
@@ -243,6 +256,7 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
+    print('cart_before:', cart)
     for products in cart:
         print(str(products['stock_product']) + ' ' + str(stock_product.id))
         if int(products['stock_product']) == int(stock_product.id):
@@ -250,10 +264,12 @@ def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
                 raise ValueError
             else:
                 products['quantity'] = int(quantity) + int(products['quantity'])
+                print('cart_after:', cart)
                 return
     if int(quantity) > stock_product.quantity:
         raise ValueError
     cart.append(model_to_dict(order_product_info))
+    print('cart_after:', cart)
 
 
 """
@@ -287,10 +303,10 @@ def add_to_cart(request):
                 request.session['cart'] = []
             try:
                 __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
+                print('request_after_after:', request.session['cart'])
             except ValueError:
                 e_handler500(request)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
-    return redirect('/')
+        return HttpResponse('success')
 
 
 """
