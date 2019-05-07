@@ -43,6 +43,24 @@ def arr_to_str(arr):
     return string
 
 
+def dict_cart_to_model_cart(dict_cart):
+    model_cart = list()
+    for i in range(len(dict_cart)):
+        stock_product = StockProduct.objects.get(id=int(dict_cart[i]['stock_product']))
+        order_product_info = OrderProductInformation(quantity=int(dict_cart[i]['quantity']),
+                                                     stock_product=stock_product)
+        order_product_info.id = i
+        model_cart.append(order_product_info)
+    return model_cart
+
+
+def js_string_to_arr(js_string):
+    ids_string = js_string
+    ids_string = ids_string[1:(len(ids_string) - 1)]
+    ids_array = ids_string.split(', ')
+    return ids_array
+
+
 def index_page(request):
     context = dict()
     print_unauth_cart(request)
@@ -69,15 +87,7 @@ def cart_page(request):
     else:
         if 'cart' not in request.session:
             request.session['cart'] = list()
-        cart = request.session['cart']
-        model_cart = list()
-        for i in range(len(cart)):
-            stock_product = StockProduct.objects.get(id=int(cart[i]['stock_product']))
-            order_product_info = OrderProductInformation(quantity=int(cart[i]['quantity']),
-                                                         stock_product=stock_product)
-            order_product_info.id = i
-            model_cart.append(order_product_info)
-        cart = model_cart
+        cart = dict_cart_to_model_cart(request.session['cart'])
 
     context['ids'] = []
     context['order_products'] = cart
@@ -90,14 +100,11 @@ def cart_page(request):
 def get_order_product_info_json(request):  # #Передается массив из order_product.id
     if request.method != 'POST' or 'order_product_id' not in request.POST:
         raise NotImplementedError
+
     info_dict = dict()
+    info_dict['order_product_ids'] = js_string_to_arr(request.POST.get('order_product_id'))
 
-    ids_string = request.POST.get('order_product_id')
-    ids_string = ids_string[1:(len(ids_string) - 1)]
-    ids_array = ids_string.split(', ')
-    info_dict['order_product_ids'] = ids_array
-
-    for order_product_id in ids_array:
+    for order_product_id in info_dict['order_product_ids']:
         info_dict[order_product_id] = dict()
 
         if request.user.is_authenticated:
@@ -105,9 +112,9 @@ def get_order_product_info_json(request):  # #Передается массив 
             stock_product = order_product.stock_product
             quantity = order_product.quantity
         else:
-            order_product_info = request.session['cart'][int(order_product_id)]
-            stock_product = StockProduct.objects.get(id=int(order_product_info['stock_product']))
-            quantity = int(order_product_info['quantity'])
+            order_product_dict = request.session['cart'][int(order_product_id)]
+            stock_product = StockProduct.objects.get(id=int(order_product_dict['stock_product']))
+            quantity = int(order_product_dict['quantity'])
 
         modifications = stock_product.modification.characteristics
         info_dict[order_product_id]['modifications'] = literal_eval(modifications)
@@ -319,7 +326,6 @@ def add_to_cart(request):
                 request.session['cart'] = []
             try:
                 __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
-                print('request_after_after:', request.session['cart'])
             except ValueError:
                 e_handler500(request)
         return HttpResponse('success')
@@ -338,15 +344,14 @@ def delete_from_cart(request):
             if request.user.is_authenticated:
                 user = request.user
                 order_product = user.cart.products.get(stock_product=stock_product)
-                print(order_product)
                 order_product.delete()
             else:
                 for order_product_dict in request.session['cart']:
                     if order_product_dict['stock_product'] == stock_product.id:
                         request.session['cart'].remove(order_product_dict)
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponse('success')
         except ObjectDoesNotExist:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponse('failed')
     return redirect('/')
 
 
