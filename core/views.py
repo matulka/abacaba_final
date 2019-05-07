@@ -70,9 +70,17 @@ def cart_page(request):
         if 'cart' not in request.session:
             request.session['cart'] = list()
         cart = request.session['cart']
+        model_cart = list()
+        for i in range(len(cart)):
+            stock_product = StockProduct.objects.get(id=int(cart[i]['stock_product']))
+            order_product_info = OrderProductInformation(quantity=int(cart[i]['quantity']),
+                                                         stock_product=stock_product)
+            order_product_info.id = i
+            model_cart.append(order_product_info)
+        cart = model_cart
+
     context['ids'] = []
     context['order_products'] = cart
-
     for i in range(len(cart)):
         context['ids'].append(cart[i].id)
 
@@ -83,21 +91,33 @@ def get_order_product_info_json(request):  # #Передается массив 
     if request.method != 'POST' or 'order_product_id' not in request.POST:
         raise NotImplementedError
     info_dict = dict()
+
     ids_string = request.POST.get('order_product_id')
     ids_string = ids_string[1:(len(ids_string) - 1)]
     ids_array = ids_string.split(', ')
     info_dict['order_product_ids'] = ids_array
+
     for order_product_id in ids_array:
-        order_product = OrderProduct.objects.get(id=order_product_id)
-        modifications = order_product.stock_product.modification.characteristics
         info_dict[order_product_id] = dict()
+
+        if request.user.is_authenticated:
+            order_product = OrderProduct.objects.get(id=order_product_id)
+            stock_product = order_product.stock_product
+            quantity = order_product.quantity
+        else:
+            order_product_info = request.session['cart'][int(order_product_id)]
+            stock_product = StockProduct.objects.get(id=int(order_product_info['stock_product']))
+            quantity = int(order_product_info['quantity'])
+
+        modifications = stock_product.modification.characteristics
         info_dict[order_product_id]['modifications'] = literal_eval(modifications)
-        info_dict[order_product_id]['quantity'] = order_product.quantity
-        info_dict[order_product_id]['max_quantity'] = order_product.stock_product.quantity
-        info_dict[order_product_id]['name'] = order_product.stock_product.product.name
-        info_dict[order_product_id]['price'] = order_product.stock_product.product.price
-        info_dict[order_product_id]['image_url'] = order_product.stock_product.product.image.image.url
-        info_dict[order_product_id]['stock_product_id'] = order_product.stock_product.id
+        info_dict[order_product_id]['quantity'] = quantity
+        info_dict[order_product_id]['max_quantity'] = stock_product.quantity
+        info_dict[order_product_id]['name'] = stock_product.product.name
+        info_dict[order_product_id]['price'] = stock_product.product.price
+        info_dict[order_product_id]['image_url'] = stock_product.product.image.image.url
+        info_dict[order_product_id]['stock_product_id'] = stock_product.id
+
     return JsonResponse(info_dict)
 
 
@@ -256,20 +276,16 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
-    print('cart_before:', cart)
     for products in cart:
-        print(str(products['stock_product']) + ' ' + str(stock_product.id))
         if int(products['stock_product']) == int(stock_product.id):
             if int(quantity) + int(products['quantity']) > stock_product.quantity:
                 raise ValueError
             else:
                 products['quantity'] = int(quantity) + int(products['quantity'])
-                print('cart_after:', cart)
                 return
     if int(quantity) > stock_product.quantity:
         raise ValueError
     cart.append(model_to_dict(order_product_info))
-    print('cart_after:', cart)
 
 
 """
@@ -325,9 +341,9 @@ def delete_from_cart(request):
                 print(order_product)
                 order_product.delete()
             else:
-                for order_product_info in request.session['cart']:
-                    if StockProduct.objects.get(id=order_product_info['stock_product']) == stock_product:
-                        request.session['cart'].remove(order_product_info)
+                for order_product_dict in request.session['cart']:
+                    if order_product_dict['stock_product'] == stock_product.id:
+                        request.session['cart'].remove(order_product_dict)
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         except ObjectDoesNotExist:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
