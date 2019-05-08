@@ -6,30 +6,30 @@
 
 {% for order_product in order_products %}
 <div class="row">
-    <div id="container-{{ order_product.id }}" class="col-sm-12 col-cart">
+    <div id="container-{{ order_product.stock_product.id }}" class="col-sm-12 col-cart">
         <div class="cart-product border border-info" style="padding: 20px;">
-            <h2 id="name-{{ order_product.id }}" style="text-align: center;">Название продукта</h2>
+            <h2 id="name-{{ order_product.stock_product.id }}" style="text-align: center;">Название продукта</h2>
             <div class="row no-gutters">
                 <div class="col-sm-5">
                     <div class="row no-gutters" style="height: 100%;">
                         <div class="col-sm-12">
                             <div class="square-box">
-                                <img id="img-{{ order_product.id }}" class="centered-div">
+                                <img id="img-{{ order_product.stock_product.id }}" class="centered-div">
                             </div>
                         </div>
                         <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
-                            <p id="cost-{{ order_product.id }}" class="lead" style="margin: 0;">Стоимость: </p>
+                            <p id="cost-{{ order_product.stock_product.id }}" class="lead" style="margin: 0;">Стоимость: </p>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-7">
                     <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center; width: auto;">
                         <div class="col-sm-auto" style="padding: 10px;">
-                            <div id="parameters-{{ order_product.id }}" class="row" style="width: auto;">
+                            <div id="parameters-{{ order_product.stock_product.id }}" class="row" style="width: auto;">
                             </div>
                         </div>
                         <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
-                            <button id="delete-{{ order_product.id }}" type="button" class="btn btn-outline-danger btn-block">Удалить из корзины</button>
+                            <button id="delete-{{ order_product.stock_product.id }}" type="button" class="btn btn-outline-danger btn-block">Удалить из корзины</button>
                         </div>
                     </div>
                 </div>
@@ -39,10 +39,15 @@
 </div>
 {% endfor %}
 
+<h2 id="cost-header"></h2>
+<button id="make-order-btn" type="button" class="btn btn-primary">Оформить заказ</button>
+
 <script>
-    window.order_product_ids = '{{ ids }}';
+    window.starting_order_product_ids = '{{ ids }}';
     window.prices = {};
-    window.stock_product_ids = {};
+    window.stock_product_ids = [];
+    window.quantities = {};
+    window.total_cost = 0;
 </script>
 
 <script type="text/javascript" src="static/classes/cart_scripts.js"></script>

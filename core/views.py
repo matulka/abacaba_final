@@ -367,6 +367,32 @@ def __cart_from_session_to_db__(current_cart, user):
         __add_to_cart_authenticated__(user, quantity, stock_product)
 
 
+def change_order_product_quantity(request):
+    if request.method != 'POST' or 'new_quantity' not in request.POST or 'stock_product_id' not in request.POST:
+        raise NotImplementedError
+    new_quantity = int(request.POST['new_quantity'])
+    stock_product_id = int(request.POST['stock_product_id'])
+    stock_product = StockProduct.objects.get(id=stock_product_id)
+    if request.user.is_authenticated:
+        order_product = request.user.cart.objects.get(stock_product=stock_product)
+        if 0 < new_quantity < stock_product.quantity:
+            order_product.quantity = new_quantity
+            order_product.save()
+            return HttpResponse('success')
+        else:
+            return HttpResponse('invalid quantity')
+    else:
+        index = None
+        for i in range(len(request.session['cart'])):
+            if request.session['cart'][i]['stock_product'] == stock_product_id:
+                index = i
+        if 0 < new_quantity < stock_product.quantity:
+            request.session['cart'][index]['quantity'] = str(new_quantity)
+            return HttpResponse('success')
+        else:
+            return HttpResponse('invalid quantity')
+
+
 """
 В этот метод необходимо передать, какой адрес выбрал пользователь. Если пользователь зарегистрирован,
 передается id адреса; в противном случае передается сам адрес (в виде строки?).
@@ -560,6 +586,3 @@ def profile(request):
 @login_required
 def profile_orders(request):
     return render(request, 'registration/profile_orders.html')
-
-
-#
