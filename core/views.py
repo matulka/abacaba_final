@@ -374,7 +374,7 @@ def change_order_product_quantity(request):
     stock_product_id = int(request.POST['stock_product_id'])
     stock_product = StockProduct.objects.get(id=stock_product_id)
     if request.user.is_authenticated:
-        order_product = request.user.cart.objects.get(stock_product=stock_product)
+        order_product = request.user.cart.products.get(stock_product=stock_product)
         if 0 < new_quantity < stock_product.quantity:
             order_product.quantity = new_quantity
             order_product.save()
