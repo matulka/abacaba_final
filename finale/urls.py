@@ -24,7 +24,8 @@ from finale import settings
 handler500 = views.e_handler500
 urlpatterns = [
     path('admin/', views.admin_page),
-
+    path('admin/product_page/', views.product_page),
+    path('admin/product_page/add_product', views.add_product),
     path('', views.index_page, name='home'),
     path('cart', views.cart_page),
     path('search', views.search),

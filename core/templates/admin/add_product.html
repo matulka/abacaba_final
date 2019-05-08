@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="create-product">
+    <h2>Добавление продукта</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label>Название:</label>
+            <input type="text">
+        </p>
+        <p>
+            <label>Цена:</label>
+            <input type="number" min="0" step="0.01">
+            <label> (в рублях)</label>
+        </p>
+        <p>
+            <label>Рейтинг:</label>
+            <input type="number">
+            <label>*опционально</label>
+        </p>
+        <p>
+            <label>Категории:</label>
+            <input list="categories" name="category">
+            <datalist id="categories">
+                {% for cat in categories %}
+                    <option>{{ cat.name }}
+                {% endfor %}
+            </datalist>
+        </p>
+        <div id="new-cat" class="row"></div>
+        <p><input type="button" value="Добавить уже существующую категорию" id="add-existing-cat" onclick="add_cat()"></p>
+        <p><input type="button" value="Добавить новую категорию"></p>
+        <input type="submit" value="Добавить">
+
+    </form>
+</div>
+<script>function add_cat(){
+    var html_str = '<p><input list="categories" name="category"></datalist></p>'
+    $('#new-cat').prepend(html_str);
+}</script>
+<script type="text/javascript" src="static/classes/admin_add_product.js"></script>
+{% endblock %}a

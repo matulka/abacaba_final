@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -18,7 +19,7 @@ class Category(models.Model):
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    price = models.IntegerField()
+    price = models.IntegerField(validators=[MinValueValidator(0)])
     rating = models.FloatField(blank=True,
                                null=True)
     categories = models.ManyToManyField(to=Category,

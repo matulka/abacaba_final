@@ -20,14 +20,29 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
-from core.forms import AddressForm, QuestionForm
+from core.forms import AddressForm, QuestionForm, AddProductForm
 from django.template import RequestContext
 
 
+@login_required
 def admin_page(request):
     if request.user.is_staff:
         return render(request, 'admin/admin_index.html')
     return redirect('/')
+
+
+def product_page(request):
+    if request.user.is_staff:
+        return render(request, 'admin/product_page.html')
+    return redirect('/')
+
+
+def add_product(request):
+    if request.user.is_staff:
+        cat = return_categories()
+        return render(request, 'admin/add_product.html', {'categories': cat})
+    return redirect('/')
+
 
 def arr_to_str(arr):
     string = str()
