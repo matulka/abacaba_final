@@ -98,6 +98,8 @@ def cart_page(request):
     if len(cart) == 0:
         context['is_empty'] = True
 
+    context['is_auth'] = request.user.is_authenticated
+
     return render(request, 'cart.html', context)
 
 

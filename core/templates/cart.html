@@ -44,8 +44,10 @@
 {% endfor %}
 
 {% if not is_empty %}
-<h2 id="cost-header"></h2>
-<button id="make-order-btn" type="button" class="btn btn-primary">Оформить заказ</button>
+<h2 style="text-align: right; margin-right: 8vw;" id="cost-header"></h2>
+<div style="width: 100%; display: flex; justify-content: flex-end; flex-direction: row;">
+    <button id="make-order-btn" type="button" class="btn btn-primary btn-lg" style="margin-right: 8vw;" onclick="make_order_btn();">Перейти к оформлению</button>
+</div>
 {% endif %}
 
 <script>
@@ -54,6 +56,10 @@
     window.stock_product_ids = [];
     window.quantities = {};
     window.total_cost = 0;
+    if ('{{ is_auth }}' == 'True') {
+        window.is_auth = true;
+    }
+    else window.is_auth = false;
 </script>
 
 <script type="text/javascript" src="static/classes/cart_scripts.js"></script>

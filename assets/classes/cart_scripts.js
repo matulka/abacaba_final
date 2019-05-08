@@ -21,8 +21,16 @@ function refresh_total_cost() {
     $('#cost-header').html('Итого: ' + window.total_cost.toString() + ' ₽');
 }
 
-function make_order_btn(event) {
-    
+function block_edit() {
+    for (var i = 0; i < window.stock_product_ids.length; i += 1) {
+        var id = window.stock_product_ids[i];
+        $('#delete-' + id.toString()).prop('disabled', true);
+        $('#quantity-' + id.toString()).prop('disabled', true);
+    }
+}
+
+function make_order_btn() {
+    block_edit();
 }
 
 function initialize_products() {

@@ -82,7 +82,7 @@ class Addresses(models.Model):
     customers = models.ManyToManyField(User)
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')
-    building = models.IntegerField(default=1)
+    building = models.IntegerField(default=1, blank=True)
     flat = models.IntegerField(default=1)
     entrance = models.TextField(null=True, blank=True)
 
@@ -99,7 +99,8 @@ class Order(models.Model):
                                 on_delete=models.CASCADE,
                                 null=True,
                                 related_name='orders')
-    email = models.TextField(null=True)  # #Электронная почта для заказов от незарегистрированных пользователей
+    email = models.TextField(null=True,
+                             blank=True)  # #Электронная почта для заказов от незарегистрированных пользователей
 
 
 class Cart(models.Model):
