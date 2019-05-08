@@ -4,8 +4,12 @@
 
 <h1 style="text-align: center; margin-bottom: 10px; margin-top: 20px;">Корзина</h1>
 
+{% if is_empty %}
+<h2 style="text-align: center; margin-bottom: 10px; margin-top: 10px; color: gray;">Корзина пуста</h2>
+{% endif %}
+
 {% for order_product in order_products %}
-<div class="row">
+<div id="content-row" class="row">
     <div id="container-{{ order_product.stock_product.id }}" class="col-sm-12 col-cart">
         <div class="cart-product border border-info" style="padding: 20px;">
             <h2 id="name-{{ order_product.stock_product.id }}" style="text-align: center;">Название продукта</h2>
@@ -39,8 +43,10 @@
 </div>
 {% endfor %}
 
+{% if not is_empty %}
 <h2 id="cost-header"></h2>
 <button id="make-order-btn" type="button" class="btn btn-primary">Оформить заказ</button>
+{% endif %}
 
 <script>
     window.starting_order_product_ids = '{{ ids }}';

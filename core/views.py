@@ -94,6 +94,10 @@ def cart_page(request):
     for i in range(len(cart)):
         context['ids'].append(cart[i].id)
 
+    context['is_empty'] = False
+    if len(cart) == 0:
+        context['is_empty'] = True
+
     return render(request, 'cart.html', context)
 
 
@@ -151,7 +155,7 @@ def search_in_base(text):
     return search_result
 
 
-def return_categories():  # #May need refactoring: context passed by value and not by pointer
+def return_categories():
     return Category.objects.all()
 
 

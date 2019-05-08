@@ -74,7 +74,7 @@ function get_current_images() {
             for (var index = 0; index < response['images'].length; index += 1) {
                 var url = response['images'][index];
                 var string_to_add = '';
-                string_to_add += '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3"><div class="square-box" style="width: 100%">';
+                string_to_add += '<div class="col-3"><div class="square-box" style="width: 100%">';
                 string_to_add += '<img class="centered-div mini-image" src="' + url + '" onclick="select_image(this)">';
                 string_to_add += '</div></div>';
                 $('#subimages_row').append(string_to_add);
