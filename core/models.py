@@ -21,7 +21,8 @@ class Product(models.Model):
     name = models.TextField()
     price = models.IntegerField(validators=[MinValueValidator(0)])
     rating = models.FloatField(blank=True,
-                               null=True)
+                               null=True,
+                               validators=[MinValueValidator(0), MaxValueValidator(5)])
     categories = models.ManyToManyField(to=Category,
                                         blank=True,
                                         related_name='products')

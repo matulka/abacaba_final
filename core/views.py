@@ -39,8 +39,17 @@ def product_page(request):
 
 def add_product(request):
     if request.user.is_staff:
-        cat = return_categories()
-        return render(request, 'admin/add_product.html', {'categories': cat})
+        if request.method == 'POST':
+            form = AddProductForm(request.POST)
+            if form.is_valid():
+                return redirect('')
+            else:
+                cat = return_categories()
+                return render(request, 'admin/add_product.html', {'categories': cat, 'form': form})
+        else:
+            form = AddProductForm()
+            cat = return_categories()
+            return render(request, 'admin/add_product.html', {'categories': cat, 'form': form})
     return redirect('/')
 
 

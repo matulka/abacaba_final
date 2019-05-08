@@ -50,7 +50,12 @@ class QuestionForm(forms.ModelForm):
 
 
 class AddProductForm(forms.ModelForm):
+    # name = forms.CharField(min_length=1, error_messages={'required': 'Поле должно быть заполнено!'})
+    # price = forms.FloatField(min_value=0, error_messages={'required': 'Поле должно быть заполнено!', 'invalid': 'LOL'})
+    # rating = forms.IntegerField(required=False, min_value=0, max_value=5, error_messages={'required': 'Поле должно быть заполнено!', 'invalid': 'LOL'})
     class Meta:
         model = Product
-        exclude = ['id']
+        fields = ['name', 'price', 'rating']
+        error_messages = {'name':{'required': 'Поле должно быть заполнено!'}, 'price':{'required': 'Поле должно быть заполнено!'},}
+
 
