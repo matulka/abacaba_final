@@ -31,6 +31,12 @@ function block_edit() {
 
 function make_order_btn() {
     block_edit();
+    $('#make-order-container').css('display', 'flex');
+    $('#make-order-btn').prop('disabled', true);
+    window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+    });
 }
 
 function initialize_products() {
