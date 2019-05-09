@@ -63,8 +63,12 @@
         </div>
         <div id="add_address_container" style="display:none">
             {% include 'address_form.html' %}
+            <div class="form-group">
+                <label for="description_input">Описание адреса</label>
+                <input id="description_input" type="text" class="form-control" placeholder="Введите описание адреса, чтобы потом Вы могли его вспомнить :)" required>
+            </div>
             <div class="form-group" style="display: flex; justify-content: center;">
-                <button type="button" class="btn btn-secondary">Сохранить адрес</button>
+                <button type="button" class="btn btn-secondary" onclick="submit_address_btn();">Сохранить адрес</button>
             </div>
         </div>
         {% endif %}

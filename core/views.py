@@ -451,6 +451,15 @@ def profile_info(request):
 
 
 @login_required
+def get_addresses_json(request):
+    user = request.user
+    response = dict()
+    for address in user.addresses.all():
+        response[address.id] = address.description
+    return JsonResponse(response)
+
+
+@login_required
 def add_address(request):
     if request.method == 'POST':
         form = AddressForm(request.POST)
@@ -461,22 +470,29 @@ def add_address(request):
             building = form.cleaned_data['building']
             flat = form.cleaned_data['flat']
             entrance = form.cleaned_data['entrance']
-            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
-                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
-                ad.customers.add(user)
-            else:
+            description = form.cleaned_data['description']
+            found = False
+            found_description = False
+            for ad in user.addresses.all():
+                if ad.city == city and ad.street == street and ad.building == building and ad.flat == flat and ad.entrance == entrance:
+                    found = True
+                if ad.description == description:
+                    found_description = True
+            if found_description:
+                return JsonResponse({'result': 'found description'})
+            if not found:
                 new_ad = Addresses(city=city,
                                    street=street,
                                    building=building,
                                    flat=flat,
-                                   entrance=entrance)
+                                   entrance=entrance,
+                                   description=description)
+                new_ad.customer = user
                 new_ad.save()
-                new_ad.customers.add(user)
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+            return JsonResponse({'result': 'success'})
         else:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    else:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return JsonResponse({'result': 'fail'})
 
 
 '''
@@ -490,7 +506,7 @@ def delete_address(request):
     if request.method == 'POST':
         address_id = int(request.POST.get('id'))
         address = Addresses.objects.get(id=address_id)
-        user.addresses_set.remove(address)
+        address.delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         return redirect('/')

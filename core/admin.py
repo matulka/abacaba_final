@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Product, Category, Image, Modification, StockProduct, Cart, OrderProduct
+from core.models import Product, Category, Image, Modification, StockProduct, Cart, OrderProduct, Addresses
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -21,3 +21,4 @@ admin.site.register(Modification)
 admin.site.register(StockProduct)
 admin.site.register(Cart)
 admin.site.register(OrderProduct)
+admin.site.register(Addresses)

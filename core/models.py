@@ -80,10 +80,13 @@ class ProductFeedback(models.Model):
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
     description = models.TextField(default='Дом')
-    customers = models.ManyToManyField(User)
+    customer = models.ForeignKey(to=User,
+                                 on_delete=models.CASCADE,
+                                 null=True,
+                                 related_name='addresses')
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')
-    building = models.IntegerField(default=1, blank=True)
+    building = models.IntegerField(default=1)
     flat = models.IntegerField(default=1)
     entrance = models.TextField(null=True, blank=True)
 

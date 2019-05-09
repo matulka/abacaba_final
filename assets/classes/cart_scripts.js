@@ -29,17 +29,86 @@ function block_edit() {
     }
 }
 
+function fill_addresses() {
+    $('#select_address').empty()
+    $.ajax({
+        url: '/get_addresses',
+        data: {
+            'csrfmiddlewaretoken': window.kek
+        },
+        success: function(response) {
+            for (var id in response) {
+                var description = response[id];
+                var str_to_add = '<option value="' + id.toString() + '">' + description.toString() + '</option>';
+                $('#select_address').append(str_to_add);
+            }
+        }
+    });
+}
+
 function make_order_btn() {
     block_edit();
     $('#make-order-container').css('display', 'flex');
     $('#make-order-btn').prop('disabled', true);
+    if (window.is_auth) {
+        fill_addresses();
+    }
     $('html, body').animate({ scrollTop: $(document).height() }, 1000);
 }
 
+function check_address_form_validity() {
+    return city_input.checkValidity() && street_input.checkValidity() && building_input.checkValidity() && entrance_input.checkValidity() && flat_input.checkValidity() && description_input.checkValidity();
+}
+
+function get_address_data() {
+    data = {};
+    data['city'] = $('#city_input').val();
+    data['street'] = $('#street_input').val();
+    data['building'] = $('#building_input').val();
+    data['entrance'] = $('#entrance_input').val();
+    data['flat'] = $('#flat_input').val();
+    data['description'] = $('#description_input').val();
+    return data;
+}
+
+function delete_input_values() {
+    $('#city_input').value = '';
+}
+
 function add_address_btn() {
-    $('#add_address_container').css('display', 'block');
-    $('#final_order_button').prop('disabled', true);
-    $('html, body').animate({ scrollTop: $(document).height() }, 1000);
+    if ($('#add_address_container').css('display') == 'none') {
+        $('#add_address_container').css('display', 'block');
+        $('#final_order_button').prop('disabled', true);
+        $('html, body').animate({ scrollTop: $(document).height() }, 1000);
+    }
+    else {
+        $('#add_address_container').css('display', 'none');
+        $('#final_order_button').prop('disabled', false);
+    }
+    
+}
+
+function submit_address_btn() {
+    if (check_address_form_validity()) {
+        var data = get_address_data();
+        data['csrfmiddlewaretoken'] = window.kek;
+        $.ajax({
+            type: 'POST',
+            url: '/add_address',
+            data: data,
+            success: function(response) {
+                if (response['result'] == 'found description') {
+                    alert('У вас уже существует адрес с таким описанием');
+                }
+                else {
+                    $('#add_address_container').css('display', 'none');
+                    $('#final_order_button').prop('disabled', false);
+                    delete_input_values();
+                    fill_addresses();
+                }
+            }
+        });
+    }
 }
 
 function initialize_products() {
