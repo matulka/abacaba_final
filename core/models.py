@@ -79,6 +79,7 @@ class ProductFeedback(models.Model):
 
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
+    description = models.TextField(default='Дом')
     customers = models.ManyToManyField(User)
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')

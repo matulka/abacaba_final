@@ -33,10 +33,13 @@ function make_order_btn() {
     block_edit();
     $('#make-order-container').css('display', 'flex');
     $('#make-order-btn').prop('disabled', true);
-    window.scrollTo({
-        top: window.innerHeight,
-        behavior: 'smooth'
-    });
+    $('html, body').animate({ scrollTop: $(document).height() }, 1000);
+}
+
+function add_address_btn() {
+    $('#add_address_container').css('display', 'block');
+    $('#final_order_button').prop('disabled', true);
+    $('html, body').animate({ scrollTop: $(document).height() }, 1000);
 }
 
 function initialize_products() {

@@ -58,6 +58,15 @@
             <select id="select_address" class="form-control">
             </select>
         </div>
+        <div class="form-group" style="display: flex; justify-content: flex-end; flex-direction: row;">
+            <button type="button" class="btn btn-secondary" onclick="add_address_btn();">Добавить новый адрес</button>
+        </div>
+        <div id="add_address_container" style="display:none">
+            {% include 'address_form.html' %}
+            <div class="form-group" style="display: flex; justify-content: center;">
+                <button type="button" class="btn btn-secondary">Сохранить адрес</button>
+            </div>
+        </div>
         {% endif %}
         {% if not is_auth %}
         <div class="form-group">
@@ -65,30 +74,10 @@
             <input type="email" class="form-control" placeholder="Введите Вашу электронную почту" aria-describedby="emailHelp">
             <small id="emailHelp" class="form-text text-muted">По этой почте мы свяжемся с Вами по поводу заказа</small>
         </div>
-        <h3 style="text-align: center;">Адрес</h3>
-        <div class="form-group">
-            <label for="city_input">Город</label>
-            <input type="text" class="form-control" placeholder="Введите Ваш город" required>
-        </div>
-        <div class="form-group">
-            <label for="street_input">Улица</label>
-            <input type="text" class="form-control" placeholder="Введите Вашу улицу" required>
-        </div>
-        <div class="form-group">
-            <label for="building_input">Строение</label>
-            <input type="text" class="form-control" placeholder="Введите номер Вашего строения (необязательно)">
-        </div>
-        <div class="form-group">
-            <label for="entrance_input">Подъезд</label>
-            <input type="text" class="form-control" placeholder="Введите номер Вашего подъезда" required>
-        </div>
-        <div class="form-group">
-            <label for="flat_input">Квартира</label>
-            <input type="text" class="form-control" placeholder="Введите номер Вашей квартиры" required>
-        </div>
+        {% include 'address_form.html' %}
         {% endif %}
         <div class="form-group" style="padding-top: 10px; display:flex; justify-content: center;">
-            <button type="button" class="btn btn-primary btn-lg">Завершить оформление заказа</button>
+            <button id="final_order_button" type="button" class="btn btn-primary btn-lg">Завершить оформление заказа</button>
         </div>
     </form>
 </div>
