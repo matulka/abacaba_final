@@ -83,6 +83,7 @@ class Addresses(models.Model):
     customer = models.ForeignKey(to=User,
                                  on_delete=models.CASCADE,
                                  null=True,
+                                 blank=True,
                                  related_name='addresses')
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')
