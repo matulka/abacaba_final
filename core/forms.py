@@ -40,7 +40,7 @@ class SignupForm(UserCreationForm):
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Addresses
-        fields = ['city', 'street', 'building', 'flat', 'entrance']
+        fields = ['city', 'street', 'building', 'flat', 'entrance', 'description']
 
 
 class QuestionForm(forms.ModelForm):

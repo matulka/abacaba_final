@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render, render_to_response
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
@@ -24,6 +23,18 @@ from core.forms import AddressForm, QuestionForm
 from django.template import RequestContext
 
 
+def clear_session(request):
+    request.session.flush()
+    return redirect('/')
+
+
+def print_unauth_cart(request):
+    if 'cart' not in request.session:
+        print('cart: None')
+    else:
+        print('cart: ', request.session['cart'])
+
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
@@ -32,8 +43,27 @@ def arr_to_str(arr):
     return string
 
 
+def dict_cart_to_model_cart(dict_cart):
+    model_cart = list()
+    for i in range(len(dict_cart)):
+        stock_product = StockProduct.objects.get(id=int(dict_cart[i]['stock_product']))
+        order_product_info = OrderProductInformation(quantity=int(dict_cart[i]['quantity']),
+                                                     stock_product=stock_product)
+        order_product_info.id = i
+        model_cart.append(order_product_info)
+    return model_cart
+
+
+def js_string_to_arr(js_string):
+    ids_string = js_string
+    ids_string = ids_string[1:(len(ids_string) - 1)]
+    ids_array = ids_string.split(', ')
+    return ids_array
+
+
 def index_page(request):
     context = dict()
+    print_unauth_cart(request)
     if request.method == 'GET' and 'category_id' in request.GET:
         context['products'] = return_products(request.GET.get('category_id'))
     else:
@@ -47,22 +77,61 @@ def e_handler500(request):
     response.status_code = 500
     return response
 
-"""
-Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
-Если пользователь не авторизован, в контексте лежат OrderProductInformation
-"""
-
 
 def cart_page(request):
     context = dict()
+    cart = list()
     if request.user.is_authenticated:
         user = request.user
-        context['cart'] = user.cart.products.all()
+        cart = user.cart.products.all()
     else:
         if 'cart' not in request.session:
             request.session['cart'] = list()
-        context['cart'] = request.session['cart']
-    return render(request, 'cart.html')
+        cart = dict_cart_to_model_cart(request.session['cart'])
+
+    context['ids'] = []
+    context['order_products'] = cart
+    for i in range(len(cart)):
+        context['ids'].append(cart[i].id)
+
+    context['is_empty'] = False
+    if len(cart) == 0:
+        context['is_empty'] = True
+
+    context['is_auth'] = request.user.is_authenticated
+
+    return render(request, 'cart.html', context)
+
+
+def get_order_product_info_json(request):  # #Передается массив из order_product.id
+    if request.method != 'POST' or 'order_product_id' not in request.POST:
+        raise NotImplementedError
+
+    info_dict = dict()
+    info_dict['order_product_ids'] = js_string_to_arr(request.POST.get('order_product_id'))
+
+    for order_product_id in info_dict['order_product_ids']:
+        info_dict[order_product_id] = dict()
+
+        if request.user.is_authenticated:
+            order_product = OrderProduct.objects.get(id=order_product_id)
+            stock_product = order_product.stock_product
+            quantity = order_product.quantity
+        else:
+            order_product_dict = request.session['cart'][int(order_product_id)]
+            stock_product = StockProduct.objects.get(id=int(order_product_dict['stock_product']))
+            quantity = int(order_product_dict['quantity'])
+
+        modifications = stock_product.modification.characteristics
+        info_dict[order_product_id]['modifications'] = literal_eval(modifications)
+        info_dict[order_product_id]['quantity'] = quantity
+        info_dict[order_product_id]['max_quantity'] = stock_product.quantity
+        info_dict[order_product_id]['name'] = stock_product.product.name
+        info_dict[order_product_id]['price'] = stock_product.product.price
+        info_dict[order_product_id]['image_url'] = stock_product.product.image.image.url
+        info_dict[order_product_id]['stock_product_id'] = stock_product.id
+
+    return JsonResponse(info_dict)
 
 
 def search(request):
@@ -88,7 +157,7 @@ def search_in_base(text):
     return search_result
 
 
-def return_categories():  # #May need refactoring: context passed by value and not by pointer
+def return_categories():
     return Category.objects.all()
 
 
@@ -140,7 +209,6 @@ def find_stock_product(product, modification_dict):  # #Ищет сток про
     return stock_product
 
 
-@csrf_exempt
 def get_images_of_stock_product(request):
     if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
         raise NotImplementedError
@@ -149,8 +217,10 @@ def get_images_of_stock_product(request):
     stock_product = find_stock_product(product, modification_dict)
     images = stock_product.images.all()
     data = dict()
+    data['images'] = list()
     for i in range(len(images)):
-        data[str(i)] = images[i].image.url
+        data['images'].append(images[i].image.url)
+    data['quantity'] = stock_product.quantity
     return JsonResponse(data)
 
 
@@ -220,7 +290,6 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
     for products in cart:
-        print(str(products['stock_product']) + ' ' + str(stock_product.id))
         if int(products['stock_product']) == int(stock_product.id):
             if int(quantity) + int(products['quantity']) > stock_product.quantity:
                 raise ValueError
@@ -265,8 +334,7 @@ def add_to_cart(request):
                 __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
             except ValueError:
                 e_handler500(request)
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # #Возврат на урл, где юзер был до этого
-    return redirect('/')
+        return HttpResponse('success')
 
 
 """
@@ -276,7 +344,7 @@ def add_to_cart(request):
 
 def delete_from_cart(request):
     if request.method == 'POST':
-        stock_product_id = request.POST.get('stock_product_id')
+        stock_product_id = int(request.POST.get('stock_product_id'))
         try:
             stock_product = StockProduct.objects.get(id=stock_product_id)
             if request.user.is_authenticated:
@@ -284,13 +352,26 @@ def delete_from_cart(request):
                 order_product = user.cart.products.get(stock_product=stock_product)
                 order_product.delete()
             else:
-                for order_product_info in request.session['cart']:
-                    if StockProduct.objects.get(id=order_product_info['stock_product']) == stock_product:
-                        request.session['cart'].remove(order_product_info)
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+                for order_product_dict in request.session['cart']:
+                    if order_product_dict['stock_product'] == stock_product.id:
+                        request.session['cart'].remove(order_product_dict)
+            return HttpResponse('success')
         except ObjectDoesNotExist:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponse('failed')
     return redirect('/')
+
+
+def clear_cart(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            cart = user.cart
+            for order_product in cart.products.all():
+                order_product.delete()
+            return HttpResponse('success')
+        else:
+            clear_session(request)
+            return HttpResponse('success')
 
 
 """
@@ -304,6 +385,31 @@ def __cart_from_session_to_db__(current_cart, user):
         stock_product = StockProduct.objects.get(id=information['stock_product'])
         __add_to_cart_authenticated__(user, quantity, stock_product)
 
+
+def change_order_product_quantity(request):
+    if request.method != 'POST' or 'new_quantity' not in request.POST or 'stock_product_id' not in request.POST:
+        raise NotImplementedError
+    new_quantity = int(request.POST['new_quantity'])
+    stock_product_id = int(request.POST['stock_product_id'])
+    stock_product = StockProduct.objects.get(id=stock_product_id)
+    if request.user.is_authenticated:
+        order_product = request.user.cart.products.get(stock_product=stock_product)
+        if 0 < new_quantity < stock_product.quantity:
+            order_product.quantity = new_quantity
+            order_product.save()
+            return HttpResponse('success')
+        else:
+            return HttpResponse('invalid quantity')
+    else:
+        index = None
+        for i in range(len(request.session['cart'])):
+            if request.session['cart'][i]['stock_product'] == stock_product_id:
+                index = i
+        if 0 < new_quantity < stock_product.quantity:
+            request.session['cart'][index]['quantity'] = str(new_quantity)
+            return HttpResponse('success')
+        else:
+            return HttpResponse('invalid quantity')
 
 
 """
@@ -324,7 +430,7 @@ def make_order(request):
             order_products = user.cart.products.all()
             if len(order_products) == 0:
                 raise NotImplementedError
-            address_id = request.POST.get('address_id')
+            address_id = int(request.POST.get('address_id'))
             address = Addresses.objects.get(id=address_id)
             order = Order(author=user,
                           address=address)
@@ -332,11 +438,21 @@ def make_order(request):
             for order_product in order_products:
                 order_product.order = order
                 order_product.save()
-            return redirect('/profile')
+            return HttpResponse('success')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
                 raise NotImplementedError
-            address = request.POST.get('address')
+            city = request.POST.get('city')
+            street = request.POST.get('street')
+            building = request.POST.get('building')
+            flat = request.POST.get('flat')
+            entrance = request.POST.get('entrance')
+            address = Addresses(city=city,
+                                street=street,
+                                building=building,
+                                flat=flat,
+                                entrance=entrance)
+            address.save()
             email = request.POST.get('email')
             current_cart = request.session['cart']
             if address is None or email is None:
@@ -358,6 +474,16 @@ def profile_info(request):
 
 
 @login_required
+def get_addresses_json(request):
+    if request.method == 'POST':
+        user = request.user
+        response = dict()
+        for address in user.addresses.all():
+            response[address.id] = address.description
+        return JsonResponse(response)
+
+
+@login_required
 def add_address(request):
     if request.method == 'POST':
         form = AddressForm(request.POST)
@@ -368,22 +494,29 @@ def add_address(request):
             building = form.cleaned_data['building']
             flat = form.cleaned_data['flat']
             entrance = form.cleaned_data['entrance']
-            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
-                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
-                ad.customers.add(user)
-            else:
+            description = form.cleaned_data['description']
+            found = False
+            found_description = False
+            for ad in user.addresses.all():
+                if ad.city == city and ad.street == street and ad.building == building and ad.flat == flat and ad.entrance == entrance:
+                    found = True
+                if ad.description == description:
+                    found_description = True
+            if found_description:
+                return JsonResponse({'result': 'found description'})
+            if not found:
                 new_ad = Addresses(city=city,
                                    street=street,
                                    building=building,
                                    flat=flat,
-                                   entrance=entrance)
+                                   entrance=entrance,
+                                   description=description)
+                new_ad.customer = user
                 new_ad.save()
-                new_ad.customers.add(user)
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+            return JsonResponse({'result': 'success'})
         else:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    else:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return JsonResponse({'result': 'fail'})
 
 
 '''
@@ -397,7 +530,7 @@ def delete_address(request):
     if request.method == 'POST':
         address_id = int(request.POST.get('id'))
         address = Addresses.objects.get(id=address_id)
-        user.addresses_set.remove(address)
+        address.delete()
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         return redirect('/')
@@ -475,8 +608,8 @@ def signup(request):
             message = render_to_string('registration/account_activate_email.html', {
                 'user': user,
                 'domain': current_site.domain,
-                'uid':urlsafe_base64_encode(force_bytes(user.pk)).decode(),
-                'token':account_activation_token.make_token(user),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'token': account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(
@@ -490,13 +623,12 @@ def signup(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
+
 @login_required
 def profile(request):
     return render(request, 'registration/profile.html')
 
+
 @login_required
 def profile_orders(request):
     return render(request, 'registration/profile_orders.html')
-
-
-#

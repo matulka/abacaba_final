@@ -77,3 +77,18 @@
 .mini-image:hover {
     border: 3px solid lightblue;
 }
+
+.col-cart {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.cart-product {
+    width: 50vw;
+}
+
+#make-order-btn {
+    
+}
