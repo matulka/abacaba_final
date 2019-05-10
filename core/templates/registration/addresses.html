@@ -1,0 +1,69 @@
+{% extends 'registration/profile_navigation.html' %}
+
+{% block data %}
+    <div style="margin-top: 15%;padding-right: 20%;padding-left: 10%;">
+        {% load widget_tweaks %}
+        {% if not empty %}
+            <form method="POST" action="{% url 'profile_addresses' %}">
+                {% csrf_token %}
+                <button type="submit">Сохранить изменения</button>
+            <table class="table" style="table-layout: auto;">
+              <thead class="thead-light">
+                <tr>
+                    <th scope="col">Город</th>
+                    <th scope="col">Улица</th>
+                    <th scope="col">Дом</th>
+                    <th scope="col">Подъезд</th>
+                    <th scope="col">Квартира</th>
+                    <th scope="col">Комментарий</th>
+                </tr>
+              </thead>
+              <tbody id="addresses">
+                    {% load widget_tweaks %}
+                    {% for key in addresses %}
+                            <tr>
+                                  <td hidden>
+                                      {% render_field form_address.id value=forloop.counter0%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.city value=key.city class+='form-control'%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.street value=key.street class+='form-control'%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.house value=key.building class+='form-control'%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.entrance value=key.entrance class+='form-control'%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.flat value=key.flat class+='form-control'%}
+                                  </td>
+
+                                  <td>
+                                      {% render_field form_address.description value=key.description class+='form-control'%}
+                                  </td>
+                            </tr>
+                    {% endfor %}
+              </tbody>
+            </table>
+            </form>
+        {% else %}
+            <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
+                <div class="form-group col-md-11">
+                    <h3>К сожалению, у Вас нет сохраненных адресов</h3>
+                    <button style="margin-top: 2%;" class="btn btn-primary btn-block">Добавить адрес</button>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+
+{% endblock %}

@@ -1,29 +1,39 @@
 {% extends 'registration/profile_navigation.html' %}
 
 {% block data %}
-    <div style="margin-top: 10%;padding-right: 20%;padding-left: 10%;">
+    <div style="margin-top: 15%;padding-right: 15%;padding-left: 10%;">
         {% load widget_tweaks %}
-        <table class="table">
-          <thead class="thead-light">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Дата заказа</th>
-                <th scope="col">Статус</th>
-                <th scope="col">Адрес доставки</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for key in orders %}
+        {% if not empty %}
+            <table class="table">
+              <thead class="thead-light">
                 <tr>
-                  <th scope="row">{{ key.id }}</th>
-                  <td>{{ key.order_date }}</td>
-                  <td>{{ key.status }}</td>
-                  <td>{{ key.address }}</td>
-                    <td>{{ key.address }}</td>
+                    <th scope="col">#</th>
+                    <th scope="col">Статус заказа</th>
+                    <th scope="col">Дата заказа</th>
+                    <th scope="col">Адрес доставки</th>
+                    <th scope="col">Товары</th>
                 </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                    {% for key in orders %}
+                        <tr>
+                            <th scope="row">{{ key.id }}</th>
+                            <th scope="row">{{ key.order.status }}</th>
+                            <th scope="row">{{ key.order.order_date }}</th>
+                            <th scope="row">{{ key.order.address }}</th>
+                            <th scope="row">{{ key.stock_product.product }} {{ key.stock_product.modification }}</th>
+                        </tr>
+                    {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+            <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
+                <div class="form-group col-md-11">
+                    <h3>К сожалению, у Вас нет активных заказов</h3>
+                    <button onclick="location.href='/'" style="margin-top: 2%;" class="btn btn-primary btn-block">Сделать заказ</button>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
 

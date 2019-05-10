@@ -12,7 +12,7 @@ class Category(models.Model):
                                         related_name='child_categories')
 
     def __str__(self):
-        return self.name
+        return 'Категория: ' + self.name
 
 
 class Product(models.Model):
@@ -21,13 +21,16 @@ class Product(models.Model):
     price = models.IntegerField()
     rating = models.FloatField(blank=True,
                                null=True)
-    category = models.ForeignKey(to=Category,
-                                 on_delete=models.CASCADE,
-                                 blank=True,
-                                 null=True,
-                                 related_name='products')
-    sample_image = models.ImageField(upload_to='images',
-                                     null=True)
+    categories = models.ManyToManyField(to=Category,
+                                        blank=True,
+                                        related_name='products')
+    main_category = models.ForeignKey(to=Category,
+                                      blank=True,
+                                      null=True,
+                                      on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Продукт: ' + self.name
 
     def __str__(self):
         return self.name
@@ -41,24 +44,21 @@ class Modification(models.Model):
     characteristics = models.TextField()
 
     def __str__(self):
-        return self.product
+        return str(self.characteristics)
 
 
 class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
-    product = models.OneToOneField(to=Product,
-                                   on_delete=models.CASCADE,
-                                   related_name='stock_product')
+    product = models.ForeignKey(to=Product,
+                                on_delete=models.CASCADE,
+                                related_name='stock_products')
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
-    image = models.ImageField(upload_to='images',
-                              blank=True,
-                              null=True)  # #product.image.url
     quantity = models.IntegerField()
 
     def __str__(self):
-        return self.product
+        return str(self.modification)
 
 
 class ProductFeedback(models.Model):
@@ -76,20 +76,24 @@ class ProductFeedback(models.Model):
                                null=True,
                                related_name='feedbacks')
 
-    def __str__(self):
-        return self.product
 
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
-    customers = models.ManyToManyField(User)
+    description = models.TextField(blank=True,
+                                   null=True)
+    customer = models.ForeignKey(to=User,
+                                 on_delete=models.CASCADE,
+                                 null=True,
+                                 blank=True,
+                                 related_name='addresses')
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')
-    building = models.IntegerField(default=1)
-    flat = models.IntegerField(default=1)
+    building = models.TextField(default='1')
+    flat = models.TextField(default='1')
     entrance = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return self.street
+        return self.city + ' ' + self.street + ' ' + self.building + ' ' + self.entrance + ' ' + self.flat
 
 
 class Order(models.Model):
@@ -98,20 +102,22 @@ class Order(models.Model):
     author = models.ForeignKey(to=User,
                                on_delete=models.CASCADE,
                                null=True,
+                               blank=True,
                                related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(to=Addresses,
                                 on_delete=models.CASCADE,
                                 null=True,
                                 related_name='orders')
-    email = models.TextField(null=True)  # #Электронная почта для заказов от незарегистрированных пользователей
-
-    def __str__(self):
-        return self.author.username
+    email = models.TextField(null=True,
+                             blank=True)  # #Электронная почта для заказов от незарегистрированных пользователей
 
 
 class Cart(models.Model):
     author = models.OneToOneField(to=User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Корзина пользователя ' + self.author.username
 
 
 class OrderProduct(models.Model):
@@ -133,9 +139,6 @@ class OrderProduct(models.Model):
         related_name='products'
     )
 
-    def __str__(self):
-        return self.stock_product
-
 
 class Question(models.Model):
     id = models.AutoField(primary_key=True)
@@ -148,9 +151,6 @@ class Question(models.Model):
     status = models.TextField(default='Рассматривается')
     admin_login = models.TextField(null=True)
 
-    def __str__(self):
-        return self.content
-
 
 class OrderProductInformation(models.Model):
     quantity = models.IntegerField()
@@ -158,5 +158,22 @@ class OrderProductInformation(models.Model):
                                       on_delete=models.CASCADE,
                                       related_name='opi')
 
+
+class Image(models.Model):
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='images',
+                              null=True)
+    description = models.TextField(null=True,
+                                   blank=True)
+    stock_product = models.ForeignKey(to=StockProduct,
+                                      on_delete=models.CASCADE,
+                                      related_name='images',
+                                      null=True,
+                                      blank=True)
+    product = models.OneToOneField(Product,
+                                   on_delete=models.CASCADE,
+                                   null=True,
+                                   blank=True)
+
     def __str__(self):
-        return self.stock_product
+        return 'Изображение: ' + self.description

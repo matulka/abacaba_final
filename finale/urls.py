@@ -35,6 +35,8 @@ urlpatterns = [
     path('get_http_categories', views.return_categories_http),
     url('accounts/orders', views.profile_orders, name='profile_orders'),
     url('accounts/profile', views.profile, name='profile'),
+    url('accounts/addresses', views.profile_addresses, name='profile_addresses'),
+    url('accounts/issues', views.profile_issues, name='profile_issues'),
     path('accounts/orders', views.profile_orders),
     url('accounts/', include('django.contrib.auth.urls')),
     url(r'^sign-up/$', views.signup, name='signup'),

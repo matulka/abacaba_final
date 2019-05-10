@@ -450,8 +450,33 @@ def profile(request):
 @login_required
 def profile_orders(request):
     user = User.objects.get(username=request.user.username)
-    orders = user.orders.all()
-    print(orders.values())
+    orders = OrderProduct.objects.all().filter(order__author=user)
+
+    if orders.count() == 0:
+        return render(request, 'registration/profile_orders.html', {'empty': 'yes'})
+
     return render(request, 'registration/profile_orders.html', {'orders': orders})
 
+@login_required
+def profile_addresses(request):
+    user = User.objects.get(username=request.user.username)
+    addresses = user.addresses.all().filter(customer=user)
+    form_address = AddressForm()
 
+    if addresses.count() == 0:
+        return render(request, 'registration/addresses.html', {'empty': 'yes'})
+
+    if request.method == 'POST':
+        data = request.POST.values()
+
+    return render(request, 'registration/addresses.html', {'addresses': addresses, 'form_address':form_address})
+
+@login_required
+def profile_issues(request):
+    user = User.objects.get(username=request.user.username)
+    issues = user.questions.all().filter(author=user)
+
+    if issues.count() == 0:
+        return render(request, 'registration/issues.html', {'empty': 'yes'})
+
+    return render(request, 'registration/issues.html', {'issues':issues})

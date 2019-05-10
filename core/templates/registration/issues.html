@@ -1,0 +1,30 @@
+{% extends 'registration/profile_navigation.html' %}
+
+{% block data %}
+    {% if not empty %}
+        <table class="table" style="table-layout: auto;">
+              <thead class="thead-light">
+                <tr>
+                    <th scope="col">Статус</th>
+                    <th scope="col">Название</th>
+                    <th scope="col">Содержание</th>
+                </tr>
+              </thead>
+              <tbody id="addresses">
+                    {% load widget_tweaks %}
+                    {% for key in issues %}
+                        <td>{{ key.status }}</td>
+                        <td>{{ key.topic }}</td>
+                        <td>{{ key.content }}</td>
+                    {% endfor %}
+              </tbody>
+        </table>
+    {% else %}
+        <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
+                <div class="form-group col-md-11">
+                    <h3>У вас нет активных жалоб</h3>
+                    <button style="margin-top: 2%;" class="btn btn-primary btn-block">Создать жалобу</button>
+                </div>
+        </div>
+    {% endif %}
+{% endblock %}

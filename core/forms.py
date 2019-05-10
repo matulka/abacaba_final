@@ -54,16 +54,13 @@ class PasswordProfileForm(forms.Form):
    password1 = forms.CharField(widget=forms.PasswordInput, required=True)
    password2 = forms.CharField(widget=forms.PasswordInput, required=True)
 
-   # def save(self, commit=True):
-   #     user = super().save(commit=False)
-   #     user.first_name = self.cleaned_data["first_name"]
-   #     user.last_name = self.cleaned_data["last_name"]
-   #     if commit:
-   #         user.save()
-   #     return user
 
-class AddressForm(forms.ModelForm):
-    class Meta:
-        model = Addresses
-        fields = ['city', 'street', 'building', 'flat', 'entrance']
+class AddressForm(forms.Form):
+    id = forms.CharField()
+    city = forms.CharField(max_length=30, required=False)
+    street = forms.CharField(max_length=30, required=False)
+    house = forms.CharField(max_length=30, required=False)
+    entrance = forms.CharField(max_length=30, required=False)
+    flat = forms.CharField(max_length=30, required=False)
+    description = forms.CharField(max_length=30, required=False)
 
