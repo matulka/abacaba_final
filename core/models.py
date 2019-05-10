@@ -102,6 +102,7 @@ class Order(models.Model):
     author = models.ForeignKey(to=User,
                                on_delete=models.CASCADE,
                                null=True,
+                               blank=True,
                                related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(to=Addresses,

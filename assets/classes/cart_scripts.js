@@ -9,6 +9,23 @@ function delete_from_arr_by_value(arr, val) {
     return arr;
 }
 
+function refresh_cart() {
+    window.location.href = '/cart';
+}
+
+function clear_cart() {
+    $.ajax({
+        type: 'POST',
+        url: '/clear_cart',
+        data: {
+            'csrfmiddlewaretoken': window.kek
+        },
+        success: function() {
+            refresh_cart();
+        }
+    });
+}
+
 function refresh_total_cost() {
     var total_cost = 0;
     for (var i = 0; i < window.stock_product_ids.length; i += 1) {
@@ -136,6 +153,23 @@ function final_order_btn() {
                 },
                 success: function() {
                     alert('Заказ успешно добавлен.');
+                    clear_cart();
+                }
+            });
+        }
+    }
+    else {
+        if (check_address_form_validity() && check_email_validity()) {
+            var data = get_address_data();
+            data['email'] = $('#email_input').val();
+            data['csrfmiddlewaretoken'] = window.kek;
+            $.ajax({
+                type: 'POST',
+                url: '/make_order',
+                data: data,
+                success: function() {
+                    alert('Заказ успешно добавлен.');
+                    clear_cart();
                 }
             });
         }

@@ -361,6 +361,19 @@ def delete_from_cart(request):
     return redirect('/')
 
 
+def clear_cart(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            user = request.user
+            cart = user.cart
+            for order_product in cart.products.all():
+                order_product.delete()
+            return HttpResponse('success')
+        else:
+            clear_session(request)
+            return HttpResponse('success')
+
+
 """
 Этот метод необходим для того, чтобы перенести корзину из кукей в базу данных
 """
@@ -429,7 +442,17 @@ def make_order(request):
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
                 raise NotImplementedError
-            address = request.POST.get('address')
+            city = request.POST.get('city')
+            street = request.POST.get('street')
+            building = request.POST.get('building')
+            flat = request.POST.get('flat')
+            entrance = request.POST.get('entrance')
+            address = Addresses(city=city,
+                                street=street,
+                                building=building,
+                                flat=flat,
+                                entrance=entrance)
+            address.save()
             email = request.POST.get('email')
             current_cart = request.session['cart']
             if address is None or email is None:

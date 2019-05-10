@@ -33,6 +33,7 @@ urlpatterns = [
     path('del_address', views.delete_address),
     path('get_addresses', views.get_addresses_json),
     path('del_from_cart', views.delete_from_cart),
+    path('clear_cart', views.clear_cart),
     path('accounts/profile', views.profile),
     path('accounts/orders', views.profile_orders),
     path('accounts/addresses', views.profile_addresses),
