@@ -24,7 +24,8 @@
         </p>
         <p>
             <label>Категории:</label>
-            <input list="categories" name="category" id="cat0" name="cat">
+            <input list="categories" name="cat" id="cat0" name="cat">
+            <label list="categories" name="lab" id="lab0"></label>
             <datalist id="categories">
                 {% for cat in categories %}
                     <option>{{ cat.name }}
@@ -37,8 +38,10 @@
         <p>
             <label>Главная категория:</label>
             <input list="categories" name="category" id="main-cat">
+            <label list="categories" name="lab" id="main-lab"></label>
         </p>
-        <input type="button" value="Добавить" onclick="valid_form()">
+        <label id="done"></label>
+        <input type="button" value="Добавить" onclick="valid_form()" id="btn_submit">
 
     </form>
 </div>

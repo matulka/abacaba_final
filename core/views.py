@@ -53,6 +53,31 @@ def add_product(request):
     return redirect('/')
 
 
+def form_product(request):
+    if request.method == 'POST':
+        categories = request.POST.getlist('cat[]')
+        main_cat = request.POST.get('main')
+        name = request.POST.get('name')
+        price = request.POST.get('price')
+        rating = request.POST.get('rating')
+        if rating != '' :
+            product = Product(name=name, price=price, rating = rating, main_category=Category.objects.get(name=main_cat))
+        else:
+            product = Product(name=name, price=price, main_category=Category.objects.get(name=main_cat))
+        product.save()
+        for cat in categories:
+            if not product.categories.filter(name=cat).exists():
+                category = Category.objects.get(name=cat)
+            product.categories.add(category)
+            cur_cat = category.parent_category
+            while cur_cat != None:
+                if not product.categories.filter(name=cur_cat.name).exists():
+                    product.categories.add(cur_cat)
+                cur_cat = cur_cat.parent_category
+        return HttpResponse('Gacha')
+    else:
+        return redirect('/')
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
@@ -75,6 +100,15 @@ def e_handler500(request):
     response = render_to_response('error500html', context)
     response.status_code = 500
     return response
+
+
+def product_names_json(request):
+    data = dict()
+    data['product_names'] = []
+    for product in Product.objects.all():
+        data['product_names'].append(product.name)
+    return JsonResponse(data)
+
 
 """
 Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
