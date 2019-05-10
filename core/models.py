@@ -79,7 +79,8 @@ class ProductFeedback(models.Model):
 
 class Addresses(models.Model):
     id = models.AutoField(primary_key=True)
-    description = models.TextField(default='Дом')
+    description = models.TextField(blank=True,
+                                   null=True)
     customer = models.ForeignKey(to=User,
                                  on_delete=models.CASCADE,
                                  null=True,
@@ -87,9 +88,12 @@ class Addresses(models.Model):
                                  related_name='addresses')
     city = models.TextField(default='Москва')
     street = models.TextField(default='Довженко')
-    building = models.IntegerField(default=1)
-    flat = models.IntegerField(default=1)
+    building = models.TextField(default='1')
+    flat = models.TextField(default='1')
     entrance = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.city + ' ' + self.street + ' ' + self.building + ' ' + self.entrance + ' ' + self.flat
 
 
 class Order(models.Model):

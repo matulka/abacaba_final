@@ -32,6 +32,7 @@ function block_edit() {
 function fill_addresses() {
     $('#select_address').empty()
     $.ajax({
+        type: 'POST',
         url: '/get_addresses',
         data: {
             'csrfmiddlewaretoken': window.kek
@@ -57,7 +58,16 @@ function make_order_btn() {
 }
 
 function check_address_form_validity() {
-    return city_input.checkValidity() && street_input.checkValidity() && building_input.checkValidity() && entrance_input.checkValidity() && flat_input.checkValidity() && description_input.checkValidity();
+    if (window.is_auth) {
+        return city_input.checkValidity() && street_input.checkValidity() && building_input.checkValidity() && entrance_input.checkValidity() && flat_input.checkValidity() && description_input.checkValidity();
+    }
+    else {
+        return city_input.checkValidity() && street_input.checkValidity() && building_input.checkValidity() && entrance_input.checkValidity() && flat_input.checkValidity();
+    }
+}
+
+function check_email_validity() {
+    return email_input.checkValidity();
 }
 
 function get_address_data() {
@@ -67,7 +77,9 @@ function get_address_data() {
     data['building'] = $('#building_input').val();
     data['entrance'] = $('#entrance_input').val();
     data['flat'] = $('#flat_input').val();
-    data['description'] = $('#description_input').val();
+    if (window.is_auth) {
+        data['description'] = $('#description_input').val();
+    }
     return data;
 }
 
@@ -108,6 +120,25 @@ function submit_address_btn() {
                 }
             }
         });
+    }
+}
+
+function final_order_btn() {
+    if (window.is_auth) {
+        if (select_address.checkValidity()) {
+            var address_id = $('#select_address').val();
+            $.ajax({
+                type: 'POST',
+                url: '/make_order',
+                data: {
+                    'address_id': address_id,
+                    'csrfmiddlewaretoken': window.kek
+                },
+                success: function() {
+                    alert('Заказ успешно добавлен.');
+                }
+            });
+        }
     }
 }
 

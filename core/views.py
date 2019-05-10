@@ -417,7 +417,7 @@ def make_order(request):
             order_products = user.cart.products.all()
             if len(order_products) == 0:
                 raise NotImplementedError
-            address_id = request.POST.get('address_id')
+            address_id = int(request.POST.get('address_id'))
             address = Addresses.objects.get(id=address_id)
             order = Order(author=user,
                           address=address)
@@ -425,7 +425,7 @@ def make_order(request):
             for order_product in order_products:
                 order_product.order = order
                 order_product.save()
-            return redirect('/profile')
+            return HttpResponse('success')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
                 raise NotImplementedError
@@ -452,11 +452,12 @@ def profile_info(request):
 
 @login_required
 def get_addresses_json(request):
-    user = request.user
-    response = dict()
-    for address in user.addresses.all():
-        response[address.id] = address.description
-    return JsonResponse(response)
+    if request.method == 'POST':
+        user = request.user
+        response = dict()
+        for address in user.addresses.all():
+            response[address.id] = address.description
+        return JsonResponse(response)
 
 
 @login_required

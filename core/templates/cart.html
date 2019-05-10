@@ -55,14 +55,14 @@
         {% if is_auth %}
         <div class="form-group">
             <label for="select_address">Выберите адрес для доставки заказа:</label>
-            <select id="select_address" class="form-control">
+            <select id="select_address" class="form-control" required>
             </select>
         </div>
         <div class="form-group" style="display: flex; justify-content: flex-end; flex-direction: row;">
             <button type="button" class="btn btn-secondary" onclick="add_address_btn();">Добавить новый адрес</button>
         </div>
         <div id="add_address_container" style="display:none">
-            {% include 'address_form.html' %}
+            {% include 'address_form_auth.html' %}
             <div class="form-group" style="display: flex; justify-content: center;">
                 <button type="button" class="btn btn-secondary" onclick="submit_address_btn();">Сохранить адрес</button>
             </div>
@@ -71,13 +71,13 @@
         {% if not is_auth %}
         <div class="form-group">
             <label for="email_input">Электронная почта</label>
-            <input type="email" class="form-control" placeholder="Введите Вашу электронную почту" aria-describedby="emailHelp">
+            <input id="email_input" type="email" class="form-control" placeholder="Введите Вашу электронную почту" aria-describedby="emailHelp">
             <small id="emailHelp" class="form-text text-muted">По этой почте мы свяжемся с Вами по поводу заказа</small>
         </div>
-        {% include 'address_form.html' %}
+        {% include 'address_form_unauth.html' %}
         {% endif %}
         <div class="form-group" style="padding-top: 10px; display:flex; justify-content: center;">
-            <button id="final_order_button" type="button" class="btn btn-primary btn-lg">Завершить оформление заказа</button>
+            <button id="final_order_button" type="button" class="btn btn-primary btn-lg" onclick="final_order_btn();">Завершить оформление заказа</button>
         </div>
     </form>
 </div>
