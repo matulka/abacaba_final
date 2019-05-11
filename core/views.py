@@ -53,6 +53,30 @@ def add_product(request):
     return redirect('/')
 
 
+def change_product(request):
+    if request.user.is_staff:
+        cat = return_categories()
+        id = request.GET.get('id')
+        prod = Product.objects.get(id=id)
+        scat = prod.categories
+        return render(request, 'admin/change_product.html', {'categories': cat, 'self_cat': scat, 'prod': prod})
+    return redirect('/')
+
+
+def get_categories_id(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        prod = Product.objects.get(id=id)
+        scat = prod.categories.all()
+        data = dict()
+        data['cat'] = []
+        for cat in scat:
+            data['cat'].append(str(cat.name))
+        return JsonResponse(data)
+    else:
+        return redirect('/')
+
+
 def form_product(request):
     if request.method == 'POST':
         categories = request.POST.getlist('cat[]')
