@@ -6,7 +6,6 @@ from core.models import Product, Category, Order, Addresses, OrderProduct, Order
 class ProductAdmin(admin.ModelAdmin):
     pass
 
-
 class CategoryAdmin(admin.ModelAdmin):
     pass
 

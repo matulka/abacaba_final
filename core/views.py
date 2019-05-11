@@ -461,15 +461,45 @@ def profile_orders(request):
 def profile_addresses(request):
     user = User.objects.get(username=request.user.username)
     addresses = user.addresses.all().filter(customer=user)
-    form_address = AddressForm()
 
     if addresses.count() == 0:
         return render(request, 'registration/addresses.html', {'empty': 'yes'})
 
-    if request.method == 'POST':
-        data = request.POST.values()
+    if request.method == 'GET':
+        if request.GET.get('id'):
+            form_address = AddressForm()
+            data = request.GET.dict()
+            id_ = int(data['id']) - 1
+            address = addresses[id_]
+            return render(request,  'registration/addresses.html',
+                          {'addresses': addresses, 'form_address': form_address, 'address': address, 'id': id_})
 
-    return render(request, 'registration/addresses.html', {'addresses': addresses, 'form_address':form_address})
+    if request.method == 'POST':
+        form_address = AddressForm(request.POST)
+
+        id_address = form_address.data.get('id')
+        city = form_address.data.get('city')
+        street = form_address.data.get('street')
+        building = form_address.data.get('building')
+        entrance = form_address.data.get('entrance')
+        flat = form_address.data.get('flat')
+        description = form_address.data.get('description')
+
+        if form_address.is_valid():
+
+            if id_address is not None:
+                address = addresses[int(id_address)]
+
+                address.city = city
+                address.street = street
+                address.building = building
+                address.entrance = entrance
+                address.flat = flat
+                address.description = description
+
+                address.save()
+
+    return render(request, 'registration/addresses.html', {'addresses': addresses})
 
 @login_required
 def profile_issues(request):
@@ -479,4 +509,10 @@ def profile_issues(request):
     if issues.count() == 0:
         return render(request, 'registration/issues.html', {'empty': 'yes'})
 
-    return render(request, 'registration/issues.html', {'issues':issues})
+    if request.method == 'GET':
+        if request.GET.get('issue'):
+            data = request.GET.dict()
+            issue = issues[int(data['issue'])-1]
+            return render(request, 'registration/issue.html', {'issue': issue})
+
+    return render(request, 'registration/issues.html', {'issues': issues})

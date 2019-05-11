@@ -59,8 +59,7 @@ class AddressForm(forms.Form):
     id = forms.CharField()
     city = forms.CharField(max_length=30, required=False)
     street = forms.CharField(max_length=30, required=False)
-    house = forms.CharField(max_length=30, required=False)
-    entrance = forms.CharField(max_length=30, required=False)
-    flat = forms.CharField(max_length=30, required=False)
-    description = forms.CharField(max_length=30, required=False)
-
+    building = forms.CharField(max_length=30, required=False)
+    entrance = forms.IntegerField(required=False)
+    flat = forms.IntegerField(required=False)
+    description = forms.CharField(max_length=150, required=False)
