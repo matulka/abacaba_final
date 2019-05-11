@@ -55,6 +55,8 @@ def dict_cart_to_model_cart(dict_cart):
 
 
 def js_string_to_arr(js_string):
+    if js_string == '[]':
+        return []
     ids_string = js_string
     ids_string = ids_string[1:(len(ids_string) - 1)]
     ids_array = ids_string.split(', ')
