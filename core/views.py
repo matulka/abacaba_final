@@ -39,17 +39,8 @@ def product_page(request):
 
 def add_product(request):
     if request.user.is_staff:
-        if request.method == 'POST':
-            form = AddProductForm(request.POST)
-            if form.is_valid():
-                return redirect('')
-            else:
-                cat = return_categories()
-                return render(request, 'admin/add_product.html', {'categories': cat, 'form': form})
-        else:
-            form = AddProductForm()
-            cat = return_categories()
-            return render(request, 'admin/add_product.html', {'categories': cat, 'form': form})
+        cat = return_categories()
+        return render(request, 'admin/add_product.html', {'categories': cat})
     return redirect('/')
 
 
@@ -70,9 +61,39 @@ def get_categories_id(request):
         scat = prod.categories.all()
         data = dict()
         data['cat'] = []
+        data['name'] = prod.name
         for cat in scat:
             data['cat'].append(str(cat.name))
         return JsonResponse(data)
+    else:
+        return redirect('/')
+
+
+def change_exist_product(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        categories = request.POST.getlist('cat[]')
+        main_cat = request.POST.get('main')
+        name = request.POST.get('name')
+        price = request.POST.get('price')
+        rating = request.POST.get('rating')
+        product = Product.objects.get(id=id)
+        product.categories.clear()
+        product.name= name
+        product.main_category = Category.objects.get(name=main_cat)
+        product.price = price
+        if rating != '':
+            product.rating = rating
+        for cat in categories:
+            if not product.categories.filter(name=cat).exists():
+                category = Category.objects.get(name=cat)
+            product.categories.add(category)
+            cur_cat = category.parent_category
+            while cur_cat != None:
+                if not product.categories.filter(name=cur_cat.name).exists():
+                    product.categories.add(cur_cat)
+                cur_cat = cur_cat.parent_category
+        return HttpResponse('Gacha')
     else:
         return redirect('/')
 
@@ -101,6 +122,20 @@ def form_product(request):
         return HttpResponse('Gacha')
     else:
         return redirect('/')
+
+
+def category_page(request):
+    if request.user.is_staff:
+        return render(request, 'admin/category_page.html')
+    return redirect('/')
+
+
+def add_category(request):
+    if request.user.is_staff:
+        cat = return_categories()
+        return render(request, 'admin/add_category.html', {'categories': cat})
+    return redirect('/')
+
 
 def arr_to_str(arr):
     string = str()

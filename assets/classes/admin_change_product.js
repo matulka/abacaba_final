@@ -11,7 +11,7 @@ function add_exist_cat(name){
      if (window.counter_categories != 0){
         html_str = '<div class="row"><input list="categories" name="cat" id="cat' + window.counter_categories +
         '" value="' + name +
-         '"> <input type="button" value="Удалить категорию" id="123" onclick="del_cat()"><label list="categories" name="lab" id="lab' + window.counter_categories +'"></label></div>'
+         '"> <input type="button" value="Удалить категорию" id="btn-remove' + window.counter_categories + '" onclick="del_cat('+window.counter_categories+')"><label list="categories" name="lab" id="lab' + window.counter_categories +'"></label></div>'
      }
     $('#new-cat').prepend(html_str);
 }
@@ -20,12 +20,16 @@ function get_product_id() {
     var arr = paramstr.split('=');
     return arr[1];
 }
+
 function del_cat(id){
-    
+    console.log(id)
+    $("#btn-remove" + id).remove()
+    $("#cat" + id).remove()
 }
 categories = [];
 string_to_add = "";
 product_names = [];
+product_name = ""
 
 class Category {
     constructor(id, name, parent_id) {
@@ -66,8 +70,7 @@ function form_categories() {
     answer = []
     var cat = document.getElementsByName('cat');
     for (var i = 0; i < cat.length; i += 1){
-        var name_cat = '#cat' + i;
-        answer.push($(name_cat).val());
+        answer.push(cat[i].value);
     }
     return answer;
 }
@@ -97,6 +100,8 @@ $(document).ready(function(){
             },
         success: function (response) {
             console.log(response['cat']);
+            console.log(response['name']);
+            product_name = response['name'];
             for (var i=0; i < response['cat'].length; i+=1){
                 add_exist_cat(response['cat'][i]);
             }
@@ -105,13 +110,14 @@ $(document).ready(function(){
 });
 function valid_form(){
     if (!window.click){
+        console.log('UUUUUUUUUF')
         var has_errors = false
         if ($('#id_name').val().length < 1){
             has_errors =true;
             $('#name_err').text("Заполните поле!")
         }
         for (var i = 0; i < product_names.length; i += 1){
-            if ($('#id_name').val() == product_names[i]){
+            if ($('#id_name').val() == product_names[i] && $('#id_name').val() != product_name){
                 has_errors =true;
                 $('#name_err').text("Продукт с таким именем уже существует!")
             }
@@ -131,23 +137,23 @@ function valid_form(){
              }
         }
         var cat = document.getElementsByName('cat');
+        var lab = document.getElementsByName('lab');
         for (var i = 0; i < cat.length; i += 1){
-            var name_cat = '#cat' + i;
+            var c = cat[i];
             var founded = false;
             for (var j = 0; j < categories.length; j += 1){
-                if ($(name_cat).val() == categories[j].name) {
+                if (c.value == categories[j].name) {
                     founded = true;
                     break;
                 }
             }
             if (!founded){
                 has_errors = true;
-                var name_label = '#lab' + i;
-                $(name_label).text("Такой категории не существует!")
+                var lable = lab[i];
+                lable.textContent = "Такой категории не существует!"
             }
-            var name_label = '#lab' + i;
-            if ($(name_cat).val() == ''){
-                $(name_label).text("Заполните поле!")
+            if (c.value == ''){
+                able.textContent = "Заполните поле!"
                 has_errors = true;
             }
         }
@@ -169,7 +175,7 @@ function valid_form(){
         if (!has_errors){
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
-            url: '/form_product',
+            url: '/change_exist_product',
             type: "POST",
             data: {
                  cat: form_categories(),
@@ -177,12 +183,13 @@ function valid_form(){
                  name: $('#id_name').val(),
                  price: $('#id_price').val(),
                  rating: $('#id_price').val(),
+                 id: get_product_id(),
                  csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
             },
             success: function (response) {
                 window.click = true
                 console.log('YES!')
-                $('#done').text("Продукт успешно создан!")
+                $('#done').text("Продукт успешно изменен!")
                 $('#btn_submit').attr('value', 'Перейти к редактированию товаров');
             },
             error: function(xhr, textStatus, errorThrown) {

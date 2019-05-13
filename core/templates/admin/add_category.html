@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="create-product">
+    <h2>Добавление категории</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label>Название:</label>
+            <input type="text" id="id_name">
+            <label id="name_err"></label>
+        </p>
+        <p>
+            <label>Родительская категории:</label>
+            <input list="categories" name="par-cat" id="par-cat">
+            <label list="categories" name="lab" id="lab"></label>
+            <datalist id="categories">
+                {% for cat in categories %}
+                    <option>{{ cat.name }}
+                {% endfor %}
+            </datalist>
+        </p>
+        <label id="done"></label>
+        <input type="button" value="Добавить" onclick="valid_form()" id="btn_submit">
+
+    </form>
+</div>
+<script type="text/javascript" src="/static/classes/admin_add_product.js?$$REVISION$$"></script>
+{% endblock %}
