@@ -137,6 +137,20 @@ def add_category(request):
     return redirect('/')
 
 
+def form_category(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        par = request.POST.get('parent')
+        if par != '':
+            par_cat = Category.objects.get(name=par)
+            category = Category(name=name, parent_category=par_cat)
+        else:
+            category = Category(name=name)
+        category.save()
+        return HttpResponse('Gacha')
+    else:
+        return redirect('/')
+
 def arr_to_str(arr):
     string = str()
     for element in arr:

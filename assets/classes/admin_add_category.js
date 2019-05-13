@@ -13,6 +13,20 @@ $(document).ready(function(){
     });
 });
 
+class Category {
+    constructor(id, name, parent_id) {
+        this.id = id;
+        this.name = name;
+        if (parent_id == 'None'){
+            this.parent_id = null;
+        }
+        else {
+            this.parent_id = parent_id;
+        }
+        this.child_categories = new Array();
+    }
+}
+
 function decode_categories(string) {
     var category_tuples = string.split(";");
     for (var i = 0; i < category_tuples.length; i += 1) {
@@ -43,45 +57,37 @@ function valid_form(){
             has_errors =true;
             $('#name_err').text("Заполните поле!")
         }
-        for (var i = 0; i < product_names.length; i += 1){
-            if ($('#id_name').val() == product_names[i] && $('#id_name').val() != product_name){
+        for (var i = 0; i < categories.length; i += 1){
+            if ($('#id_name').val() == categories[i].name){
                 has_errors =true;
-                $('#name_err').text("Продукт с таким именем уже существует!")
+                $('#name_err').text("Категория с таким именем уже существует!")
             }
         }
+        var founded = false
         for (var j = 0; j < categories.length; j += 1){
-            var founded = false;
-            if ($('#main-cat').val() == categories[j].name) {
+            if ($('#par-cat').val() == categories[j].name) {
                  founded = true;
                  break;
             }
         }
         if (!founded){
            has_errors = true;
-           $('#main-lab').text("Такой категории не существует!")
-        }
-        if ($('#main-cat').val() == '') {
-            has_errors = true;
-            $('#main-lab').text("Заполните поле!")
+           $('#par-lab').text("Такой категории не существует!")
         }
         if (!has_errors){
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
-            url: '/change_exist_product',
+            url: '/form_category',
             type: "POST",
             data: {
-                 cat: form_categories(),
-                 main: $('#main-cat').val(),
+                 parent: $('#par-cat').val(),
                  name: $('#id_name').val(),
-                 price: $('#id_price').val(),
-                 rating: $('#id_price').val(),
-                 id: get_product_id(),
                  csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
             },
             success: function (response) {
                 window.click = true
                 console.log('YES!')
-                $('#done').text("Продукт успешно изменен!")
+                $('#done').text("Категория успешно создана!")
                 $('#btn_submit').attr('value', 'Перейти к редактированию товаров');
             },
             error: function(xhr, textStatus, errorThrown) {
@@ -91,6 +97,6 @@ function valid_form(){
         }
     }
     else{
-        window.location.replace('/admin/product_page/')
+        window.location.replace('/admin/category_page/')
     }
 }

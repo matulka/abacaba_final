@@ -118,8 +118,8 @@ function valid_form(){
                 has_errors = true;
             }
         }
+        founded = false;
         for (var j = 0; j < categories.length; j += 1){
-            var founded = false;
             if ($('#main-cat').val() == categories[j].name) {
                  founded = true;
                  break;

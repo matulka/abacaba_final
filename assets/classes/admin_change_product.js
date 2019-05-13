@@ -138,9 +138,9 @@ function valid_form(){
         }
         var cat = document.getElementsByName('cat');
         var lab = document.getElementsByName('lab');
+        founded = false;
         for (var i = 0; i < cat.length; i += 1){
             var c = cat[i];
-            var founded = false;
             for (var j = 0; j < categories.length; j += 1){
                 if (c.value == categories[j].name) {
                     founded = true;

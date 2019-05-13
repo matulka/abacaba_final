@@ -11,9 +11,9 @@
             <label id="name_err"></label>
         </p>
         <p>
-            <label>Родительская категории:</label>
+            <label>Родительская категория:</label>
             <input list="categories" name="par-cat" id="par-cat">
-            <label list="categories" name="lab" id="lab"></label>
+            <label list="categories" name="lab" id="par-lab">Поле может быть пустым</label>
             <datalist id="categories">
                 {% for cat in categories %}
                     <option>{{ cat.name }}
@@ -25,5 +25,5 @@
 
     </form>
 </div>
-<script type="text/javascript" src="/static/classes/admin_add_product.js?$$REVISION$$"></script>
+<script type="text/javascript" src="/static/classes/admin_add_category.js?$$REVISION$$"></script>
 {% endblock %}
