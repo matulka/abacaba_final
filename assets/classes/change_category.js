@@ -1,5 +1,12 @@
+function get_category_id() {
+    var paramstr = window.location.search.substr(1);
+    var arr = paramstr.split('=');
+    return arr[1];
+}
+
 categories = [];
 string_to_add = "";
+cat_name = ""
 
 $(document).ready(function(){
     window.counter_categories = -1;
@@ -11,6 +18,7 @@ $(document).ready(function(){
             decode_categories(string);
         }
     });
+    cat_name = $('#id_name').val()
 });
 
 class Category {
@@ -49,16 +57,17 @@ function decode_categories(string) {
     }
 }
 
+
 function valid_form(){
     if (!window.click){
-        console.log('UUUUUUUUUF')
+        console.log(get_category_id())
         var has_errors = false
         if ($('#id_name').val().length < 1){
             has_errors =true;
             $('#name_err').text("Заполните поле!")
         }
         for (var i = 0; i < categories.length; i += 1){
-            if ($('#id_name').val() == categories[i].name){
+            if ($('#id_name').val() == categories[i].name && $('#id_name').val() != cat_name){
                 has_errors =true;
                 $('#name_err').text("Категория с таким именем уже существует!")
             }
@@ -77,9 +86,10 @@ function valid_form(){
         if (!has_errors){
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
-            url: '/form_category',
+            url: '/change_exist_category',
             type: "POST",
             data: {
+                 id: get_category_id(),
                  parent: $('#par-cat').val(),
                  name: $('#id_name').val(),
                  csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
@@ -87,7 +97,7 @@ function valid_form(){
             success: function (response) {
                 window.click = true
                 console.log('YES!')
-                $('#done').text("Категория успешно создана!")
+                $('#done').text("Категория успешно изменена!")
                 $('#btn_submit').attr('value', 'Перейти к редактированию категорий');
             },
             error: function(xhr, textStatus, errorThrown) {

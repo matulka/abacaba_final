@@ -1,6 +1,7 @@
 function add_cat(){
     window.counter_categories += 1;
-    var html_str = '<div class="row"><input list="categories" name="cat" id="cat' + window.counter_categories + '"> <label list="categories" name="lab" id="lab' + window.counter_categories +'"></label></div>'
+    var html_str = '<div class="row"><input list="categories" name="cat" id="cat' + window.counter_categories +
+     '"> <label list="categories" name="lab" id="lab' + window.counter_categories +'"></label></div>'
     $('#new-cat').prepend(html_str);
 }
 categories = [];

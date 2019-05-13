@@ -93,6 +93,7 @@ def change_exist_product(request):
                 if not product.categories.filter(name=cur_cat.name).exists():
                     product.categories.add(cur_cat)
                 cur_cat = cur_cat.parent_category
+        product.save()
         return HttpResponse('Gacha')
     else:
         return redirect('/')
@@ -137,6 +138,12 @@ def add_category(request):
     return redirect('/')
 
 
+def category_list(request):
+    if request.user.is_staff:
+        cat = return_categories()
+        return render(request, 'admin/category_list.html', {'categories': cat})
+    return redirect('/')
+
 def form_category(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -146,6 +153,39 @@ def form_category(request):
             category = Category(name=name, parent_category=par_cat)
         else:
             category = Category(name=name)
+        category.save()
+        return HttpResponse('Gacha')
+    else:
+        return redirect('/')
+
+def change_category(request):
+    if request.method == 'GET':
+        cat = return_categories()
+        id = request.GET.get('id')
+        category = Category.objects.get(id=id)
+        return render(request, 'admin/change_category.html', {'cat': cat, 'category': category})
+    else:
+        return redirect('/')
+
+def get_category_id(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        category = Category.objects.get(id=id)
+        data = dict()
+        data['name'] = category.name
+        return JsonResponse(data)
+    else:
+        return redirect('/')
+
+def change_exist_category(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        category = Category.objects.get(id=id)
+        if request.POST.get('parent') != '' and request.POST.get('parent') != category.name:
+            category.parent_category = Category.objects.get(name=request.POST.get('parent'))
+        else:
+            category.parent_category = None
+        category.name = request.POST.get('name')
         category.save()
         return HttpResponse('Gacha')
     else:
