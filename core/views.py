@@ -384,6 +384,7 @@ def activate(request, uidb64, token):
         messages.error(request, 'Ссылка для регистрации устарела')
         return redirect('home')
 
+
 def signup(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -410,6 +411,7 @@ def signup(request):
         form = SignupForm()
 
     return render(request, 'registration/signup.html', {'form': form})
+
 
 @login_required
 def profile(request):
@@ -447,6 +449,7 @@ def profile(request):
 
     return render(request, 'registration/profile.html', {'form_name':form_name, 'form_password':form_password})
 
+
 @login_required
 def profile_orders(request):
     user = User.objects.get(username=request.user.username)
@@ -456,6 +459,7 @@ def profile_orders(request):
         return render(request, 'registration/profile_orders.html', {'empty': 'yes'})
 
     return render(request, 'registration/profile_orders.html', {'orders': orders})
+
 
 @login_required
 def profile_addresses(request):
@@ -500,6 +504,7 @@ def profile_addresses(request):
                 address.save()
 
     return render(request, 'registration/addresses.html', {'addresses': addresses})
+
 
 @login_required
 def profile_issues(request):

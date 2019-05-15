@@ -9,13 +9,13 @@
                    <label for="personal_data" style="font-size: 130%;">Личные данные</label>
                    <div id="personal_data" style="margin-left: 5%;">
                         <li class="nav-item">
-                            <a class="nav-link active" href="/accounts/profile">Мой профиль</a>
+                            <a id="my_profile_ref" class="nav-link active" href="/accounts/profile">Мой профиль</a>
                         </li>
                        <li class="nav-item">
-                            <a class="nav-link" href="/accounts/orders">Мои заказы</a>
+                            <a id="my_orders_ref" class="nav-link" href="/accounts/orders">Мои заказы</a>
                        </li>
                        <li class="nav-item">
-                            <a class="nav-link"href="/accounts/addresses">Адреса</a>
+                            <a id="my_address_ref" class="nav-link" href="/accounts/addresses">Адреса</a>
                        </li>
                    </div>
                    <label for="help" style="font-size: 130%; margin-top: 15%;">Помощь</label>
@@ -36,4 +36,6 @@
             </div>
         </div>
 </div>
+
+<script type="text/javascript" src="/static/classes/profile_scripts.js"></script>
 {% endblock %}
