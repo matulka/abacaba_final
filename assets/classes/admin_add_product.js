@@ -2,7 +2,7 @@ function add_cat(){
     window.counter_categories += 1;
     var html_str = '<div class="row"><input list="categories" name="cat" id="cat' + window.counter_categories +
      '"> <label list="categories" name="lab" id="lab' + window.counter_categories +'"></label></div>'
-    $('#new-cat').prepend(html_str);
+    $('#new-cat').append(html_str);
 }
 categories = [];
 string_to_add = "";
@@ -136,6 +136,8 @@ function valid_form(){
         }
         if (!has_errors){
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
+            var fd = new FormData()
+            fd.append('img', $('#img').val())
             $.ajax({
             url: '/form_product',
             type: "POST",

@@ -108,6 +108,7 @@ $(document).ready(function(){
         }
     });
 });
+
 function valid_form(){
     if (!window.click){
         console.log('UUUUUUUUUF')

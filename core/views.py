@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from core.models import Product, Category, Cart, OrderProduct, Order,\
-    Addresses, Product, Question, StockProduct, Modification, OrderProductInformation
+    Addresses, Product, Question, StockProduct, Modification, OrderProductInformation, Image
 from django.core.exceptions import ObjectDoesNotExist
 from ast import literal_eval
 from json import dumps
@@ -190,6 +190,35 @@ def change_exist_category(request):
         return HttpResponse('Gacha')
     else:
         return redirect('/')
+
+
+def get_product_by_name(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        prod = Product.objects.get(name=name)
+        data = dict()
+        data['id'] = prod.id
+        return JsonResponse(data)
+    return redirect('/')
+
+def modification_page(request):
+    if request.user.is_staff:
+        return render(request, 'admin/modification_page.html')
+    return redirect('/')
+
+
+def find_product(request):
+    if request.user.is_staff:
+        products = Product.objects.all()
+        return render(request, 'admin/find_product.html', {'products': products})
+    return redirect('/')
+
+
+def add_modification(request):
+    if request.user.is_staff:
+
+        return render(request, 'admin/add_modification.html')
+    return redirect('/')
 
 def arr_to_str(arr):
     string = str()
