@@ -27,7 +27,7 @@ class Product(models.Model):
     main_category = models.ForeignKey(to=Category,
                                       blank=True,
                                       null=True,
-                                      on_delete=models.CASCADE)
+                                      on_delete=models.SET_NULL)
 
     def __str__(self):
         return 'Продукт: ' + self.name
@@ -103,7 +103,7 @@ class Order(models.Model):
                                related_name='orders')
     order_date = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(to=Addresses,
-                                on_delete=models.CASCADE,
+                                on_delete=models.SET_NULL,
                                 null=True,
                                 related_name='orders')
     email = models.TextField(null=True,
@@ -127,12 +127,14 @@ class OrderProduct(models.Model):
         to=Order,
         on_delete=models.CASCADE,
         null=True,
+        blank=True,
         related_name='products'
     )
     cart = models.ForeignKey(
         to=Cart,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='products'
     )
 
@@ -168,7 +170,7 @@ class Image(models.Model):
                                       null=True,
                                       blank=True)
     product = models.OneToOneField(Product,
-                                   on_delete=models.CASCADE,
+                                   on_delete=models.SET_NULL,
                                    null=True,
                                    blank=True)
 
