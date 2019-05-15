@@ -85,7 +85,12 @@ def cart_page(request):
     cart = list()
     if request.user.is_authenticated:
         user = request.user
-        cart = user.cart.products.all()
+        try:
+            cart = user.cart.products.all()
+        except ObjectDoesNotExist:
+            new_cart = Cart(author=user)
+            new_cart.save()
+            cart = new_cart.products.all()
     else:
         if 'cart' not in request.session:
             request.session['cart'] = list()
@@ -366,10 +371,9 @@ def delete_from_cart(request):
 def clear_cart(request):
     if request.method == 'POST':
         if request.user.is_authenticated:
-            user = request.user
-            cart = user.cart
-            for order_product in cart.products.all():
-                order_product.delete()
+            request.user.cart.delete()
+            cart = Cart(author=request.user)
+            cart.save()
             return HttpResponse('success')
         else:
             clear_session(request)
