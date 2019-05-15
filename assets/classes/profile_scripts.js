@@ -7,11 +7,13 @@ function disable_all_tabs() {
 function get_current_tab_id() {
     var url = window.location.href;
     var path_array = url.split('/');
-    var current_section = path_array[path_array.length - 1];
+    var index = path_array.findIndex(function(el){if (el == 'accounts') return true; return false;});
+    index += 1;
+    var current_section = path_array[index];
     
-    if (current_section == 'profile') return '#my_profile_ref';
-    if (current_section == 'orders') return '#my_orders_ref';
-    if (current_section == 'addresses') return '#my_address_ref';
+    if (current_section.includes('profile')) return '#my_profile_ref';
+    if (current_section.includes('orders')) return '#my_orders_ref';
+    if (current_section.includes('addresses')) return '#my_address_ref';
     return null;
 }
 

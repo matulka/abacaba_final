@@ -70,9 +70,9 @@ class QuestionForm(forms.ModelForm):
 
 class ProfileAddressForm(forms.Form):
     id = forms.CharField()
-    city = forms.CharField(max_length=30, required=False)
-    street = forms.CharField(max_length=30, required=False)
-    building = forms.CharField(max_length=30, required=False)
-    entrance = forms.IntegerField(required=False)
-    flat = forms.IntegerField(required=False)
-    description = forms.CharField(max_length=150, required=False)
+    city = forms.CharField(max_length=30, required=True)
+    street = forms.CharField(max_length=30, required=True)
+    building = forms.CharField(max_length=30, required=True)
+    entrance = forms.CharField(required=True)
+    flat = forms.CharField(required=True)
+    description = forms.CharField(max_length=150, required=True)

@@ -675,7 +675,7 @@ def profile_addresses(request):
 
     if request.method == 'GET':
         if request.GET.get('id'):
-            form_address = AddressForm()
+            form_address = ProfileAddressForm()
             data = request.GET.dict()
             id_ = int(data['id']) - 1
             address = addresses[id_]
