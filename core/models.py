@@ -32,9 +32,6 @@ class Product(models.Model):
     def __str__(self):
         return 'Продукт: ' + self.name
 
-    def __str__(self):
-        return self.name
-
 
 class Modification(models.Model):
     id = models.AutoField(primary_key=True)
@@ -179,5 +176,3 @@ class Image(models.Model):
 
     def __str__(self):
         return 'Изображение: ' + self.description
-
-

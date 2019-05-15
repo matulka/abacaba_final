@@ -1,0 +1,41 @@
+{% extends 'registration/profile_navigation.html' %}
+
+{% block data %}
+    <div>
+        {% load widget_tweaks %}
+        {% if not empty %}
+            <table class="table border border-light">
+              <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Статус заказа</th>
+                    <th scope="col">Дата заказа</th>
+                    <th scope="col">Адрес доставки</th>
+                    <th scope="col">Товары</th>
+                </tr>
+              </thead>
+              <tbody>
+                    {% for key in orders %}
+                        <tr>
+                            <th scope="row" style="overflow: hidden;">{{ key.id }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.order.status }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.order.order_date }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.order.address }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.stock_product.product }} {{ key.stock_product.modification }}</th>
+                        </tr>
+                    {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <h3>К сожалению, у Вас нет активных заказов</h3>
+                    <button onclick="location.href='/'" style="margin-top: 2%;" class="btn btn-primary btn-block">Сделать заказ</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+
+
+{% endblock %}
