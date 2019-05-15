@@ -135,3 +135,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'abacabamain@gmail.com'
 EMAIL_HOST_PASSWORD = 'Abacabafinal'
 EMAIL_PORT = 587
+
+# Session
+
+SESSION_SAVE_EVERY_REQUEST = True

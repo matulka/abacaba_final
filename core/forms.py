@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from core.models import Addresses
+from core.models import Addresses, Question
+
 
 class SearchForm(forms.Form):
     input = forms.CharField(label='Поиск',
@@ -55,7 +56,19 @@ class PasswordProfileForm(forms.Form):
    password2 = forms.CharField(widget=forms.PasswordInput, required=True)
 
 
-class AddressForm(forms.Form):
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Addresses
+        fields = ['city', 'street', 'building', 'flat', 'entrance', 'description']
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['topic', 'content']
+
+
+class ProfileAddressForm(forms.Form):
     id = forms.CharField()
     city = forms.CharField(max_length=30, required=False)
     street = forms.CharField(max_length=30, required=False)

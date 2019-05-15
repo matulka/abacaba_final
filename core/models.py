@@ -32,9 +32,6 @@ class Product(models.Model):
     def __str__(self):
         return 'Продукт: ' + self.name
 
-    def __str__(self):
-        return self.name
-
 
 class Modification(models.Model):
     id = models.AutoField(primary_key=True)
@@ -44,7 +41,7 @@ class Modification(models.Model):
     characteristics = models.TextField()
 
     def __str__(self):
-        return str(self.characteristics)
+        return 'Модификация: ' + self.characteristics
 
 
 class StockProduct(models.Model):
@@ -58,7 +55,7 @@ class StockProduct(models.Model):
     quantity = models.IntegerField()
 
     def __str__(self):
-        return str(self.modification)
+        return 'Складовый продукт: ' + str(self.modification)
 
 
 class ProductFeedback(models.Model):
