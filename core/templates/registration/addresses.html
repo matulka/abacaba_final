@@ -1,7 +1,7 @@
 {% extends 'registration/profile_navigation.html' %}
 
 {% block data %}
-    <div style="margin-top: 15%;padding-right: 20%;padding-left: 10%;">
+    <div>
         {% load widget_tweaks %}
         {% if not empty %}
             {% load widget_tweaks %}
@@ -110,8 +110,8 @@
             {% endif %}
 
         {% else %}
-            <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
-                <div class="form-group col-md-11">
+            <div class="form-row">
+                <div class="form-group col-md-12">
                     <h3>К сожалению, у Вас нет сохраненных адресов</h3>
                     <button style="margin-top: 2%;" class="btn btn-primary btn-block">Добавить адрес</button>
                 </div>

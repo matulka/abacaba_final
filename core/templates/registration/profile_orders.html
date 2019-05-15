@@ -4,7 +4,7 @@
     <div>
         {% load widget_tweaks %}
         {% if not empty %}
-            <table class="table">
+            <table class="table border border-light">
               <thead class="thead-light">
                 <tr>
                     <th scope="col">#</th>
@@ -27,8 +27,8 @@
               </tbody>
             </table>
         {% else %}
-            <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
-                <div class="form-group col-md-11">
+            <div class="form-row">
+                <div class="form-group col-md-12">
                     <h3>К сожалению, у Вас нет активных заказов</h3>
                     <button onclick="location.href='/'" style="margin-top: 2%;" class="btn btn-primary btn-block">Сделать заказ</button>
                 </div>
