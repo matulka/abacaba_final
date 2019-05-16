@@ -233,17 +233,21 @@ def form_modifications(request):
             endval[i] = str.split(',')
         prod = Product.objects.get(id=request.POST.get('id'))
         prod.modifications.clear()
+        prod.stock_products.clear()
         for i in itertools.product(*endval):
-            str = '{'
+            str = ''
             for j in range(len(char_names)):
+                if j == 0:
+                    str = '{'
                 str += '\'' + char_names[j] + '\': '
                 str += '\'' + i[j] + '\''
                 if j != len(char_names) - 1:
                     str += ', '
                 else:
                     str += '}'
-            mod = Modification(product=prod, characteristics=str)
-            mod.save()
+            if str != '':
+                mod = Modification(product=prod, characteristics=str)
+                mod.save()
         return HttpResponse('Gacha')
     return redirect('/')
 
@@ -285,6 +289,50 @@ def have_modifications(request):
         return JsonResponse(data)
     return redirect('/')
 
+
+def stock_product_page(request):
+    if request.user.is_staff:
+        products = Product.objects.all()
+        return render(request, 'admin/stock_product_page.html', {'products': products})
+    return redirect('/')
+
+
+def add_stock_product(request):
+    if request.user.is_staff:
+        return render(request, 'admin/add_stock_product.html')
+    return redirect('/')
+
+
+def get_product_modifications(request):
+    if request.method == 'POST':
+        prod = Product.objects.get(id=request.POST.get('id'))
+        data = dict()
+        data['mod'] = []
+        data['quantity'] = []
+        data['ids'] = []
+        for mod in prod.modifications.all():
+            data['mod'].append(mod.characteristics)
+            data['ids'].append(mod.id)
+            if hasattr(mod, 'stock_product'):
+                data['quantity'].append(mod.stock_product.quantity)
+            else:
+                data['quantity'].append(0)
+        return JsonResponse(data)
+    return redirect('/')
+
+def form_stock_products(request):
+    if request.method == 'POST':
+        prod = Product.objects.get(id=request.POST.get('id'))
+        ids = request.POST.getlist('ids[]')
+        q = request.POST.getlist('qs[]')
+        prod.stock_products.clear()
+        for i in range(len(ids)):
+            mod = Modification.objects.get(id=ids[i])
+            sp = StockProduct(product=prod, modification=mod, quantity=q[i])
+            print('IIIIIIIIDDDDDDDD:  ' +  str(sp.id))
+            sp.save()
+        return HttpResponse('Gacha')
+    return redirect('/')
 
 def arr_to_str(arr):
     string = str()

@@ -42,7 +42,8 @@ class Modification(models.Model):
     id = models.AutoField(primary_key=True)
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
-                                related_name='modifications')
+                                related_name='modifications',
+                                null=True)
     characteristics = models.TextField()
 
     def __str__(self):
@@ -53,7 +54,8 @@ class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
-                                related_name='stock_products')
+                                related_name='stock_products',
+                                null=True)
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
