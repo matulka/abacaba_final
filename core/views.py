@@ -22,6 +22,7 @@ from django.forms.models import model_to_dict
 from django.core import serializers
 from core.forms import AddressForm, QuestionForm, AddProductForm
 from django.template import RequestContext
+import itertools
 
 
 @login_required
@@ -216,9 +217,74 @@ def find_product(request):
 
 def add_modification(request):
     if request.user.is_staff:
-
         return render(request, 'admin/add_modification.html')
     return redirect('/')
+
+
+def form_modifications(request):
+    if request.method == 'POST':
+        char_names = request.POST.getlist('characteristics[]')
+        print(char_names)
+        values = request.POST.getlist('values[]')
+        endval = []
+        for i in range(len(values)):
+            endval.append([])
+            str = values[i]
+            endval[i] = str.split(',')
+        prod = Product.objects.get(id=request.POST.get('id'))
+        prod.modifications.clear()
+        for i in itertools.product(*endval):
+            str = '{'
+            for j in range(len(char_names)):
+                str += '\'' + char_names[j] + '\': '
+                str += '\'' + i[j] + '\''
+                if j != len(char_names) - 1:
+                    str += ', '
+                else:
+                    str += '}'
+            mod = Modification(product=prod, characteristics=str)
+            mod.save()
+        return HttpResponse('Gacha')
+    return redirect('/')
+
+
+def decode_characteristics(prod):
+    sample_mod = prod.modifications.all()[0].characteristics
+    d = dict()
+    d = literal_eval(sample_mod)
+    ans = []
+    for key in d:
+        ans.append(key)
+    return ans
+
+
+def decode_values(prod, chars):
+    ans = []
+    for i in range(len(chars)):
+        ans.append([])
+    for mod in prod.modifications.all():
+        d = literal_eval(mod.characteristics)
+        it = 0
+        for key in d:
+            ans[it].append(d[key])
+            it += 1
+    for i in range(len(chars)):
+        ans[i] = list(set(ans[i]))
+    return ans
+
+def have_modifications(request):
+    if request.method == 'POST':
+        prod = Product.objects.get(id=request.POST.get('id'))
+        data = dict()
+        data['have'] = True
+        if len(prod.modifications.all()) == 0:
+            data['have'] = False
+        if data['have']:
+            data['char'] = decode_characteristics(prod)
+            data['values'] = decode_values(prod, data['char'])
+        return JsonResponse(data)
+    return redirect('/')
+
 
 def arr_to_str(arr):
     string = str()
