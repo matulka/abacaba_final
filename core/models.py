@@ -162,7 +162,8 @@ class Image(models.Model):
     product = models.OneToOneField(Product,
                                    on_delete=models.CASCADE,
                                    null=True,
-                                   blank=True)
+                                   blank=True,
+                                   related_name='image')
 
     def __str__(self):
         return 'Изображение: ' + self.description

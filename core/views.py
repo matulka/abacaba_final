@@ -20,7 +20,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
 from django.core import serializers
-from core.forms import AddressForm, QuestionForm, AddProductForm
+from core.forms import AddressForm, QuestionForm, AddImgForm, AddSeveralImgForm
 from django.template import RequestContext
 import itertools
 
@@ -320,6 +320,21 @@ def get_product_modifications(request):
         return JsonResponse(data)
     return redirect('/')
 
+
+def get_product_stock_products(request):
+    if request.method == 'POST':
+        prod = Product.objects.get(id=request.POST.get('id'))
+        data = dict()
+        data['mod'] = []
+        data['ids'] = []
+        print(len(prod.stock_products.all()))
+        for sp in prod.stock_products.all():
+            data['mod'].append(sp.modification.characteristics)
+            data['ids'].append(sp.id)
+        return JsonResponse(data)
+    return redirect('/')
+
+
 def form_stock_products(request):
     if request.method == 'POST':
         prod = Product.objects.get(id=request.POST.get('id'))
@@ -328,11 +343,94 @@ def form_stock_products(request):
         prod.stock_products.clear()
         for i in range(len(ids)):
             mod = Modification.objects.get(id=ids[i])
+            mod.stock_product.delete()
             sp = StockProduct(product=prod, modification=mod, quantity=q[i])
-            print('IIIIIIIIDDDDDDDD:  ' +  str(sp.id))
             sp.save()
+            print('IIIIIIIIDDDDDDDD:  ' +  str(prod))
         return HttpResponse('Gacha')
     return redirect('/')
+
+
+def find_prod_for_img(request):
+    if request.user.is_staff:
+        products = Product.objects.all()
+        return render(request, 'admin/find_prod_for_img.html', {'products': products})
+    return redirect('/')
+
+
+def product_page_img(request):
+    if request.user.is_staff:
+        prod = Product.objects.get(id=request.GET.get('id'))
+        has_img = hasattr(prod, 'image')
+        if request.method == 'POST':
+            form = AddImgForm(request.POST, request.FILES)
+            if form.is_valid():
+                if has_img:
+                    prod_img = prod.image
+                    prod_img.delete()
+                if 'img' in request.FILES and request.FILES['img'] != None:
+                    img = request.FILES['img']
+                    image = Image(image=img, product=prod)
+                    image.save()
+                return HttpResponseRedirect('/')
+        else:
+            form = AddImgForm()
+        return render(request, 'admin/product_img.html', {'form': form, 'prod': prod, 'img': has_img})
+    return redirect('/')
+
+
+def find_out_what_stock_product(request):
+    if request.user.is_staff:
+        prod = Product.objects.get(id=request.GET.get('id'))
+        sp = prod.stock_products.all()
+        return render(request, 'admin/find_stock_pr.html', {'sp': sp})
+    return redirect('/')
+
+
+def stock_product_images(request):
+    if request.user.is_staff:
+        sp = StockProduct.objects.get(id=request.GET.get('id'))
+        has_img = hasattr(sp, 'images')
+        images = []
+        for imag in sp.images.all():
+            images.append(imag.image.url)
+        if request.method == 'POST':
+            form = AddSeveralImgForm(request.POST, request.FILES)
+            if form.is_valid():
+                imags = request.FILES.getlist('img')
+                for img in imags:
+                    image = Image(image=img, stock_product=sp)
+                    image.save()
+                return HttpResponseRedirect('/')
+        else:
+            form = AddSeveralImgForm()
+        return render(request, 'admin/stock_product_img.html', {'form': form, 'sp': sp, 'img': has_img, 'images': images})
+    return redirect('/')
+
+
+def find_sp_images(request):
+    if request.method == 'POST':
+        sp = StockProduct.objects.get(id=request.POST.get('id'))
+        data = dict()
+        data['urls'] = []
+        data['ids'] = []
+        for img in sp.images.all():
+            data['urls'].append(img.image.url)
+            data['ids'].append(img.id)
+        return JsonResponse(data)
+    return redirect('/')
+
+
+# # delete stock_product img
+def del_img(request):
+    if request.method == 'POST':
+        img = Image.objects.get(id=request.POST.get('id'))
+        id = request.POST.get('prod_id')
+        prod = StockProduct.objects.get(id=id)
+        prod.images.remove(img)
+        return HttpResponse('Gacha')
+    return redirect('/')
+
 
 def arr_to_str(arr):
     string = str()

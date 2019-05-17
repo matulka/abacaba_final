@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Добавление/изменение картинок</h1>
+<form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label>Текущая картинка:</label>
+            {% if img %}
+                <img id="main-image" src="{{prod.image.image.url}}" alt="Изображение товара">
+            {% else %}
+                <label> нет</label>
+            {% endif %}
+        </p>
+        <table>
+        {{ form }}
+        </table>
+        <input type="submit" value="Подтвердить">
+</form>
+{% endblock %}

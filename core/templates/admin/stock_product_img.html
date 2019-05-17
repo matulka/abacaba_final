@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Добавление/изменение картинок</h1>
+<form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label>Текущие картинки:</label>
+            <div class="container" id="images"></div>
+        </p>
+        <table>
+        {{ form }}
+        </table>
+        <p>
+            <label >Зажмите клавишу Ctrl, чтобы выбрать несколько изоражений</label>
+        </p>
+        <input type="submit" value="Подтвердить">
+</form>
+<script type="text/javascript" src="/static/classes/stock_product_img.js?$$REVISION$$"></script>
+{% endblock %}

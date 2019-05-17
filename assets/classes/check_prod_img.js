@@ -13,7 +13,7 @@ $(document).ready(function(){
 
 function valid_form(){
         var has_errors = false
-        $('#lab').text(""
+        $('#lab').text("")
         if ($('#prod').val().length < 1){
             has_errors =true;
             $('#lab').text("Заполните поле!")
@@ -29,6 +29,11 @@ function valid_form(){
            has_errors = true;
            $('#lab').text("Такого продукта не существует!")
         }
+        $('#radio_err').text("")
+        if ($( "input:checked" ).length == 0){
+            has_errors = true;
+            $('#radio_err').text("Выберете для чего редактировать картинки!")
+        }
         if (!has_errors){
             var csrf_token = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
@@ -40,7 +45,12 @@ function valid_form(){
             },
             success: function (response) {
                 id = response['id']
-                window.location.replace('/admin/modification_page/add_modification' + '?id=' + id)
+                if ($( "input:checked" )[0].id == 'product'){
+                    window.location.replace('/admin/product_page/img' + '?id=' + id)
+                }
+                else{
+                    window.location.replace('/admin/stock_products/img' + '?id=' + id)
+                }
             },
             error: function(xhr, textStatus, errorThrown) {
                     alert("pl report: " + errorThrown + xhr.status + xhr.responseText);

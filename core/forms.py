@@ -59,3 +59,27 @@ class AddProductForm(forms.ModelForm):
         error_messages = {'name':{'required': 'Поле должно быть заполнено!'}, 'price':{'required': 'Поле должно быть заполнено!'},}
 
 
+class AddImgForm(forms.Form):
+    img = forms.FileField(label="Картинка:", required=False)
+
+    def clean_img(self):
+        img = self.cleaned_data['img']
+        if img != None:
+            if not img.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                raise forms.ValidationError("Только форматы .jpg, .png, .jpeg разрешены")
+            return img
+        else:
+            return None
+
+
+class AddSeveralImgForm(forms.Form):
+    img = forms.FileField(label="Картинка:", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    def clean_img(self):
+        img = self.cleaned_data['img']
+        if img != None:
+            if not img.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                raise forms.ValidationError("Только форматы .jpg, .png, .jpeg разрешены")
+            return img
+        else:
+            return None
+
