@@ -1,4 +1,13 @@
 <div id="items" class="row" style="margin: 15px;">
+    {% if is_category %}
+    <h1 style="text-align: center; width: 100%;">Категория: {{ category_name }}</h1>
+    {% endif %}
+    {% if is_search %}
+    <h1 style="text-align: center; width: 100%;">Найдено по запросу "{{ search_query }}":</h1>
+    {% endif %}
+    {% if is_empty %}
+    <h1 style="text-align: center; width: 100%;">К сожалению, таких продуктов нет</h1>
+    {% endif %}
     {% for product in products %}
     {% include 'product_preview.html'%}
     {% endfor %}

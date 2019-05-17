@@ -66,11 +66,26 @@ def js_string_to_arr(js_string):
 
 def index_page(request):
     context = dict()
-    print_unauth_cart(request)
-    if request.method == 'GET' and 'category_id' in request.GET:
-        context['products'] = return_products(request.GET.get('category_id'))
+    if 'category_id' in request.GET:
+        category_id = request.GET.get('category_id')
+        category = Category.objects.get(id=category_id)
+        context['is_category'] = True
+        context['category_name'] = category.name
     else:
-        context['products'] = return_products()
+        category_id = None
+        context['is_category'] = False
+    if 'text' in request.GET:
+        text = request.GET.get('text')
+        context['search_query'] = text
+        context['is_search'] = True
+    else:
+        text = None
+        context['is_search'] = False
+    context['products'] = return_products(category_id=category_id, search_query=text)
+    if len(context['products']) == 0:
+        context['is_empty'] = True
+    else:
+        context['is_empty'] = False
     return render(request, 'index.html', context)
 
 
@@ -193,13 +208,17 @@ def browse_product(request):  # #Возвращает контекст для о
     return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
 
 
-def return_products(category_id=None):  # #Возвращает список продуктов для главной страницы
-    if category_id is None:
+def return_products(category_id=None, search_query=None):  # #Возвращает список продуктов для главной страницы
+    if category_id is None and search_query is None:
         return Product.objects.all()
+    if category_id is None:
+        return search_in_base(search_query)
     category = Category.objects.get(id=category_id)
-    if category is None:
-        return []
-    return category.products.all()
+    category_products = category.products.all()
+    if search_query is None:
+        return category_products
+    found_products = search_in_base(search_query)
+    return set(found_products).intersection(category_products)
 
 
 def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
