@@ -13,7 +13,7 @@ $(document).ready(function(){
 
 function valid_form(){
         var has_errors = false
-        $('#lab').text(""
+        $('#lab').text("")
         if ($('#prod').val().length < 1){
             has_errors =true;
             $('#lab').text("Заполните поле!")

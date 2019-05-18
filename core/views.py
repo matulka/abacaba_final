@@ -343,7 +343,8 @@ def form_stock_products(request):
         prod.stock_products.clear()
         for i in range(len(ids)):
             mod = Modification.objects.get(id=ids[i])
-            mod.stock_product.delete()
+            if hasattr(mod, 'stock_product'):
+                mod.stock_product.delete()
             sp = StockProduct(product=prod, modification=mod, quantity=q[i])
             sp.save()
             print('IIIIIIIIDDDDDDDD:  ' +  str(prod))
