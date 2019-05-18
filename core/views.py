@@ -502,7 +502,10 @@ def index_page(request):
     context = dict()
     if 'category_id' in request.GET:
         category_id = request.GET.get('category_id')
-        category = Category.objects.get(id=category_id)
+        if Category.objects.filter(id=category_id).exists():
+            category = Category.objects.get(id=category_id)
+        else:
+            return e_handler500(request)
         context['is_category'] = True
         context['category_name'] = category.name
     else:
@@ -524,8 +527,7 @@ def index_page(request):
 
 
 def e_handler500(request):
-    context = RequestContext(request)
-    response = render_to_response('error500html', context)
+    response = render_to_response('error500.html')
     response.status_code = 500
     return response
 
@@ -932,21 +934,7 @@ def make_order(request):
             current_cart = request.session['cart']
             if address is None or email is None:
                 raise ValueError # # Лучше переработать
-            city = address['city']
-            street = address['street']
-            building = address['building']
-            flat = address['flat']
-            entrance = address['entrance']
-            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
-                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
-            else:
-                ad = Addresses(city=city,
-                               street=street,
-                               building=building,
-                               flat=flat,
-                               entrance=entrance)
-                ad.save()
-            order = Order(email=email, address=ad)
+            order = Order(email=email, address=address)
             order.save()
             for order_product_information in current_cart:
                 order_product = OrderProduct(quantity=order_product_information['quantity'],
@@ -1006,33 +994,6 @@ def add_address(request):
             return JsonResponse({'result': 'success'})
         else:
             return JsonResponse({'result': 'fail'})
-
-
-def add_address_unauth(request):
-    if request.method == 'POST' and not request.user.is_authenticated:
-        form = AddressForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            city = form.cleaned_data['city']
-            street = form.cleaned_data['street']
-            building = form.cleaned_data['building']
-            flat = form.cleaned_data['flat']
-            entrance = form.cleaned_data['entrance']
-            if Addresses.objects.filter(city=city, street=street, building=building, flat=flat, entrance=entrance).exists():
-                ad = Addresses.objects.get(city=city, street=street, building=building, flat=flat, entrance=entrance)
-                request.session['address'] = model_to_dict(ad)
-            else:
-                new_ad = Addresses(city=city,
-                                   street=street,
-                                   building=building,
-                                   flat=flat,
-                                   entrance=entrance)
-                request.session['address'] = model_to_dict(new_ad)
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # #Возможно, редерикт на страницу оформления заказа
-        else:
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    else:
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 '''

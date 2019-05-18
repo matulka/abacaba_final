@@ -59,7 +59,6 @@ urlpatterns = [
     path('add_to_cart', views.add_to_cart),
     path('form_category', views.form_category),
     path('add_address', views.add_address),
-    path('add_address_unauth', views.add_address_unauth),
     path('del_address', views.delete_address),
     path('get_addresses', views.get_addresses_json),
     path('del_from_cart', views.delete_from_cart),
