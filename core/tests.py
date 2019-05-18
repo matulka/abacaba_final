@@ -73,24 +73,26 @@ class TestCategories(TestCase):
         self.prod1 = Product.objects.create(name='abacaba',
                              price='1',
                              main_category=self.cat1)
+        self.prod1.categories.add(self.cat1)
         self.prod2 = Product.objects.create(name='c',
                              price='1',
                              main_category=self.cat1)
+        self.prod2.categories.add(self.cat1)
         self.prod3 = Product.objects.create(name='c',
                                             price='1',
                                             main_category=self.cat2)
 
-    # def test_no_category(self):
-    #     response = self.c.get('/sget_http_categories', {'cat': 'a'})
-    #     self.assertEqual(len(response.context['products']), 0)
-    #
-    # def test_found_category1(self):
-    #     response = self.c.get('/categories', {'cat': 'b'})
-    #     self.assertEqual(len(response.context['products']), 2)
-    #
-    # def test_found_category2(self):
-    #     response = self.c.get('/categories', {'cat': 'd'})
-    #     self.assertEqual(len(response.context['products']), 1)
+    def test_no_category(self):
+        response = self.c.get('/', {'category_id': '0'})
+        self.assertEqual(len(response.context['products']), 0)
+
+    def test_found_category1(self):
+        response = self.c.get('/', {'category_id': '1'})
+        self.assertEqual(len(response.context['products']), 2)
+
+    def test_found_category2(self):
+        response = self.c.get('/', {'category_id': '2'})
+        self.assertEqual(len(response.context['products']), 0)
 
 
 class TestAddresses(TestCase):
@@ -313,11 +315,11 @@ class TestMakeOrder(TestCase):
                                {'address_id': 1})
         self.assertEqual(len(Order.objects.filter(author=self.user)[0].products.all()), 2)
 
-    # def test_unauth_make_order_1(self):
-    #     self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
-    #     response = self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
-    #     request = response.wsgi_request
-    #     request.session['address'] = model_to_dict(self.ad)
-    #     response = self.c.post('/make_order',
-    #                            {'email': 'lol@kek.su'})
-    #     self.assertEqual(len(Order.objects.filter(email='lol@kek.su')), 1)
+    def test_unauth_make_order_1(self):
+        self.c.post('/add_to_cart', {'quantity': 4, 'product_id': 1, 'a': 2, 'b': 3})
+        self.c.post('/add_to_cart', {'quantity': 2, 'product_id': 2, 'a': 3, 'b': 3})
+        self.c.post('/add_address_unauth',
+                    {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+        response = self.c.post('/make_order',
+                               {'email': 'lol@kek.su'})
+        self.assertEqual(len(Order.objects.filter(email='lol@kek.su')), 1)

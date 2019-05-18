@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="create-product">
+    <h2 id="title">Редактирование продуктов на складе</h2>
+    <div class="container" id="modifications"></div>
+    <p>
+        <label id="done"></label>
+    </p>
+    <p>
+        <input type="button" value="Сохранить количество продуктов" onclick="valid_form()" id="btn_submit">
+    </p>
+</div>
+<script type="text/javascript" src="/static/classes/admin_add_stock_product.js?$$REVISION$$"></script>
+{% endblock %}

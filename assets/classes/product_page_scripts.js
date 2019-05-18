@@ -92,6 +92,11 @@ function get_current_images() {
     });
 }
 
+function change_button_action(){
+    var url = '/admin/product_page/change_product' + '?id=' + get_product_id()
+    window.location.replace(url)
+}
+
 function cart_button_action(event) {
     if (quantity.checkValidity()) {
         data = {};
@@ -119,5 +124,6 @@ $(document).ready(function(){
     var product_id = get_product_id();
     initialize_modifications(product_id);
     $('#edit-button').on('click', edit_button_action);
+    $('#change-button').on('click', change_button_action);
     $('#cart-button').on('click', cart_button_action);
 });

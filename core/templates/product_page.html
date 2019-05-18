@@ -30,6 +30,9 @@
                         <div class="col-sm-6"><input readonly class="form-control-plaintext" value="Цена"></div>
                         <div class="col-sm-6"><input readonly class="form-control-plaintext" value="{{ product.price }} ₽" style="text-align: right;"></div>
                         <div class="col-sm-12" style="display: flex; justify-content: center; padding-top: 10px;"><button class="btn btn-outline-success btn-block" type="button" id="cart-button">Добавить в корзину</button></div>
+                        {% if user.is_staff %}
+                            <div class="col-sm-12" style="display: flex; justify-content: center; padding-top: 10px;"><button class="btn btn-outline-danger btn-block" type="button" id="change-button">Изменить</button></div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -37,5 +40,5 @@
     </div>
 </div>
 
-<script type="text/javascript" src="static/classes/product_page_scripts.js"></script>
+<script type="text/javascript" src="static/classes/product_page_scripts.js?$$REVISION$$"></script>
 {% endblock %}

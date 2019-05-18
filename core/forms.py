@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from core.models import Addresses, Question
+from core.models import Addresses, Question, Product
 
 
 class SearchForm(forms.Form):
@@ -68,6 +68,41 @@ class QuestionForm(forms.ModelForm):
         fields = ['topic', 'content']
 
 
+class AddProductForm(forms.ModelForm):
+    # name = forms.CharField(min_length=1, error_messages={'required': 'Поле должно быть заполнено!'})
+    # price = forms.FloatField(min_value=0, error_messages={'required': 'Поле должно быть заполнено!', 'invalid': 'LOL'})
+    # rating = forms.IntegerField(required=False, min_value=0, max_value=5, error_messages={'required': 'Поле должно быть заполнено!', 'invalid': 'LOL'})
+    class Meta:
+        model = Product
+        fields = ['name', 'price', 'rating']
+        error_messages = {'name':{'required': 'Поле должно быть заполнено!'}, 'price':{'required': 'Поле должно быть заполнено!'},}
+
+
+class AddImgForm(forms.Form):
+    img = forms.FileField(label="Картинка:", required=False)
+
+    def clean_img(self):
+        img = self.cleaned_data['img']
+        if img != None:
+            if not img.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                raise forms.ValidationError("Только форматы .jpg, .png, .jpeg разрешены")
+            return img
+        else:
+            return None
+
+
+class AddSeveralImgForm(forms.Form):
+    img = forms.FileField(label="Картинка:", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    def clean_img(self):
+        img = self.cleaned_data['img']
+        if img != None:
+            if not img.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                raise forms.ValidationError("Только форматы .jpg, .png, .jpeg разрешены")
+            return img
+        else:
+            return None
+
+
 class ProfileAddressForm(forms.Form):
     id = forms.CharField()
     city = forms.CharField(max_length=30, required=True)
@@ -76,3 +111,4 @@ class ProfileAddressForm(forms.Form):
     entrance = forms.CharField(required=True)
     flat = forms.CharField(required=True)
     description = forms.CharField(max_length=150, required=True)
+

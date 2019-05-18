@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -18,9 +19,10 @@ class Category(models.Model):
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.TextField()
-    price = models.IntegerField()
+    price = models.IntegerField(validators=[MinValueValidator(0)])
     rating = models.FloatField(blank=True,
-                               null=True)
+                               null=True,
+                               validators=[MinValueValidator(0), MaxValueValidator(5)])
     categories = models.ManyToManyField(to=Category,
                                         blank=True,
                                         related_name='products')
@@ -37,7 +39,8 @@ class Modification(models.Model):
     id = models.AutoField(primary_key=True)
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
-                                related_name='modifications')
+                                related_name='modifications',
+                                null=True)
     characteristics = models.TextField()
 
     def __str__(self):
@@ -48,7 +51,8 @@ class StockProduct(models.Model):
     id = models.AutoField(primary_key=True)
     product = models.ForeignKey(to=Product,
                                 on_delete=models.CASCADE,
-                                related_name='stock_products')
+                                related_name='stock_products',
+                                null=True)
     modification = models.OneToOneField(to=Modification,
                                         on_delete=models.CASCADE,
                                         related_name='stock_product')
@@ -172,7 +176,8 @@ class Image(models.Model):
     product = models.OneToOneField(Product,
                                    on_delete=models.SET_NULL,
                                    null=True,
-                                   blank=True)
+                                   blank=True,
+                                   related_name='image')
 
     def __str__(self):
         return 'Изображение: ' + self.description

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="create-product">
+    <h2>Выберете продукт, для которого хотите редактировать экземпляры на складе</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label>Продукт:</label>
+            <input list="products" name="prod" id="prod">
+            <label list="products" name="lab" id="lab"></label>
+            <datalist id="products">
+                {% for prod in products %}
+                    <option>{{ prod.name }}
+                {% endfor %}
+            </datalist>
+
+        </p>
+        <label id="done"></label>
+        <input type="button" value="Перейти к созданию модификаций" onclick="valid_form()" id="btn_submit">
+
+    </form>
+</div>
+<script type="text/javascript" src="/static/classes/stock_prod.js?$$REVISION$$"></script>
+{% endblock %}

@@ -1,7 +1,16 @@
 from django.contrib import admin
 from core.models import Product, Category, Image, Modification, StockProduct, Cart, OrderProduct, Addresses, Order
 
+class CategoryAdmin(admin.ModelAdmin):
+    pass
 
+
+class ImagesAdmin(admin.ModelAdmin):
+    pass
+
+
+class ModificationAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/models/model_change_list.html'
 
 
 admin.site.register(Product)

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="create-product">
+    <h2>Добавление продукта</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <p>
+            <label>Название:</label>
+            <input type="text" id="id_name">
+            <label id="name_err"></label>
+        </p>
+        <p>
+            <label>Цена:</label>
+            <input type="number" step="0.01" id="id_price" min="0">
+            <label> (в рублях)</label>
+            <label id="price_err"></label>
+        </p>
+        <p>
+            <label>Рейтинг:</label>
+            <input type="number" min="0"  id="id_rating">
+            <label>*опционально</label>
+            <label id="rating_err"></label>
+        </p>
+        <p>
+            <label>Категории:</label>
+            <input list="categories" name="cat" id="cat0">
+            <label list="categories" name="lab" id="lab0"></label>
+            <datalist id="categories">
+                {% for cat in categories %}
+                    <option>{{ cat.name }}
+                {% endfor %}
+            </datalist>
+        </p>
+        <div class="container" id="new-cat">
+        </div>
+        <p><input type="button" value="Добавить ещё категорию" id="add-existing-cat" onclick="add_cat()"></p>
+        <p>
+            <label>Главная категория:</label>
+            <input list="categories" name="category" id="main-cat">
+            <label list="categories" name="lab" id="main-lab"></label>
+        </p>
+        <label id="done"></label>
+        <input type="button" value="Добавить" onclick="valid_form()" id="btn_submit">
+
+    </form>
+</div>
+<script type="text/javascript" src="/static/classes/admin_add_product.js?$$REVISION$$"></script>
+{% endblock %}
