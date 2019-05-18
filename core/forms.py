@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from core.models import Addresses, Question, Product
@@ -37,10 +38,28 @@ class SignupForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2' )
 
 
+class ProfileForm(UserCreationForm):
+    first_name = forms.CharField(max_length=30, required=False)
+    last_name = forms.CharField(max_length=30, required=False)
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        if commit:
+            user.save()
+        return user
+
+
+class PasswordProfileForm(forms.Form):
+   password1 = forms.CharField(widget=forms.PasswordInput, required=True)
+   password2 = forms.CharField(widget=forms.PasswordInput, required=True)
+
+
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Addresses
-        fields = ['city', 'street', 'building', 'flat', 'entrance']
+        fields = ['city', 'street', 'building', 'flat', 'entrance', 'description']
 
 
 class QuestionForm(forms.ModelForm):
@@ -82,4 +101,14 @@ class AddSeveralImgForm(forms.Form):
             return img
         else:
             return None
+
+
+class ProfileAddressForm(forms.Form):
+    id = forms.CharField()
+    city = forms.CharField(max_length=30, required=True)
+    street = forms.CharField(max_length=30, required=True)
+    building = forms.CharField(max_length=30, required=True)
+    entrance = forms.CharField(required=True)
+    flat = forms.CharField(required=True)
+    description = forms.CharField(max_length=150, required=True)
 

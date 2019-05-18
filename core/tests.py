@@ -104,37 +104,44 @@ class TestAddresses(TestCase):
     def test_del(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
         response = self.c.post('/del_address',
                                {'id': 1})
-        self.assertEqual(len(self.user.addresses_set.all()), 0)
+        self.assertEqual(len(self.user.addresses.all()), 0)
 
     def test_adding(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
-        self.assertEqual(len(self.user.addresses_set.all()), 1)
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
+        self.assertEqual(len(self.user.addresses.all()), 1)
 
     def test_add_two_simillar_1(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
-        self.assertEqual(len(self.user.addresses_set.all()), 1)
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
+        self.assertEqual(len(self.user.addresses.all()), 1)
 
     def test_add_two_simillar_2(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
         self.assertEqual(len(Addresses.objects.all()), 1)
 
     def can_see_addresses(self):
         self.c.login(username='a', password='a')
         response = self.c.post('/add_address',
-                               {'city': 'city', 'street': 'street', 'building': 1, 'flat': 1, 'entrance': 1})
+                               {'city': 'city', 'street': 'street', 'building': '1', 'flat': '1', 'entrance': '1',
+                                'description': 'kek'})
         response = self.c.post('/accounts/addresses')
         self.assertEqual(response.status_code, 200)
 

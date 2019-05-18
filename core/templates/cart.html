@@ -1,5 +1,98 @@
 {% extends "base.html" %}
 
 {% block content %}
-Cart
+
+<h1 style="text-align: center; margin-bottom: 10px; margin-top: 20px;">Корзина</h1>
+
+{% if is_empty %}
+<h2 style="text-align: center; margin-bottom: 10px; margin-top: 10px; color: gray;">Корзина пуста</h2>
+{% endif %}
+
+{% for order_product in order_products %}
+<div id="content-row" class="row">
+    <div id="container-{{ order_product.stock_product.id }}" class="col-sm-12 col-cart">
+        <div class="cart-product border border-info" style="padding: 20px;">
+            <h2 id="name-{{ order_product.stock_product.id }}" style="text-align: center;">Название продукта</h2>
+            <div class="row no-gutters">
+                <div class="col-sm-5">
+                    <div class="row no-gutters" style="height: 100%;">
+                        <div class="col-sm-12">
+                            <div class="square-box">
+                                <img id="img-{{ order_product.stock_product.id }}" class="centered-div">
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+                            <p id="cost-{{ order_product.stock_product.id }}" class="lead" style="margin: 0;">Стоимость: </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center; width: auto;">
+                        <div class="col-sm-auto" style="padding: 10px;">
+                            <div id="parameters-{{ order_product.stock_product.id }}" class="row" style="width: auto;">
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                            <button id="delete-{{ order_product.stock_product.id }}" type="button" class="btn btn-outline-danger btn-block">Удалить из корзины</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% if not is_empty %}
+<h2 style="text-align: right; margin-right: 8vw;" id="cost-header"></h2>
+<div style="width: 100%; display: flex; justify-content: flex-end; flex-direction: row; margin-bottom: 40px;">
+    <button id="make-order-btn" type="button" class="btn btn-primary btn-lg" style="margin-right: 8vw;" onclick="make_order_btn();">Перейти к оформлению</button>
+</div>
+{% endif %}
+
+<div id="make-order-container" style="display: none; justify-content: center; padding: 20px; margin-top: 20px; margin-bottom: 10vh;">
+    <form style="width: 50vw;">
+        {% if is_auth %}
+        <div class="form-group">
+            <label for="select_address">Выберите адрес для доставки заказа:</label>
+            <select id="select_address" class="form-control" required>
+            </select>
+        </div>
+        <div class="form-group" style="display: flex; justify-content: flex-end; flex-direction: row;">
+            <button type="button" class="btn btn-secondary" onclick="add_address_btn();">Добавить новый адрес</button>
+        </div>
+        <div id="add_address_container" style="display:none">
+            {% include 'address_form_auth.html' %}
+            <div class="form-group" style="display: flex; justify-content: center;">
+                <button type="button" class="btn btn-secondary" onclick="submit_address_btn();">Сохранить адрес</button>
+            </div>
+        </div>
+        {% endif %}
+        {% if not is_auth %}
+        <div class="form-group">
+            <label for="email_input">Электронная почта</label>
+            <input id="email_input" type="email" class="form-control" placeholder="Введите Вашу электронную почту" aria-describedby="emailHelp">
+            <small id="emailHelp" class="form-text text-muted">По этой почте мы свяжемся с Вами по поводу заказа</small>
+        </div>
+        {% include 'address_form_unauth.html' %}
+        {% endif %}
+        <div class="form-group" style="padding-top: 10px; display:flex; justify-content: center;">
+            <button id="final_order_button" type="button" class="btn btn-primary btn-lg" onclick="final_order_btn();">Завершить оформление заказа</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    window.starting_order_product_ids = '{{ ids }}';
+    window.prices = {};
+    window.stock_product_ids = [];
+    window.quantities = {};
+    window.total_cost = 0;
+    if ('{{ is_auth }}' == 'True') {
+        window.is_auth = true;
+    }
+    else window.is_auth = false;
+</script>
+
+<script type="text/javascript" src="static/classes/cart_scripts.js"></script>
 {% endblock %}
