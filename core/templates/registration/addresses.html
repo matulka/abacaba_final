@@ -1,10 +1,79 @@
 {% extends 'registration/profile_navigation.html' %}
 
 {% block data %}
-    <div style="margin-top: 15%;padding-right: 20%;padding-left: 10%;">
+    {% load widget_tweaks %}
+
+    <div class="modal fade" tabindex="-1" id="add_address" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Добавить адрес</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form method="POST" action="{% url 'add_address_user' %}">
+              {% csrf_token %}
+              <div class="modal-body">
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Город</label>
+                        <div class="col-sm-10">
+                            {{ form_address.city|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Улица</label>
+                        <div class="col-sm-10">
+                            {{ form_address.street|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Дом</label>
+                        <div class="col-sm-10">
+                            {{ form_address.building|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Подъезд</label>
+                        <div class="col-sm-10">
+                            {{ form_address.entrance|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Квартира</label>
+                        <div class="col-sm-10">
+                            {{ form_address.flat|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Комментарий</label>
+                        <div class="col-sm-12" style="height: 150%;">
+                            {{ form_address.description|add_class:'form-control' }}
+                        </div>
+                      </div>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Добавить адрес</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    {% if not empty %}
+        <button class="btn btn-primary" id="button_add" onclick="$('#add_address').modal()" style="margin-left: 75%;margin-top: 2%;">Добавить адрес</button>
+    {% endif %}
+
+    <div style="margin-top: 10%;padding-right: 20%;padding-left: 10%;">
         {% load widget_tweaks %}
         {% if not empty %}
-            {% load widget_tweaks %}
             <table class="table table-bordered" style="table-layout: auto;">
               <thead class="thead-light">
                 <tr>
@@ -29,7 +98,10 @@
                                 <th scope="row" style="overflow: hidden;">{{ key.entrance }}</th>
                                 <th scope="row" style="overflow: hidden;">{{ key.flat }}</th>
                                 <th scope="row" style="overflow: hidden;">{{ key.description }}</th>
-                                <th scope="row"><a class="btn btn-primary btn-sm" href="/accounts/addresses?id={{ key.id }}">Изменить</a></th>
+                                <th scope="row">
+                                    <a class="btn btn-primary btn-sm" href="/accounts/addresses?id={{ key.id }}">Изменить</a>
+                                    <a class="btn btn-primary btn-sm" href="/accounts/addresses/delete/?id={{ key.id }}" style="margin-top: 5%;">Удалить</a>
+                                </th>
                             </tr>
                     {% endfor %}
               </tbody>
@@ -112,13 +184,12 @@
         {% else %}
             <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
                 <div class="form-group col-md-11">
-                    <h3>К сожалению, у Вас нет сохраненных адресов</h3>
-                    <button style="margin-top: 2%;" class="btn btn-primary btn-block">Добавить адрес</button>
+                    <h3 style="margin-left: 15%;">У Вас нет сохраненных адресов</h3>
+                    <button style="margin-top: 2%;" onclick="$('#add_address').modal()" class="btn btn-primary btn-block">Добавить адрес</button>
                 </div>
             </div>
         {% endif %}
 
     </div>
-
 
 {% endblock %}

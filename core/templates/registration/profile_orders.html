@@ -11,7 +11,7 @@
                     <th scope="col">Статус заказа</th>
                     <th scope="col">Дата заказа</th>
                     <th scope="col">Адрес доставки</th>
-                    <th scope="col">Товары</th>
+                    <th scope="col">Действие</th>
                 </tr>
               </thead>
               <tbody>
@@ -20,8 +20,10 @@
                             <th scope="row" style="overflow: hidden;">{{ key.id }}</th>
                             <th scope="row" style="overflow: hidden;">{{ key.order.status }}</th>
                             <th scope="row" style="overflow: hidden;">{{ key.order.order_date }}</th>
-                            <th scope="row" style="overflow: hidden;">{{ key.order.address }}</th>
-                            <th scope="row" style="overflow: hidden;">{{ key.stock_product.product }} {{ key.stock_product.modification }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.order.address.description }}</th>
+                            <th scope="row" style="overflow: hidden;">
+                                <a class="btn btn-primary btn-sm" href="/order/?id={{ key.id }}">Перейти к заказу</a>
+                            </th>
                         </tr>
                     {% endfor %}
               </tbody>
@@ -29,13 +31,11 @@
         {% else %}
             <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
                 <div class="form-group col-md-11">
-                    <h3>К сожалению, у Вас нет активных заказов</h3>
+                    <h3 style="margin-left: 5%;">К сожалению, у Вас нет активных заказов</h3>
                     <button onclick="location.href='/'" style="margin-top: 2%;" class="btn btn-primary btn-block">Сделать заказ</button>
                 </div>
             </div>
         {% endif %}
     </div>
-
-
 
 {% endblock %}
