@@ -46,6 +46,16 @@ function block_edit() {
     }
 }
 
+function check_quantity_validity() {
+    var valid = true;
+    for (var i = 0; i < window.stock_product_ids.length; i += 1) {
+        var id = window.stock_product_ids[i];
+        var quantity_input = document.getElementById('quantity-' + id.toString());
+        valid = valid && quantity_input.checkValidity();
+    }
+    return valid;
+}
+
 function fill_addresses() {
     $('#select_address').empty()
     $.ajax({
@@ -65,13 +75,18 @@ function fill_addresses() {
 }
 
 function make_order_btn() {
-    block_edit();
-    $('#make-order-container').css('display', 'flex');
-    $('#make-order-btn').prop('disabled', true);
-    if (window.is_auth) {
-        fill_addresses();
+    if (check_quantity_validity()) {
+        block_edit();
+        $('#make-order-container').css('display', 'flex');
+        $('#make-order-btn').prop('disabled', true);
+        if (window.is_auth) {
+            fill_addresses();
+        }
+        $('html, body').animate({ scrollTop: $(document).height() }, 1000);
     }
-    $('html, body').animate({ scrollTop: $(document).height() }, 1000);
+    else {
+        alert('Вы заказали больше продуктов, чем есть на складе.');
+    }
 }
 
 function check_address_form_validity() {
