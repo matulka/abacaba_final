@@ -40,6 +40,8 @@ urlpatterns = [
     path('admin/stock_products/add_stock_product', views.add_stock_product),
     path('admin/stock_products/img', views.find_out_what_stock_product),
     path('admin/stock_products/change_img', views.stock_product_images),
+    path('admin/orders_page', views.orders_page),
+    path('get_all_orders', views.get_all_orders),
     path('get_prod_by_name', views.get_product_by_name),
     path('find_prod_modifications', views.get_product_modifications),
     path('find_prod_sps', views.get_product_stock_products),

@@ -433,6 +433,31 @@ def del_img(request):
     return redirect('/')
 
 
+def orders_page(request):
+    if request.user.is_staff:
+        return render(request, 'admin/orders_page.html')
+    return redirect('/')
+
+
+def get_all_orders(request):
+    if request.method == 'POST':
+        orders = Order.objects.all()
+        data = dict()
+        data['id'] = []
+        data['date'] = []
+        data['author'] = []
+        data['email'] = []
+        data['status'] = []
+        for order in orders:
+            data['ids'].append(order.id)
+            data['date'].append(order.date)
+            data['author'].append(order.author)
+            data['email'].append(order.email)
+            data['status'].append(order.status)
+        return JsonResponse(data)
+    return redirect('/')
+
+
 def arr_to_str(arr):
     string = str()
     for element in arr:
