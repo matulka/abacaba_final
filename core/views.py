@@ -15,7 +15,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.hashers import check_password
 from django.template.loader import render_to_string
-from core.token import account_activation_token
+from core.token import account_activation_token, confirm_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
@@ -448,6 +448,40 @@ def change_order_product_quantity(request):
 И удаление текущей корзины.
 """
 
+def confirm_order(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        print(uid)
+        order = Order.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError):
+        order = None
+    if order is not None and confirm_token.check_token(order, token):
+        order.status = 'Подтвержден'
+        order.save()
+        messages.success(request, 'Вы успешно подтвердили свой заказ')
+        return redirect('home')
+    else:
+        messages.error(request, 'Ссылка для подтвержения устарела')
+        return redirect('home')
+
+
+def validate_order(request, order):
+    user = request.user
+    current_site = get_current_site(request)
+    mail_subject = 'Подтвердите ваш заказ'
+    message = render_to_string('confirm_order.html', {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(order.pk)).decode(),
+        'token': confirm_token.make_token(order),
+        'order': order.pk
+    })
+    to_email = order.author.email
+    email = EmailMessage(
+        mail_subject, message, to=[to_email]
+    )
+    email.send()
+
 
 def make_order(request):
     if request.method == 'POST':
@@ -461,6 +495,7 @@ def make_order(request):
             order = Order(author=user,
                           address=address)
             order.save()
+            validate_order(request, order)
             for order_product in order_products:
                 order_product.order = order
                 order_product.save()
@@ -485,11 +520,15 @@ def make_order(request):
                 raise ValueError
             order = Order(email=email, address=address)
             order.save()
+
+            validate_order(request, order)
+
             for order_product_information in current_cart:
                 order_product = OrderProduct(quantity=order_product_information['quantity'],
                                              stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
                 order_product.save()
+
             return redirect('/')
     return redirect('/')
 
