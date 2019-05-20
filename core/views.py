@@ -923,17 +923,31 @@ def confirm_order(request, uidb64, token):
 
 
 def validate_order(request, order):
-    user = request.user
+    if request.user.is_authenticated:
+        user = request.user
     current_site = get_current_site(request)
     mail_subject = 'Подтвердите ваш заказ'
-    message = render_to_string('confirm_order.html', {
-        'user': user,
-        'domain': current_site.domain,
-        'uid': urlsafe_base64_encode(force_bytes(order.pk)).decode(),
-        'token': confirm_token.make_token(order),
-        'order': order.pk
-    })
-    to_email = order.author.email
+    if request.user.is_authenticated:
+        message = render_to_string('confirm_order.html', {
+            'is_authenticated': True,
+            'user': user,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(order.pk)).decode(),
+            'token': confirm_token.make_token(order),
+            'order': order.pk
+        })
+    else:
+        message = render_to_string('confirm_order.html', {
+            'is_authenticated': False,
+            'domain': current_site.domain,
+            'uid': urlsafe_base64_encode(force_bytes(order.pk)).decode(),
+            'token': confirm_token.make_token(order),
+            'order': order.pk
+        })
+    if request.user.is_authenticated:
+        to_email = order.author.email
+    else:
+        to_email = order.email
     email = EmailMessage(
         mail_subject, message, to=[to_email]
     )
