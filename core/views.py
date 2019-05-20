@@ -995,6 +995,25 @@ def add_address(request):
         else:
             return JsonResponse({'result': 'fail'})
 
+@login_required
+def add_address_user(request):
+
+    if request.method == "POST":
+        form_address = AddressForm(request.POST)
+
+        city = form_address.data.get('city')
+        street = form_address.data.get('street')
+        building = form_address.data.get('building')
+        entrance = form_address.data.get('entrance')
+        flat = form_address.data.get('flat')
+        description = form_address.data.get('description')
+
+        address_new = Addresses(city=city, street=street, building=building, flat=flat, entrance=entrance,
+                                description=description)
+        address_new.customer = request.user
+        address_new.save()
+
+    return redirect('profile_addresses')
 
 '''
 В этот метод необходимо передать id адреса, подлежащего удалению
@@ -1144,8 +1163,10 @@ def profile_addresses(request):
     user = User.objects.get(username=request.user.username)
     addresses = user.addresses.all().filter(customer=user)
 
+    form_address = AddressForm()
+
     if addresses.count() == 0:
-        return render(request, 'registration/addresses.html', {'empty': 'yes'})
+        return render(request, 'registration/addresses.html', {'empty': 'yes', 'form_address': form_address})
 
     if request.method == 'GET':
         if request.GET.get('id'):
@@ -1170,18 +1191,30 @@ def profile_addresses(request):
         if form_address.is_valid():
 
             if id_address is not None:
-                address = addresses[int(id_address)]
 
-                address.city = city
-                address.street = street
-                address.building = building
-                address.entrance = entrance
-                address.flat = flat
-                address.description = description
+                    address = addresses[int(id_address)]
+                    address.city = city
+                    address.street = street
+                    address.building = building
+                    address.entrance = entrance
+                    address.flat = flat
+                    address.description = description
+                    address.save()
 
-                address.save()
+            return redirect('profile_addresses')
 
-    return render(request, 'registration/addresses.html', {'addresses': addresses})
+    return render(request, 'registration/addresses.html', {'addresses': addresses, 'form_address': form_address})
+
+#@login_required
+#def delete_address(request):
+#
+#    if request.method == 'GET':
+#        data = request.GET.dict()
+#        user = request.user
+#        addresses = user.addresses.all()
+#        address = addresses[int(data.get('id'))-1]
+#        address.delete()
+#        return redirect('profile_addresses')
 
 
 @login_required
