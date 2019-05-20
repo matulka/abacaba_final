@@ -4,6 +4,7 @@ from core.models import Product, Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification
 from django.core.exceptions import ObjectDoesNotExist
 from core import views
+from core.views import search_in_base
 from django.test.client import RequestFactory
 from django.forms.models import model_to_dict
 
@@ -20,10 +21,6 @@ class TestUserCanSeePages(TestCase):
 
     def test_user_can_see_cart(self):
         response = self.c.get('/cart')
-        self.assertEqual(response.status_code, 200)
-
-    def test_user_can_see_search_page(self):
-        response = self.c.get('/search')
         self.assertEqual(response.status_code, 200)
 
     def test_user_can_see_categories_page(self):
@@ -44,24 +41,20 @@ class TestSearch(TestCase):
                              main_category=self.cat)
 
     def test_no_text(self):
-        response = self.c.get('/search', {'text': ''})
-        self.assertEqual(len(response.context['products']), 2)
+        products = search_in_base('')
+        self.assertEqual(len(products), 2)
 
     def test_no_result_1(self):
-        response = self.c.get('/search', {'text': 'ol'})
-        self.assertEqual(len(response.context['products']), 0)
+        products = search_in_base('ol')
+        self.assertEqual(len(products), 0)
 
     def test_all_result(self):
-        response = self.c.get('/search', {'text': 'c'})
-        self.assertEqual(len(response.context['products']), 2)
+        products = search_in_base('c')
+        self.assertEqual(len(products), 2)
 
     def test_one_result(self):
-        response = self.c.get('/search', {'text': 'abac'})
-        self.assertEqual(len(response.context['products']), 1)
-
-    def test_none(self):
-        response = self.c.get('/search')
-        self.assertEqual(len(response.context['products']), 0)
+        products = search_in_base('abac')
+        self.assertEqual(len(products), 1)
 
 
 class TestCategories(TestCase):

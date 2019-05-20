@@ -145,6 +145,7 @@ def category_list(request):
         return render(request, 'admin/category_list.html', {'categories': cat})
     return redirect('/')
 
+
 def form_category(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -159,6 +160,7 @@ def form_category(request):
     else:
         return redirect('/')
 
+
 def change_category(request):
     if request.method == 'GET':
         cat = return_categories()
@@ -167,6 +169,7 @@ def change_category(request):
         return render(request, 'admin/change_category.html', {'cat': cat, 'category': category})
     else:
         return redirect('/')
+
 
 def get_category_id(request):
     if request.method == 'POST':
@@ -177,6 +180,7 @@ def get_category_id(request):
         return JsonResponse(data)
     else:
         return redirect('/')
+
 
 def change_exist_category(request):
     if request.method == 'POST':
@@ -201,6 +205,7 @@ def get_product_by_name(request):
         data['id'] = prod.id
         return JsonResponse(data)
     return redirect('/')
+
 
 def modification_page(request):
     if request.user.is_staff:
@@ -275,6 +280,7 @@ def decode_values(prod, chars):
     for i in range(len(chars)):
         ans[i] = list(set(ans[i]))
     return ans
+
 
 def have_modifications(request):
     if request.method == 'POST':
