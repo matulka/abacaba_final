@@ -75,7 +75,7 @@
             <table class="table table-bordered" style="table-layout: auto;">
               <thead class="thead-light">
                 <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">ID</th>
                     <th scope="col">Город</th>
                     <th scope="col">Улица</th>
                     <th scope="col">Дом</th>
@@ -101,7 +101,7 @@
                                         
                                     
                                         <div class="col-sm-12" style="display: flex; justify-content: center;"><a class="btn btn-primary btn-sm" href="/accounts/addresses?id={{ key.id }}" style="width: 80%;">Изменить</a></div>
-                                        <div address_id = "{{ key.address_id }}" class="col-sm-12" style="display: flex; justify-content: center;"><a class="btn btn-primary btn-sm" onclick="del_address({{ key.id }});" style="margin-top: 10px; width: 80%;">Удалить</a></div>
+                                        <div address_id = "{{ key.address_id }}" class="col-sm-12" style="display: flex; justify-content: center;"><a class="btn btn-primary btn-sm" onclick="del_address({{ key.id }});" style="margin-top: 10px; width: 80%; color: white;">Удалить</a></div>
                                     </div>
                                     
                                 </th>
