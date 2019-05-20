@@ -67,11 +67,9 @@
       </div>
     </div>
 
-    {% if not empty %}
-        <button class="btn btn-primary" id="button_add" onclick="$('#add_address').modal()" style="margin-left: 75%;margin-top: 2%;">Добавить адрес</button>
-    {% endif %}
+   
 
-    <div style="margin-top: 10%;padding-right: 20%;padding-left: 10%;">
+    <div>
         {% load widget_tweaks %}
         {% if not empty %}
             <table class="table table-bordered" style="table-layout: auto;">
@@ -90,7 +88,7 @@
               <tbody id="addresses">
                     {% load widget_tweaks %}
                     {% for key in addresses %}
-                            <tr>
+                            <tr id = "tr-{{ key.id }}">
                                 <th scope="row" style="overflow: hidden;">{{ key.id }}</th>
                                 <th scope="row" style="overflow: hidden;">{{ key.city }}</th>
                                 <th scope="row" style="overflow: hidden;">{{ key.street }}</th>
@@ -99,8 +97,13 @@
                                 <th scope="row" style="overflow: hidden;">{{ key.flat }}</th>
                                 <th scope="row" style="overflow: hidden;">{{ key.description }}</th>
                                 <th scope="row">
-                                    <a class="btn btn-primary btn-sm" href="/accounts/addresses?id={{ key.id }}">Изменить</a>
-                                    <a class="btn btn-primary btn-sm" href="/accounts/addresses/delete/?id={{ key.id }}" style="margin-top: 5%;">Удалить</a>
+                                    <div class="row">
+                                        
+                                    
+                                        <div class="col-sm-12" style="display: flex; justify-content: center;"><a class="btn btn-primary btn-sm" href="/accounts/addresses?id={{ key.id }}" style="width: 80%;">Изменить</a></div>
+                                        <div address_id = "{{ key.address_id }}" class="col-sm-12" style="display: flex; justify-content: center;"><a class="btn btn-primary btn-sm" onclick="del_address({{ key.id }});" style="margin-top: 10px; width: 80%;">Удалить</a></div>
+                                    </div>
+                                    
                                 </th>
                             </tr>
                     {% endfor %}
@@ -182,14 +185,18 @@
             {% endif %}
 
         {% else %}
-            <div class="form-row" style="margin-left: 6%;margin-top: 25%;">
+            <div class="form-row">
                 <div class="form-group col-md-12">
                     <h3>У Вас нет сохраненных адресов</h3>
                     <button style="margin-top: 2%;" onclick="$('#add_address').modal()" class="btn btn-primary btn-block">Добавить адрес</button>
                 </div>
             </div>
         {% endif %}
-
+{% if not empty %}
+<button class="btn btn-primary" id="button_add" onclick="$('#add_address').modal()">Добавить адрес</button>
+{% endif %}
     </div>
+
+
 
 {% endblock %}

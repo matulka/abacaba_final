@@ -23,6 +23,25 @@ function change_active_tab() {
     $(id).addClass('active');
 }
 
+function del_address(id) {
+    $.post({
+        url: '/del_address', 
+        data: {
+            'id': id,
+            'csrfmiddlewaretoken': window.kek
+        },
+        success: function(response) {
+            if (response['result'] == 'success') {
+                $('#tr-' + id).remove();
+                alert('Адрес успешно удален');
+            }
+            if (response['result'] == 'permission denied') {
+                alert('Вам не принадлежит этот адрес');
+            }
+        }
+    });
+}
+
 $(document).ready(function() {
     change_active_tab();
 });

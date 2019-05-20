@@ -1001,6 +1001,7 @@ def add_address(request):
         else:
             return JsonResponse({'result': 'fail'})
 
+
 @login_required
 def add_address_user(request):
 
@@ -1013,6 +1014,14 @@ def add_address_user(request):
         entrance = form_address.data.get('entrance')
         flat = form_address.data.get('flat')
         description = form_address.data.get('description')
+
+        found_description = False
+        for ad in request.user.addresses.all():
+            if ad.description == description:
+                found_description = True
+        if found_description:
+            return HttpResponse('У вас уже существует адрес с таким описанием\
+             <a href="/accounts/addresses/">Вернуться</>')
 
         address_new = Addresses(city=city, street=street, building=building, flat=flat, entrance=entrance,
                                 description=description)
@@ -1029,11 +1038,14 @@ def add_address_user(request):
 @login_required
 def delete_address(request):
     user = request.user
+    user_addresses = user.addresses.all()
     if request.method == 'POST':
         address_id = int(request.POST.get('id'))
         address = Addresses.objects.get(id=address_id)
-        address.delete()
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if address in user_addresses:
+            address.delete()
+            return JsonResponse({'result': 'success'})
+        return JsonResponse({'result': 'permission denied'})
     else:
         return redirect('/')
 
@@ -1169,7 +1181,7 @@ def profile_addresses(request):
     user = User.objects.get(username=request.user.username)
     addresses = user.addresses.all().filter(customer=user)
 
-    form_address = AddressForm()
+    form_address = ProfileAddressForm()
 
     if addresses.count() == 0:
         return render(request, 'registration/addresses.html', {'empty': 'yes', 'form_address': form_address})
@@ -1178,8 +1190,12 @@ def profile_addresses(request):
         if request.GET.get('id'):
             form_address = ProfileAddressForm()
             data = request.GET.dict()
-            id_ = int(data['id']) - 1
-            address = addresses[id_]
+            id_ = int(data['id'])
+            address = None
+            for user_address in addresses:
+                if user_address.id == id_:
+                    address = user_address
+
             return render(request,  'registration/addresses.html',
                           {'addresses': addresses, 'form_address': form_address, 'address': address, 'id': id_})
 
