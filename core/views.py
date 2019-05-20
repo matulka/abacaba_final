@@ -448,15 +448,57 @@ def get_all_orders(request):
         data['author'] = []
         data['email'] = []
         data['status'] = []
+        data['address'] = []
         for order in orders:
-            data['ids'].append(order.id)
-            data['date'].append(order.date)
-            data['author'].append(order.author)
+            data['id'].append(order.id)
+            data['date'].append(order.order_date.strftime("%Y-%m-%d %H:%M"))
+            if order.author != None:
+                data['author'].append(order.author.username)
+            else:
+                data['author'].append('Незарегестрирован')
             data['email'].append(order.email)
             data['status'].append(order.status)
+            data['address'].append(str(order.address))
+        for i in range(len(data['id'])):
+            j = i + 1
+            while j < len(data['id']):
+                if data['status'][i] == "Ожидает подтверждения":
+                    if data['status'][j] == "Ожидает подтверждения":
+                        if data['date'][i] < data['date'][j]:
+                            swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+                if data['status'][i] == "Подтвержден":
+                    if data['status'][j] == "Ожидает подтверждения":
+                       swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+                    elif data['status'][j] == "Подтвержден":
+                        if data['date'][i] < data['date'][j]:
+                            swap_data(data['id'], data['date'], data['author'], data['email'], data['status'],
+                                      data['address'], i, j)
+                if data['status'][i] == "Доставлен":
+                    if data['date'][i] < data['date'][j]:
+                        swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+
+                j += 1
         return JsonResponse(data)
     return redirect('/')
 
+
+def swap_data(id, date, author, email, status, address, i, j):
+    id[i], id[j] = id[j], id[i]
+    date[i], date[j] = date[j], date[i]
+    author[i], author[j] = author[j], author[i]
+    email[i], email[j] = email[j], email[i]
+    status[i], status[j] = status[j], status[i]
+    address[i], address[j] = address[j], address[i]
+
+
+def change_order_status(request):
+    if request.method == 'POST':
+        order = Order.objects.get(id=request.POST.get('id'))
+        status = request.POST.get('state')
+        order.status = status
+        order.save()
+        return HttpResponse('Gacha')
+    return redirect('/')
 
 def clear_session(request):
     request.session.flush()

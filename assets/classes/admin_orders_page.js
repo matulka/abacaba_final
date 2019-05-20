@@ -1,8 +1,9 @@
 date = []
 author = []
 email = []
-status = []
+state = []
 id = []
+address = []
 
 function create_header(){
     st = ' style="border: 1px solid grey;"'
@@ -13,13 +14,48 @@ function create_header(){
     $('#table').append(html_str);
 }
 
-function add_tr(i, id){
+function order_info(i){
+    window.location.replace('/admin/oders_page/order?id=' + i)
+}
+
+function add_tr(i){
+    console.log(status)
     st = ' style="border: 1px solid grey;"'
     var html_str = '<tr'+st+'><th'+st+'>'+date[i]+'</th><th'+st+'>'+author[i]+'</th>'
-                +'<th'+st+'><input type="button"></th><th'+st+'><input type="button"></th>' +
-                '<th'+st+'>'+email[i]+'</th><th'+st+'></th>'+status[i]+'</tr>'
+                +'<th'+st+'><input type="button" value="Подробнее" onclick="order_info('+id[i]+')"></th><th'+st+'>' + address[i]+
+                '<th'+st+'>'+email[i]+'</th><th'+st+'>'+
+                '<select id="select'+id[i]+'">'+
+                '<option id="vaiting'+id[i]+'">Ожидает подтверждения</option>'+
+                '<option id="confirmed'+id[i]+'">Подтвержден</option>'+
+                '<option id="delivered'+id[i]+'">Доставлен</option>'+
+                '</selsect>'+
+                '</th></tr>'
     $('#tbl').append(html_str);
+    var sel = document.getElementById("select"+id[i]);
+    if (state[i] == 'Ожидает подтверждения'){
+        sel.options[0].selected = true;
+    }
+    else if (state[i] == 'Подтвержден'){
+         sel.options[1].selected = true;
+    }
+    else{
+         sel.options[2].selected = true;
+    }
+    $('#select'+id[i]).on('focus', function () {
+        previous = this.value;
+    }).change(function() {
+        $.ajax({
+        url: '/change_order_status',
+        type: "POST",
+        data:{
+            id: id[i],
+            state: sel.value,
+        }
+    });
+        previous = this.value;
+    });
 }
+
 
 $(document).ready(function(){
     window.counter_chars = -1;
@@ -55,11 +91,13 @@ $(document).ready(function(){
             id = response['id']
             author = response['author']
             email = response['email']
-            status = response['status']
+            state = response['status']
+            address = response['address']
             create_header()
             for (var i = 0; i < id.length; i += 1){
-                add_tr(i, id[i])
+                add_tr(i)
             }
         }
     });
+
 });
