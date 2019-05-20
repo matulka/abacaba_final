@@ -1,4 +1,5 @@
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
 from django.utils import six
 class TokenGenerator(PasswordResetTokenGenerator):
     def _make_hash_value(self, user, timestamp):
@@ -6,4 +7,15 @@ class TokenGenerator(PasswordResetTokenGenerator):
             six.text_type(user.pk) + six.text_type(timestamp) +
             six.text_type(user.is_active)
         )
+
+
 account_activation_token = TokenGenerator()
+
+
+class ConfirmGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, order, timestamp):
+        return (
+            six.text_type(order.pk)
+        )
+
+confirm_token = ConfirmGenerator()

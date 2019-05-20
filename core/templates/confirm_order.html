@@ -1,0 +1,5 @@
+{% autoescape off %}
+Привет, {{ user.username }},
+Для подтвреждения заказа вашего заказа {{ order }},
+http://{{ domain }}{% url 'confirm_order' uidb64=uid token=token %}
+{% endautoescape %}
