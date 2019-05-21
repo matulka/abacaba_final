@@ -500,6 +500,53 @@ def change_order_status(request):
         return HttpResponse('Gacha')
     return redirect('/')
 
+
+def user_list(request):
+    if request.user.is_staff:
+        return render(request, 'admin/user_list.html')
+    return redirect('/')
+
+
+def get_users(request):
+    if request.method == 'POST':
+        users = User.objects.all()
+        data = dict()
+        data['login'] = []
+        data['email'] = []
+        data['is_staff'] = []
+        data['id'] = []
+        for user in users:
+            if user != request.user:
+                data['email'].append(user.email)
+                data['login'].append(user.username)
+                data['is_staff'].append(user.is_staff)
+                data['id'].append(user.id)
+        print(data['id'])
+        return JsonResponse(data)
+    return redirect('/')
+
+
+def change_user_rights(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        user = User.objects.get(id=id)
+        if request.POST.get('is_staff') == 'true':
+            user.is_staff = True
+        else:
+            user.is_staff = False
+        user.save()
+    return redirect('/')
+
+
+def del_user(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        user = User.objects.get(id=id)
+        user.delete()
+        return HttpResponse('Gacha')
+    return redirect('/')
+
+
 def clear_session(request):
     request.session.flush()
     return redirect('/')
