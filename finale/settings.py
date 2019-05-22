@@ -31,13 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'core',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
     'widget_tweaks'
 ]
 
@@ -135,6 +135,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'abacabamain@gmail.com'
 EMAIL_HOST_PASSWORD = 'Abacabafinal'
 EMAIL_PORT = 587
+
 
 # Session
 
