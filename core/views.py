@@ -1033,7 +1033,7 @@ def make_order(request):
                                              stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
                 stock_product = StockProduct.objects.get(id=order_product_information['stock_product'])
-                stock_product.quantity -= order_product_information['quantity']
+                stock_product.quantity -= int(order_product_information['quantity'])
                 stock_product.save()
                 order_product.save()
             return redirect('/')
