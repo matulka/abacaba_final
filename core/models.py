@@ -105,6 +105,7 @@ class Order(models.Model):
                                null=True,
                                blank=True,
                                related_name='orders')
+    cost = models.IntegerField(default=0)
     order_date = models.DateTimeField(auto_now_add=True)
     address = models.ForeignKey(to=Addresses,
                                 on_delete=models.SET_NULL,
@@ -141,6 +142,11 @@ class OrderProduct(models.Model):
         blank=True,
         related_name='products'
     )
+    cost = models.IntegerField(default=0)
+
+    def refresh_cost(self):
+        self.cost = self.quantity * self.stock_product.product.price
+        self.save()
 
 
 class Question(models.Model):

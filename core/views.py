@@ -759,6 +759,7 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
             raise ValueError
         else:
             prod.quantity += int(quantity)
+            prod.refresh_cost()
             prod.save()
     else:
         if int(quantity) > stock_product.quantity:
@@ -768,6 +769,7 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
             order_product.quantity = int(quantity)
             order_product.stock_product = stock_product
             order_product.cart = current_cart
+            order_product.refresh_cost()
             order_product.save()
 
 
@@ -879,6 +881,7 @@ def change_order_product_quantity(request):
         order_product = request.user.cart.products.get(stock_product=stock_product)
         if 0 < new_quantity < stock_product.quantity:
             order_product.quantity = new_quantity
+            order_product.refresh_cost()
             order_product.save()
             return HttpResponse('success')
         else:
@@ -894,16 +897,6 @@ def change_order_product_quantity(request):
         else:
             return HttpResponse('invalid quantity')
 
-
-"""
-В этот метод необходимо передать, какой адрес выбрал пользователь. Если пользователь зарегистрирован,
-передается id адреса; в противном случае передается сам адрес (в виде строки?).
-Если пользователь не авторизован, то прежде чем отправлять на этот метод, надо чтобы он
-указал свою электронную почту для связи (вероятно, это придется делать на отдельной странице).
-Также стоит добавить в этом методе оповещение пользователя об успешном заказе по электронной почте.
-Необходимо добавить уменьшение числа вещей на складе после заказа.
-И удаление текущей корзины.
-"""
 
 def confirm_order(request, uidb64, token):
     try:
@@ -967,9 +960,14 @@ def make_order(request):
                           address=address)
             order.save()
             validate_order(request, order)
+
+            cost = 0
             for order_product in order_products:
                 order_product.order = order
+                cost += order_product.stock_product.product.price * order_product.quantity
                 order_product.save()
+            order.cost = cost
+            order.save()
             return HttpResponse('success')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
@@ -994,14 +992,47 @@ def make_order(request):
 
             validate_order(request, order)
 
+            cost = 0
             for order_product_information in current_cart:
                 order_product = OrderProduct(quantity=order_product_information['quantity'],
                                              stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
+                order_product.refresh_cost()
                 order_product.save()
+                cost += int(order_product.cost)
+            order.cost = cost
+            order.save()
 
             return redirect('/')
     return redirect('/')
+
+
+@login_required
+def view_order(request):
+    if request.method == 'GET':
+        if 'id' not in request.GET:
+            return e_handler500(request)
+        order_id = request.GET.get('id')
+        has_permission = False
+        user = request.user
+        if user.is_superuser:
+            has_permission = True
+        else:
+            for order in user.orders.all():
+                if order.id == order_id:
+                    has_permission = True
+        if not has_permission:
+            return e_handler500(request)
+        order = Order.objects.get(id=order_id)
+        context = dict()
+        context['ids'] = list()
+        context['order_products'] = order.products.all()
+        context['order_cost'] = order.cost
+        context['order_id'] = order_id
+        for order_product in order.products.all():
+            context['ids'].append(order_product.id)
+        return render(request, 'order.html', context)
+    return e_handler500(request)
 
 
 @login_required

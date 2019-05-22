@@ -68,6 +68,7 @@ urlpatterns = [
     url('accounts/issues', views.profile_issues, name='profile_issues'),
     path('clear_cart', views.clear_cart),
     path('make_order', views.make_order),
+    path('order', views.view_order),
     path('make_question', views.make_question),
     path('get_http_categories', views.return_categories_json),
     path('get_category_by_id', views.get_category_id),

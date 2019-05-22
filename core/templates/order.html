@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 style="text-align: center; margin-bottom: 10px; margin-top: 20px;">Заказ #{{ order_id }}</h1>
+
+{% for order_product in order_products %}
+<div id="content-row" class="row">
+    <div id="container-{{ order_product.stock_product.id }}" class="col-sm-12 col-cart">
+        <div class="cart-product border border-info" style="padding: 20px;">
+            <h2 id="name-{{ order_product.stock_product.id }}" style="text-align: center;">Название продукта</h2>
+            <div class="row no-gutters">
+                <div class="col-sm-5">
+                    <div class="row no-gutters" style="height: 100%;">
+                        <div class="col-sm-12">
+                            <div class="square-box">
+                                <img id="img-{{ order_product.stock_product.id }}" class="centered-div">
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+                            <p id="cost-{{ order_product.stock_product.id }}" class="lead" style="margin: 0;">Стоимость: {{ order_product.cost }} ₽</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="row no-gutters" style="height: 100%; display: flex; justify-content: center; width: auto;">
+                        <div class="col-sm-auto" style="padding: 10px;">
+                            <div id="parameters-{{ order_product.stock_product.id }}" class="row" style="width: auto;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<h2 style="text-align: right; margin-right: 8vw;" id="cost-header">Итого: {{ order_cost }} ₽</h2>
+
+<script>
+    window.order_product_ids = '{{ ids }}';
+    window.stock_product_ids = [];
+</script>
+<script type="text/javascript" src="/static/classes/order_scripts.js"></script>
+{% endblock %}
