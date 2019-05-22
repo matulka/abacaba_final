@@ -1004,6 +1004,9 @@ def make_order(request):
             for order_product in order_products:
                 order_product.order = order
                 order_product.save()
+                sp = order_product.stock_product
+                sp.quantity -= order_product.quantity
+                sp.save()
             return HttpResponse('success')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
@@ -1029,6 +1032,9 @@ def make_order(request):
                 order_product = OrderProduct(quantity=order_product_information['quantity'],
                                              stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
+                stock_product = StockProduct.objects.get(id=order_product_information['stock_product'])
+                stock_product.quantity -= order_product_information['quantity']
+                stock_product.save()
                 order_product.save()
             return redirect('/')
     return redirect('/')
