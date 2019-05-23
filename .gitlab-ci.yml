@@ -17,7 +17,7 @@ pep8:
   stage: style
   script:
   - chmod +x ./ci/pycodestyle_runner.sh
-  - sudo ./ci/pycodestyle_runner.sh
+  - ./ci/pycodestyle_runner.sh
   artifacts:
     paths:
       - public/pycodestyle.txt
@@ -26,7 +26,7 @@ pylint:
   stage: style
   script:
   - chmod +x ./ci/pylint_runner.sh
-  - sudo ./ci/pylint_runner.sh
+  - ./ci/pylint_runner.sh
   artifacts:
     paths:
       - public/pylint.svg
