@@ -1,59 +1,65 @@
-date = []
-author = []
+rights = []
+login = []
 email = []
-state = []
 id = []
-address = []
 
 function create_header(){
     st = ' style="border: 1px solid grey;"'
     var html_str = '<table'+st+' id="tbl">'+
-                '<tr'+st+'><th'+st+'>Дата</th><th'+st+'>Автор</th><th'+st+'>Наполнение</th><th'+st+'>Адрес</th>' +
-                '<th'+st+'>email</th><th'+st+'>Статус</th></tr>'
+                '<tr'+st+'><th'+st+'>Username</th><th'+st+'>email</th><th'+st+'>Права</th><th'+st+'>Кнопка удаления пользователя</th></tr>' +
                 '</table>'
     $('#table').append(html_str);
 }
 
-function order_info(i){
-    window.location.replace('/order?id=' + i)
-}
 
 function add_tr(i){
     console.log(status)
     st = ' style="border: 1px solid grey;"'
-    var html_str = '<tr'+st+'><th'+st+'>'+date[i]+'</th><th'+st+'>'+author[i]+'</th>'
-                +'<th'+st+'><input type="button" value="Подробнее" onclick="order_info('+id[i]+')"></th><th'+st+'>' + address[i]+
-                '<th'+st+'>'+email[i]+'</th><th'+st+'>'+
+    var html_str = '<tr'+st+' id="tr'+id[i]+'"><th'+st+' id="log'+id[i]+'">'+login[i]+'</th><th'+st+' id="email'+id[i]+'">'+email[i]+'</th>'+
+                '<th'+st+' id="sel'+id[i]+'">'+
                 '<select id="select'+id[i]+'">'+
-                '<option id="vaiting'+id[i]+'">Ожидает подтверждения</option>'+
-                '<option id="confirmed'+id[i]+'">Подтвержден</option>'+
-                '<option id="delivered'+id[i]+'">Доставлен</option>'+
+                '<option id="is_staff'+id[i]+'">Права администратора</option>'+
+                '<option id="no_staff'+id[i]+'">Обычный пользователь</option>'+
                 '</selsect>'+
-                '</th></tr>'
+                '</th><th'+st+' id="del'+id[i]+'"><input type="button" value="Удалить" onclick="del_user('+id[i]+')"</th></tr>'
     $('#tbl').append(html_str);
     var sel = document.getElementById("select"+id[i]);
-    if (state[i] == 'Ожидает подтверждения'){
+    if (rights[i]){
         sel.options[0].selected = true;
     }
-    else if (state[i] == 'Подтвержден'){
-         sel.options[1].selected = true;
-    }
     else{
-         sel.options[2].selected = true;
+         sel.options[1].selected = true;
     }
     $('#select'+id[i]).on('focus', function () {
         previous = this.value;
     }).change(function() {
+        is_staff = true
+        if (sel.value == "Обычный пользователь"){
+            is_staff = false
+        }
         $.ajax({
-        url: '/change_order_status',
+        url: '/change_user_rights',
         type: "POST",
         data:{
             id: id[i],
-            state: sel.value,
+            is_staff: is_staff,
         }
     });
-        previous = this.value;
     });
+}
+
+
+function del_user(id){
+     $.ajax({
+        url: '/delete_user',
+        type: "POST",
+        data:{
+            id: id,
+        },
+        success: function (response) {
+            $('#tr'+id).remove()
+        }
+     });
 }
 
 
@@ -84,17 +90,15 @@ $(document).ready(function(){
         }
     });
     $.ajax({
-        url: '/get_all_orders',
+        url: '/get_users_except_this',
         type: "POST",
         success: function (response) {
-            date = response['date']
             id = response['id']
-            author = response['author']
+            login = response['login']
             email = response['email']
-            state = response['status']
-            address = response['address']
+            rights = response['is_staff']
             create_header()
-            for (var i = 0; i < id.length; i += 1){
+            for (var i = 0; i < login.length; i += 1){
                 add_tr(i)
             }
         }

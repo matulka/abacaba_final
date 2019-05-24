@@ -454,13 +454,102 @@ def get_all_orders(request):
         data['author'] = []
         data['email'] = []
         data['status'] = []
+        data['address'] = []
         for order in orders:
-            data['ids'].append(order.id)
-            data['date'].append(order.date)
-            data['author'].append(order.author)
+            data['id'].append(order.id)
+            data['date'].append(order.order_date.strftime("%Y-%m-%d %H:%M"))
+            if order.author != None:
+                data['author'].append(order.author.username)
+            else:
+                data['author'].append('Незарегистрирован')
             data['email'].append(order.email)
             data['status'].append(order.status)
+            data['address'].append(str(order.address))
+        for i in range(len(data['id'])):
+            j = i + 1
+            while j < len(data['id']):
+                if data['status'][i] == "Ожидает подтверждения":
+                    if data['status'][j] == "Ожидает подтверждения":
+                        if data['date'][i] < data['date'][j]:
+                            swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+                if data['status'][i] == "Подтвержден":
+                    if data['status'][j] == "Ожидает подтверждения":
+                       swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+                    elif data['status'][j] == "Подтвержден":
+                        if data['date'][i] < data['date'][j]:
+                            swap_data(data['id'], data['date'], data['author'], data['email'], data['status'],
+                                      data['address'], i, j)
+                if data['status'][i] == "Доставлен":
+                    if data['date'][i] < data['date'][j]:
+                        swap_data(data['id'], data['date'], data['author'], data['email'], data['status'], data['address'], i, j)
+
+                j += 1
         return JsonResponse(data)
+    return redirect('/')
+
+
+def swap_data(id, date, author, email, status, address, i, j):
+    id[i], id[j] = id[j], id[i]
+    date[i], date[j] = date[j], date[i]
+    author[i], author[j] = author[j], author[i]
+    email[i], email[j] = email[j], email[i]
+    status[i], status[j] = status[j], status[i]
+    address[i], address[j] = address[j], address[i]
+
+
+def change_order_status(request):
+    if request.method == 'POST':
+        order = Order.objects.get(id=request.POST.get('id'))
+        status = request.POST.get('state')
+        order.status = status
+        order.save()
+        return HttpResponse('Gacha')
+    return redirect('/')
+
+
+def user_list(request):
+    if request.user.is_staff:
+        return render(request, 'admin/user_list.html')
+    return redirect('/')
+
+
+def get_users(request):
+    if request.method == 'POST':
+        users = User.objects.all()
+        data = dict()
+        data['login'] = []
+        data['email'] = []
+        data['is_staff'] = []
+        data['id'] = []
+        for user in users:
+            if user != request.user:
+                data['email'].append(user.email)
+                data['login'].append(user.username)
+                data['is_staff'].append(user.is_staff)
+                data['id'].append(user.id)
+        print(data['id'])
+        return JsonResponse(data)
+    return redirect('/')
+
+
+def change_user_rights(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        user = User.objects.get(id=id)
+        if request.POST.get('is_staff') == 'true':
+            user.is_staff = True
+        else:
+            user.is_staff = False
+        user.save()
+    return redirect('/')
+
+
+def del_user(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        user = User.objects.get(id=id)
+        user.delete()
+        return HttpResponse('Gacha')
     return redirect('/')
 
 
@@ -966,8 +1055,14 @@ def make_order(request):
                 order_product.order = order
                 cost += order_product.stock_product.product.price * order_product.quantity
                 order_product.save()
+
+                sp = order_product.stock_product
+                sp.quantity -= order_product.quantity
+                sp.save()
+
             order.cost = cost
             order.save()
+
             return HttpResponse('success')
         else:
             if 'cart' not in request.session or len(request.session['cart']) == 0:
@@ -998,6 +1093,9 @@ def make_order(request):
                                              stock_product=StockProduct.objects.get(id=order_product_information['stock_product']),
                                              order=order)
                 order_product.refresh_cost()
+                stock_product = StockProduct.objects.get(id=order_product_information['stock_product'])
+                stock_product.quantity -= int(order_product_information['quantity'])
+                stock_product.save()
                 order_product.save()
                 cost += int(order_product.cost)
             order.cost = cost

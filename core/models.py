@@ -145,7 +145,7 @@ class OrderProduct(models.Model):
     cost = models.IntegerField(default=0)
 
     def refresh_cost(self):
-        self.cost = self.quantity * self.stock_product.product.price
+        self.cost = int(self.quantity) * int(self.stock_product.product.price)
         self.save()
 
 
