@@ -5,10 +5,53 @@ cache:
   - ~/.cache/pip/
 
 before_script:
-  - python -V # Print out python version for debugging
+  - python -V
   - pip install -r requirements.txt
 
-test:
+stages:
+  - test
+  - style
+  - deploy
 
+pep8:
+  stage: style
   script:
-  - python manage.py test
+  - chmod +x ./ci/pycodestyle_runner.sh
+  - ./ci/pycodestyle_runner.sh
+  artifacts:
+    paths:
+      - public/pycodestyle.txt
+
+pylint:
+  stage: style
+  script:
+  - chmod +x ./ci/pylint_runner.sh
+  - ./ci/pylint_runner.sh
+  artifacts:
+    paths:
+      - public/pylint.svg
+      - public/pylint.html
+
+test:
+  stage: test
+  script:
+  - coverage run manage.py test
+  - coverage report --omit=manage.py
+  - coverage html --omit=manage.py
+  - mkdir public
+  - mv htmlcov public/coverage
+  artifacts:
+    paths:
+      - public/coverage
+
+
+pages:
+  stage: deploy
+  script:
+  - echo 'Publish pages data'
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+

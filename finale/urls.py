@@ -20,9 +20,11 @@ from core import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 from finale import settings
+from django.contrib.auth import views as auth_views
 
 handler500 = views.e_handler500
 urlpatterns = [
+    path('admin-django/', admin.site.urls, name='admin'),
     path('admin/', views.admin_page),
     path('admin/product_page/', views.product_page),
     path('admin/product_page/img', views.product_page_img),
