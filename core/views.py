@@ -594,6 +594,11 @@ def js_string_to_arr(js_string):
 
 
 def index_page(request):
+    """
+    Функция, которая обрабатывает главную страницу
+    \n:param request: Запрос
+    \n:return: Обработанная HTML-страница
+    """
     context = dict()
     if 'category_id' in request.GET:
         category_id = request.GET.get('category_id')
