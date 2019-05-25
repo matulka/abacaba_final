@@ -597,10 +597,10 @@ def index_page(request):
     """
     Обработка главной страницы
 
-        :param request: Запрос
-        :return: Обработанная HTML-страница
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
 
-    Контекст:
+    \nКонтекст:
 
         :is_category: Надо ли отобразить конкретную категорию
         :category_name: Имя категории, которую надо отобразить
@@ -655,10 +655,10 @@ def cart_page(request):
     """
     Обработка страницы корзины
 
-        :param request: Запрос
-        :return: Обработанная HTML-страница
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
 
-    Контекст:
+    \nКонтекст:
 
         :ids: Список id объектов OrderProduct из корзины
         :order_products: Объекты OrderProduct из корзины
@@ -699,10 +699,10 @@ def get_order_product_info_json(request):  # #Передается массив 
     """
     Возвращение информации об объектах OrderProduct
 
-        :param request: Запрос
-        :return: Словарь в виде JSON, содержащий информацию об объектах OrderProduct
+        \n:param request: Запрос\
+        \n:return: Словарь в виде JSON, содержащий информацию об объектах OrderProduct\
 
-    Содержание запроса:
+    \nСодержание запроса:
 
         :order_product_id: Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
                             посредством метода js_string_to_arr
@@ -779,13 +779,13 @@ def return_categories_json(request):
     """
     Возвращение информации о категориях в виде JSON
 
-        :param request: Запрос
-        :return: Строка с описанием категорий, включенная в JSON-словарь
+        \n:param request: Запрос\
+        \n:return: Строка с описанием категорий, включенная в JSON-словарь\
 
-    Содержание JSON:
-    \n Под ключем '1' хранится строка, содержащая информацию о всех категориях в виде
-    \n 'category_id, category_name, parent_category_id;', если есть родительская категория, или
-    \n 'category_id, category_name, None;', если родительской категории нет.
+    \nСодержание JSON:
+    \n Под ключем '1' хранится строка, содержащая информацию о всех категориях в виде\
+    \n 'category_id, category_name, parent_category_id;', если есть родительская категория, или\
+    \n 'category_id, category_name, None;', если родительской категории нет.\
 
     """
     string = str()
@@ -803,6 +803,22 @@ def return_categories_json(request):
 
 
 def browse_product(request):  # #Возвращает контекст для отображения страницы товара
+    """
+    Обработка страницы товара
+
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
+
+    \nСодержание запроса:
+
+        :id: ID отображаемого продукта
+
+    \nКонтекст:
+
+        :product: Объект Product, соответствующий отображаемому продукту
+
+
+    """
     context = dict()
     if request.method == 'GET':
         if 'id' in request.GET:
@@ -812,7 +828,14 @@ def browse_product(request):  # #Возвращает контекст для о
     return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
 
 
-def return_products(category_id=None, search_query=None):  # #Возвращает список продуктов для главной страницы
+def return_products(category_id=None, search_query=None):
+    """
+    Возвращение продуктов для главной страницы
+
+        \n:param category_id: ID выбранной категории (если есть)\
+        \n:param search_query: Поисковой запрос (если есть)\
+        \n:return: Массив продуктов из искомой категории, удовлетворяющих поисковому запросу\
+    """
     if category_id is None and search_query is None:
         return Product.objects.all()
     if category_id is None:
@@ -825,7 +848,15 @@ def return_products(category_id=None, search_query=None):  # #Возвращае
     return set(found_products).intersection(category_products)
 
 
-def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
+def find_modification(product, modification_dict):
+    """
+    Поиск конкретной модификации в базе данных по набору параметров и продукту
+
+        \n:param product: Объект Product, к которому привязана модификация\
+        \n:param modification_dict: Словарь вида {parameter: value}, кодирующий модификацию\
+
+        \n:return: Искомая модификация (если она есть) или None (если ее нет)\
+    """
     modifications = Modification.objects.filter(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)

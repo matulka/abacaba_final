@@ -34,19 +34,51 @@
   <div class="section" id="module-core.views">
 <span id="welcome-to-abacaba-zin-s-documentation"></span><h1>Welcome to ABACABA.zin’s documentation!<a class="headerlink" href="#module-core.views" title="Ссылка на этот заголовок">¶</a></h1>
 <dl class="function">
-<dt id="core.views.cart_page">
-<code class="descclassname">core.views.</code><code class="descname">cart_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.cart_page" title="Ссылка на это определение">¶</a></dt>
-<dd><p>Обработка страницы корзины</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param request</dt>
-<dd class="field-odd"><p>Запрос</p>
+<dt id="core.views.browse_product">
+<code class="descclassname">core.views.</code><code class="descname">browse_product</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.browse_product" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Обработка страницы товара</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
 </dd>
-<dt class="field-even">return</dt>
+<dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Обработанная HTML-страница</p>
 </dd>
 </dl>
+<p>Содержание запроса:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">id</dt>
+<dd class="field-odd"><p>ID отображаемого продукта</p>
+</dd>
+</dl>
 </div></blockquote>
+<p>Контекст:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">product</dt>
+<dd class="field-odd"><p>Объект Product, соответствующий отображаемому продукту</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.cart_page">
+<code class="descclassname">core.views.</code><code class="descname">cart_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.cart_page" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Обработка страницы корзины</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Обработанная HTML-страница</p>
+</dd>
+</dl>
 <p>Контекст:</p>
 <blockquote>
 <div><dl class="field-list simple">
@@ -67,22 +99,41 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="core.views.find_modification">
+<code class="descclassname">core.views.</code><code class="descname">find_modification</code><span class="sig-paren">(</span><em>product</em>, <em>modification_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.find_modification" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Поиск конкретной модификации в базе данных по набору параметров и продукту</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>product</strong> – Объект Product, к которому привязана модификация</p></li>
+<li><p><strong>modification_dict</strong> – Словарь вида {parameter: value}, кодирующий модификацию</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Искомая модификация (если она есть) или None (если ее нет)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.get_order_product_info_json">
 <code class="descclassname">core.views.</code><code class="descname">get_order_product_info_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.get_order_product_info_json" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>
 <div><p>Возвращение информации об объектах OrderProduct</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param request</dt>
-<dd class="field-odd"><p>Запрос</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
 </dd>
-<dt class="field-even">return</dt>
+<dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Словарь в виде JSON, содержащий информацию об объектах OrderProduct</p>
 </dd>
 </dl>
-</div></blockquote>
 <p>Содержание запроса:</p>
 <blockquote>
+<div><blockquote>
 <div><dl class="field-list simple">
 <dt class="field-odd">order_product_id</dt>
 <dd class="field-odd"><p>Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
@@ -123,17 +174,17 @@
 <dl class="function">
 <dt id="core.views.index_page">
 <code class="descclassname">core.views.</code><code class="descname">index_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.index_page" title="Ссылка на это определение">¶</a></dt>
-<dd><p>Обработка главной страницы</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param request</dt>
-<dd class="field-odd"><p>Запрос</p>
+<dd><blockquote>
+<div><p>Обработка главной страницы</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
 </dd>
-<dt class="field-even">return</dt>
+<dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Обработанная HTML-страница</p>
 </dd>
 </dl>
-</div></blockquote>
 <p>Контекст:</p>
 <blockquote>
 <div><dl class="field-list simple">
@@ -164,21 +215,40 @@
 <code class="descclassname">core.views.</code><code class="descname">return_categories_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.return_categories_json" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>
 <div><p>Возвращение информации о категориях в виде JSON</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param request</dt>
-<dd class="field-odd"><p>Запрос</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
 </dd>
-<dt class="field-even">return</dt>
+<dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Строка с описанием категорий, включенная в JSON-словарь</p>
 </dd>
 </dl>
-</div></blockquote>
 <p>Содержание JSON:</p>
+<blockquote>
+<div><p>Под ключем „1“ хранится строка, содержащая информацию о всех категориях в виде
+„category_id, category_name, parent_category_id;“, если есть родительская категория, или
+„category_id, category_name, None;“, если родительской категории нет.</p>
 </div></blockquote>
-<p>Под ключем „1“ хранится строка, содержащая информацию о всех категориях в виде</p>
-<p>„category_id, category_name, parent_category_id;“, если есть родительская категория, или</p>
-<p>„category_id, category_name, None;“, если родительской категории нет.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.return_products">
+<code class="descclassname">core.views.</code><code class="descname">return_products</code><span class="sig-paren">(</span><em>category_id=None</em>, <em>search_query=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.return_products" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Возвращение продуктов для главной страницы</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>category_id</strong> – ID выбранной категории (если есть)</p></li>
+<li><p><strong>search_query</strong> – Поисковой запрос (если есть)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Массив продуктов из искомой категории, удовлетворяющих поисковому запросу</p>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="toctree-wrapper compound">
