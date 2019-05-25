@@ -7,6 +7,7 @@ from core import views
 from core.views import search_in_base
 from django.test.client import RequestFactory
 from django.forms.models import model_to_dict
+import json
 
 
 class TestUserCanSeePages(TestCase):
@@ -435,3 +436,65 @@ class TestAdmin(TestCase):
         self.c.login(username='b', password='b')
         response = self.c.get('/admin/user_list')
         self.assertEqual(response.status_code, 302)
+
+
+    def test_can_create_product(self):
+        response = self.c.post('/form_product', {'cat[]': ['d'], 'main': 'd', 'name': 'lol', 'price': 123, 'rating': ''})
+        self.assertEqual(len(Product.objects.filter(name='lol')), 1)
+
+
+    def test_can_create_product_with_many_cat(self):
+        response = self.c.post('/form_product', {'cat[]': ['d', 'b'], 'main': 'd', 'name': 'lol', 'price': 123, 'rating': ''})
+        self.assertEqual(len(Product.objects.filter(name='lol')[0].categories.all()), 2)
+
+
+    def test_can_change_exist_product(self):
+        response = self.c.post('/change_exist_product', {'id': 1, 'cat[]': ['d', 'b'], 'main': 'd', 'name': 'lol', 'price': 123, 'rating': ''})
+        self.assertEqual(len(Product.objects.filter(name='lol')[0].categories.all()), 2)
+
+
+    def test_get_categories_names(self):
+        esponse = self.c.post('/form_product',
+                              {'cat[]': ['d', 'b'], 'main': 'd', 'name': 'lol', 'price': 123, 'rating': ''})
+        response = self.c.post('/get_categories_by_id',
+                               {'id': 4})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'cat': ['b', 'd'], 'name': 'lol'}
+        )
+
+
+    def test_can_create_category(self):
+        response = self.c.post('/form_category', {'name': 'lol', 'parent': 'b'})
+        self.assertEqual(len(Category.objects.filter(name='lol')), 1)
+        self.assertEqual(Category.objects.filter(name='lol')[0].parent_category.name, 'b')
+
+
+    def test_can_change_category(self):
+        response = self.c.post('/form_category', {'name': 'lol', 'parent': 'b'})
+        response = self.c.post('/change_exist_category', {'name': 'kek', 'parent': '', 'id': 3})
+        self.assertEqual(len(Category.objects.filter(name='kek')), 1)
+        self.assertEqual(Category.objects.filter(name='kek')[0].parent_category, None)
+
+
+    def test_canget_category_id(self):
+        response = self.c.post('/get_category_by_id', {'id': 1})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'name': 'b'}
+        )
+
+
+    def test_can_get_prod_id(self):
+        response = self.c.post('/get_prod_by_name', {'name': 'abacaba'})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'id': 1}
+        )
+
+    def test_have_modifications(self):
+        response = self.c.post('/have_modifications', {'id': 1})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {'have': True, 'char': ['a', 'b'], 'values': [['2'], ['3']]}
+        )
