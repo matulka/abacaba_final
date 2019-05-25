@@ -602,12 +602,12 @@ def index_page(request):
 
     \nКонтекст:
 
-        :is_category: Надо ли отобразить конкретную категорию
-        :category_name: Имя категории, которую надо отобразить
-        :is_search: Надо ли делать поисковой запрос
-        :search_query: Поисковой запрос, если он имеется
-        :products: Список продуктов для отображения
-        :is_empty: Пуст ли список продуктов для отображения
+        \n:param is_category: Надо ли отобразить конкретную категорию\
+        \n:param category_name: Имя категории, которую надо отобразить\
+        \n:param is_search: Надо ли делать поисковой запрос\
+        \n:param search_query: Поисковой запрос, если он имеется\
+        \n:param products: Список продуктов для отображения\
+        \n:param is_empty: Пуст ли список продуктов для отображения\
 
     """
     context = dict()
@@ -660,10 +660,10 @@ def cart_page(request):
 
     \nКонтекст:
 
-        :ids: Список id объектов OrderProduct из корзины
-        :order_products: Объекты OrderProduct из корзины
-        :is_empty: Пуста ли корзина
-        :is_auth: Зарегистрирован ли текущий пользователь
+        \n:param ids: Список id объектов OrderProduct из корзины\
+        \n:param order_products: Объекты OrderProduct из корзины\
+        \n:param is_empty: Пуста ли корзина\
+        \n:param is_auth: Зарегистрирован ли текущий пользователь\
 
     """
     context = dict()
@@ -704,19 +704,19 @@ def get_order_product_info_json(request):  # #Передается массив 
 
     \nСодержание запроса:
 
-        :order_product_id: Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
-                            посредством метода js_string_to_arr
+        \n:param order_product_id: Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
+                            посредством метода js_string_to_arr\
 
-    Содержание JSON:
+    \nСодержание JSON:
     \nПервым ключем в словаре служит ID соответствующего OrderProduct
 
-        :modifications: Словарь из модификаций продукта
-        :quantity: Количество продукта в OrderProduct
-        :max_quantity: Количество продукта на складе
-        :name: Название продукта
-        :price: Цена продукта
-        :image_url: Ссылка на превью-изображение продукта
-        :stock_product_id: ID соответствующего складового продукта
+        \n:param modifications: Словарь из модификаций продукта\
+        \n:param quantity: Количество продукта в OrderProduct\
+        \n:param max_quantity: Количество продукта на складе\
+        \n:param name: Название продукта\
+        \n:param price: Цена продукта\
+        \n:param image_url: Ссылка на превью-изображение продукта\
+        \n:param stock_product_id: ID соответствующего складового продукта\
     """
     if request.method != 'POST' or 'order_product_id' not in request.POST:
         raise NotImplementedError
@@ -802,7 +802,7 @@ def return_categories_json(request):
     return JsonResponse(d)
 
 
-def browse_product(request):  # #Возвращает контекст для отображения страницы товара
+def browse_product(request):
     """
     Обработка страницы товара
 
@@ -811,11 +811,11 @@ def browse_product(request):  # #Возвращает контекст для о
 
     \nСодержание запроса:
 
-        :id: ID отображаемого продукта
+        \n:param id: ID отображаемого продукта\
 
     \nКонтекст:
 
-        :product: Объект Product, соответствующий отображаемому продукту
+        \n:param product: Объект Product, соответствующий отображаемому продукту\
 
 
     """
@@ -825,7 +825,7 @@ def browse_product(request):  # #Возвращает контекст для о
             product = Product.objects.get(id=request.GET['id'])
             context['product'] = product
             return render(request, 'product_page.html', context)
-    return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
+    return render(request, 'index.html', context)
 
 
 def return_products(category_id=None, search_query=None):
@@ -891,13 +891,13 @@ def get_images_of_stock_product(request):
 
     \nСодержание запроса:
 
-        :product_id: ID объекта Product, к которому привязан складовой продукт
-        :modification_dict_str: Строка, содержащая в себе словарь модификации
+        \n:param product_id: ID объекта Product, к которому привязан складовой продукт\
+        \n:param modification_dict_str: Строка, содержащая в себе словарь модификации\
 
     \nСодержание JSON:
 
-        :images: Массив из ссылок на изображения складового продукта
-        :quantity: Количество продуктов на складе
+        \n:param images: Массив из ссылок на изображения складового продукта\
+        \n:param quantity: Количество продуктов на складе\
     """
     if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
         raise NotImplementedError
@@ -913,7 +913,13 @@ def get_images_of_stock_product(request):
     return JsonResponse(data)
 
 
-def get_product_modification_parameters(product):  # #Передает параметры модификаций данного продукта
+def get_product_modification_parameters(product):
+    """
+    Возвращение параметров модификации данного продукта
+
+        \n:param product: Объект Product\
+        \n:return: Список из параметров, по которым меняются модификации для данного продукта\
+    """
     sample_modification = product.modifications.all()[0]
     sample_characteristics = sample_modification.characteristics
     sample_char_dict = literal_eval(sample_characteristics)
@@ -923,7 +929,14 @@ def get_product_modification_parameters(product):  # #Передает пара�
     return parameters_list
 
 
-def get_modification_parameter_values(product, parameter):  # #Возвращает все возможные значения параметра модификации
+def get_modification_parameter_values(product, parameter):
+    """
+    Возвращение возможных значения данного параметра модификации
+
+        \n:param product: Объект Product\
+        \n:param parameter: Конкретный параметр модификации\
+        \n:return: Список из всех возможных значения для данного параметра модификации\
+    """
     modifications = product.modifications.all()
     values = []
     for modification in modifications:
@@ -936,7 +949,14 @@ def get_modification_parameter_values(product, parameter):  # #Возвраща�
     return values
 
 
-def get_modifications_dict(product):  # #Возвращает параметры модификации и их возможные значения в виде словаря
+def get_modifications_dict(product):
+    """
+    Возвращение всех параметров модификаций и их значений в виде словаря
+
+        \n:param product: Объект product\
+        \n:return: Словарь, ключами которого служат параметры, а в mod_dict[parameter] лежит список из возможных
+                    значений данного параметра
+    """
     mod_dict = dict()
     parameters = get_product_modification_parameters(product)
     for parameter in parameters:
@@ -944,7 +964,18 @@ def get_modifications_dict(product):  # #Возвращает параметры
     return mod_dict
 
 
-def get_modifications_json(request):  # #Возвращает параметры модификации и их возможные значения в JSON
+def get_modifications_json(request):
+    """
+    Возвращение всех параметров модификаций и их значений в виде JSON
+
+        \n:param request: Гет-запрос\
+        \n:return: JSON-словарь, по структуре аналогичный словарю из get_modifications_dict(product)\
+
+    \nСодержание запроса:
+
+        \n:param product_id: ID объекта Product\
+
+    """
     if not request.method == 'GET' or 'product_id' not in request.GET:
         raise NotImplementedError
     product = Product.objects.get(id=request.GET.get('product_id'))
@@ -953,6 +984,14 @@ def get_modifications_json(request):  # #Возвращает параметры
 
 
 def __add_to_cart_authenticated__(user, quantity, stock_product):
+    """
+    Добавление складового продукта в корзину зарегистрированного пользователя
+
+        \n:param user: Пользователь\
+        \n:param quantity: Количества продукта, которое надо добавить\
+        \n:param stock_product: Объект StockProduct\
+        \n:raises ValueError: Если количество продукта больше, чем есть на складе\
+    """
     try:
         current_cart = user.cart
     except ObjectDoesNotExist:
@@ -979,6 +1018,14 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
+    """
+    Добавление складового продукта в корзину незарегистрированного пользователя
+
+        \n:param quantity: Количество продукта, которое надо добавить\
+        \n:param stock_product: Объект StockProduct\
+        \n:param cart: Список, служащий корзиной для данного пользователя\
+        \n:raises ValueError: Если количество продукта больше, чем есть на складе\
+    """
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
     for products in cart:
         if int(products['stock_product']) == int(stock_product.id):
@@ -992,12 +1039,27 @@ def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     cart.append(model_to_dict(order_product_info))
 
 
-"""
-В запросе через скрытое поле должне передаваться id продукта
-"""
-
-
 def add_to_cart(request):
+    """
+    Добавление складового продукта в корзину пользователя
+
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success', если добавление прошло удачно, или ошибку500, если количество продукта
+        слишком большое\
+        \n:raises NotImplementedError: Если в запросе не прописаны значения для каждого из параметров модификации\
+
+    \nСодержание запроса:
+
+        \n:param quantity: Количество продукта, которое надо добавить\
+        \n:param product_id: ID объекта Product\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя, хранящаяся в сессии\
+
+        Для каждого параметра модификации:
+
+            \n:param modification_parameter: Значение параметра для модификации, которую надо добавить в корзину\
+
+
+    """
     context = dict()
     if request.method == 'POST':
         quantity = request.POST.get('quantity')
@@ -1028,12 +1090,20 @@ def add_to_cart(request):
         return HttpResponse('success')
 
 
-"""
-В этот метод необходимо передать id соответствующего StockProduct
-"""
-
-
 def delete_from_cart(request):
+    """
+    Удаление складового продукта из корзины
+
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success', если удаление прошло удачно, или HttpResponse 'failed', если при удалении
+        произошла ошибка\
+
+    \nСодержание запроса:
+
+        \n:param stock_product_id: ID объекта StockProduct, который надо удалить из корзины\
+        \n:param user: Пользователь (если пользователь зарегистрирован)\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя, хранящаяся в сессии\
+    """
     if request.method == 'POST':
         stock_product_id = int(request.POST.get('stock_product_id'))
         try:
@@ -1053,6 +1123,14 @@ def delete_from_cart(request):
 
 
 def clear_cart(request):
+    """
+    Отчистка корзины
+
+        \n:param request: Пост-запрос, содержащий текущего пользователя (если он зарегистрирован) и корзину
+        незарегистрированного пользователя в сессии\
+
+        \n:return: HttpResponse 'success', если отчистка прошла удачно\
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             request.user.cart.delete()
@@ -1064,11 +1142,6 @@ def clear_cart(request):
             return HttpResponse('success')
 
 
-"""
-Этот метод необходим для того, чтобы перенести корзину из кукей в базу данных
-"""
-
-
 def __cart_from_session_to_db__(current_cart, user):
     for information in current_cart:
         quantity = information['quantity']
@@ -1077,6 +1150,20 @@ def __cart_from_session_to_db__(current_cart, user):
 
 
 def change_order_product_quantity(request):
+    """
+    Изменение количества в объекте OrderProduct (для изменения количества товара в корзине)
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success' при удачном изменении, или HttpResponse 'invalid quantity' при неподходящем
+        новом количестве товаров\
+
+        \n:raises NotImplementedError: Если запрос не содержит все необходимые данные\
+
+    \nСодержание запроса:
+
+        \n:param new_quantity: Новое количество товара\
+        \n:param stock_product_id: ID складового продукта, количество которого меняется\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя в сессии\
+    """
     if request.method != 'POST' or 'new_quantity' not in request.POST or 'stock_product_id' not in request.POST:
         raise NotImplementedError
     new_quantity = int(request.POST['new_quantity'])
