@@ -1243,25 +1243,25 @@ def make_order(request):
     """
     Создание заказа
 
-        \n:param request: Пост-запрос\
-        \n:return: HttpResponse 'success' или перенаправление на главную страницу, если все прошло успешно\
-        \n:raises NotImplementedError: Если запрос не содержит всю необходимую информацию\
-        \n:raises ValueError: Если с фронтенда передается неправильная форма\
+        \n:param request: Пост-запрос
+        \n:return: HttpResponse 'success' или перенаправление на главную страницу, если все прошло успешно
+        \n:raises NotImplementedError: Если запрос не содержит всю необходимую информацию
+        \n:raises ValueError: Если с фронтенда передается неправильная форма
 
     \nСодержание запроса для зарегистрированного пользователя:
 
-        \n:param user: Пользователь\
-        \n:param address_id: ID адреса, выбранного пользователем для доставки\
+        \n:param user: Пользователь
+        \n:param address_id: ID адреса, выбранного пользователем для доставки
 
     \nСодержание запроса для незарегистрированного пользователя:
 
-        \n:param request.session['cart']: Корзина, хранящаяся в сессии\
-        \n:param city: Город\
-        \n:param street: Улица\
-        \n:param building: Строение\
-        \n:param flat: Номер квартиры\
-        \n:param entrance: Номер подъезда\
-        \n:param email: Электронная почта пользователя\
+        \n:param request.session['cart']: Корзина, хранящаяся в сессии
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param flat: Номер квартиры
+        \n:param entrance: Номер подъезда
+        \n:param email: Электронная почта пользователя
 
     """
     if request.method == 'POST':
@@ -1334,6 +1334,24 @@ def make_order(request):
 
 @login_required
 def view_order(request):
+    """
+    Обработка страницы отображения заказа
+
+        \n:param request: Гет-запрос
+        \n:return: Обработанная HTML-страница, если все прошло успешно, или ошибка500 при возникновении ошибки
+
+    \nСодержание запроса:
+
+        \n:param id: ID заказа
+        \n:param user: Пользователь
+
+    \nКонтекст:
+
+        \n:param ids: Список из ID объектов OrderProduct, входящих в состав заказа
+        \n:param order_products: Список из объектов OrderProduct, входящих в состав заказа
+        \n:param order_cost: Стоимость заказа
+        \n:param order_id: ID заказа
+    """
     if request.method == 'GET':
         if 'id' not in request.GET:
             return e_handler500(request)
@@ -1367,6 +1385,11 @@ def profile_info(request):
 
 @login_required
 def get_addresses_json(request):
+    """
+    Получение адресов пользователя в виде JSON
+        \n:param request: Пост-запрос
+        \n:return: JSON-словарь вида {address_id: address_description}
+    """
     if request.method == 'POST':
         user = request.user
         response = dict()
@@ -1377,6 +1400,25 @@ def get_addresses_json(request):
 
 @login_required
 def add_address(request):
+    """
+    Добавление адреса в список адресов зарегистрированного пользователя на странице создания заказа
+
+        \n:param request: Пост-запрос
+        \n:return: JSON {'result': 'success'} при успешном выполнении, JSON {'result': 'fail'} при возникновении ошибки
+        в процессе выполнения, или JSON {'result': 'found description'}, если адрес с введенным пользователем
+        описанием уже был в списке адресов этого пользователя
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param flat: Номер квартиры
+        \n:param entrance: Номер подъезда
+        \n:param description: Описание адреса
+
+    """
     if request.method == 'POST':
         form = AddressForm(request.POST)
         if form.is_valid():
@@ -1413,7 +1455,22 @@ def add_address(request):
 
 @login_required
 def add_address_user(request):
+    """
+    Добавление адреса в список адресов зарегистрированного пользователя в Личном кабинете
 
+        \n:param request: Пост-запрос
+        \n:return: Перенаправление на страницу адресов в Личном кабинете
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param entrance: Номер подъезда
+        \n:param flat: Номер квартиры
+        \n:param description: Описание адреса
+    """
     if request.method == "POST":
         form_address = AddressForm(request.POST)
 
@@ -1439,13 +1496,21 @@ def add_address_user(request):
 
     return redirect('profile_addresses')
 
-'''
-В этот метод необходимо передать id адреса, подлежащего удалению
-'''
-
 
 @login_required
 def delete_address(request):
+    """
+    Удаление адреса
+
+        \n:param request: Пост-запрос
+        \n:return: JSON {'result': 'success'} в случае успешного удаление и JSON {'result': 'permission denied}, если
+        у пользователя нет прав на удаление этого адреса
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param id: ID адреса, подлежащего удалению
+    """
     user = request.user
     user_addresses = user.addresses.all()
     if request.method == 'POST':
@@ -1510,6 +1575,17 @@ def activate(request, uidb64, token):
 
 
 def signup(request):
+    """
+    Регистрация нового пользователя
+
+        \n:param request: Пост-запрос для регистрации и гет-запрос для отображения страницы
+        \n:return: После регистрации: перенаправление на главную страницу и отправка письма с подтверждением аккаунта,
+        до регистрации: отображение страницы регистрации
+
+    \nСодержание запроса:
+
+        \n:param SignupForm: В пост-запросе: Данные, необходимые для заполнения формы SignupForm (core.forms.SignupForm)
+    """
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
@@ -1539,7 +1615,17 @@ def signup(request):
 
 @login_required
 def profile(request):
+    """
+    Страница с отображением информации о пользователе
 
+        \n:param request: Пост-запрос для изменения данных и гет-запрос для отображения данных
+        \n:return: Возвращает сообщение об успешной смене данных и перенаправляет на исходную страницу
+
+    \nОписание метода:
+
+        Метод позволяет просмотреть текущую информацию о пользователей (имя, фамилия, электронная почта, пароль).
+        Всю эту информацию, кроме электронной почты, можно изменить на этой же странице.
+    """
     if request.method == 'POST':
         if "first_name" in request.POST:
             form_name = ProfileForm(request.POST)
@@ -1571,11 +1657,22 @@ def profile(request):
         form_name.fields["first_name"].initial = request.user.first_name
         form_name.fields["last_name"].initial = request.user.last_name
 
-    return render(request, 'registration/profile.html', {'form_name':form_name, 'form_password':form_password})
+    return render(request, 'registration/profile.html', {'form_name': form_name, 'form_password': form_password})
 
 
 @login_required
 def profile_orders(request):
+    """
+    Отображение таблицы заказов данного пользователя
+
+        \n:param request: Запрос
+        \n:return: Обработанная страница для отображения таблицы заказов
+
+    \nКонтекст:
+
+        \n:param empty: yes, если корзина пуста
+        \n:param orders: Список заказов, если он не пуст
+    """
     user = User.objects.get(username=request.user.username)
     orders = OrderProduct.objects.all().filter(order__author=user)
 
@@ -1587,6 +1684,35 @@ def profile_orders(request):
 
 @login_required
 def profile_addresses(request):
+    """
+    Отображение страницы просмотра и редактирования адресов пользователя
+
+        \n:param request: Гет-запрос для просмотра адресов и пост-запрос для редактирования адресов
+        \n:return: Обработанная страница адресов
+
+    \nСодержание гет-запроса:
+
+        \n:param user: Пользователь
+        \n:param id: ID конкретного адреса, если пользователь хочет его просмотреть
+
+    \nКонтекст после гет-запроса:
+
+        \n:param empty: yes, если список адресов пуст
+        \n:param addresses: Список адресов
+        \n:param form_address: Форма для редактирования адреса
+        \n:param address: Конкретный адрес, если пользователь хочет просмотреть его
+        \n:param id_: ID просматриваемого адреса
+
+    \nСодержание пост-запроса:
+
+        \n:param id_address: ID редактируемого адреса
+        \n:param city: Новый город
+        \n:param street: Новая улица
+        \n:param building: Новое строение
+        \n:param entrance: Новый номер подъезда
+        \n:param flat: Новый номер квартиры
+        \n:param description: Новое описание адреса
+    """
     user = User.objects.get(username=request.user.username)
     addresses = user.addresses.all().filter(customer=user)
 
@@ -1635,17 +1761,6 @@ def profile_addresses(request):
             return redirect('profile_addresses')
 
     return render(request, 'registration/addresses.html', {'addresses': addresses, 'form_address': form_address})
-
-#@login_required
-#def delete_address(request):
-#
-#    if request.method == 'GET':
-#        data = request.GET.dict()
-#        user = request.user
-#        addresses = user.addresses.all()
-#        address = addresses[int(data.get('id'))-1]
-#        address.delete()
-#        return redirect('profile_addresses')
 
 
 @login_required

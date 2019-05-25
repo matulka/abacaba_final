@@ -34,6 +34,68 @@
   <div class="section" id="module-core.views">
 <span id="welcome-to-abacaba-zin-s-documentation"></span><h1>Welcome to ABACABA.zin’s documentation!<a class="headerlink" href="#module-core.views" title="Ссылка на этот заголовок">¶</a></h1>
 <dl class="function">
+<dt id="core.views.add_address">
+<code class="descclassname">core.views.</code><code class="descname">add_address</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.add_address" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Добавление адреса в список адресов зарегистрированного пользователя на странице создания заказа</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>JSON {„result“: „success“} при успешном выполнении, JSON {„result“: „fail“} при возникновении ошибки
+в процессе выполнения, или JSON {„result“: „found description“}, если адрес с введенным пользователем
+описанием уже был в списке адресов этого пользователя</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – Пользователь</p></li>
+<li><p><strong>city</strong> – Город</p></li>
+<li><p><strong>street</strong> – Улица</p></li>
+<li><p><strong>building</strong> – Строение</p></li>
+<li><p><strong>flat</strong> – Номер квартиры</p></li>
+<li><p><strong>entrance</strong> – Номер подъезда</p></li>
+<li><p><strong>description</strong> – Описание адреса</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.add_address_user">
+<code class="descclassname">core.views.</code><code class="descname">add_address_user</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.add_address_user" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Добавление адреса в список адресов зарегистрированного пользователя в Личном кабинете</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Перенаправление на страницу адресов в Личном кабинете</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – Пользователь</p></li>
+<li><p><strong>city</strong> – Город</p></li>
+<li><p><strong>street</strong> – Улица</p></li>
+<li><p><strong>building</strong> – Строение</p></li>
+<li><p><strong>entrance</strong> – Номер подъезда</p></li>
+<li><p><strong>flat</strong> – Номер квартиры</p></li>
+<li><p><strong>description</strong> – Описание адреса</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.add_to_cart">
 <code class="descclassname">core.views.</code><code class="descname">add_to_cart</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.add_to_cart" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>
@@ -168,6 +230,32 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="core.views.delete_address">
+<code class="descclassname">core.views.</code><code class="descname">delete_address</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.delete_address" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Удаление адреса</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>JSON {„result“: „success“} в случае успешного удаление и JSON {„result“: „permission denied}, если
+у пользователя нет прав на удаление этого адреса</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – Пользователь</p></li>
+<li><p><strong>id</strong> – ID адреса, подлежащего удалению</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.delete_from_cart">
 <code class="descclassname">core.views.</code><code class="descname">delete_from_cart</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.delete_from_cart" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>
@@ -228,6 +316,22 @@
 </dd>
 <dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Складовой продукт (если он найден) или None (если ничего не найдено)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.get_addresses_json">
+<code class="descclassname">core.views.</code><code class="descname">get_addresses_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.get_addresses_json" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Получение адресов пользователя в виде JSON</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>JSON-словарь вида {address_id: address_description}</p>
 </dd>
 </dl>
 </dd></dl>
@@ -453,6 +557,103 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="core.views.profile">
+<code class="descclassname">core.views.</code><code class="descname">profile</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.profile" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Страница с отображением информации о пользователе</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос для изменения данных и гет-запрос для отображения данных</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Возвращает сообщение об успешной смене данных и перенаправляет на исходную страницу</p>
+</dd>
+</dl>
+<p>Описание метода:</p>
+<blockquote>
+<div><p>Метод позволяет просмотреть текущую информацию о пользователей (имя, фамилия, электронная почта, пароль).
+Всю эту информацию, кроме электронной почты, можно изменить на этой же странице.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.profile_addresses">
+<code class="descclassname">core.views.</code><code class="descname">profile_addresses</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.profile_addresses" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Отображение страницы просмотра и редактирования адресов пользователя</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Гет-запрос для просмотра адресов и пост-запрос для редактирования адресов</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Обработанная страница адресов</p>
+</dd>
+</dl>
+<p>Содержание гет-запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – Пользователь</p></li>
+<li><p><strong>id</strong> – ID конкретного адреса, если пользователь хочет его просмотреть</p></li>
+</ul>
+</dd>
+</dl>
+<p>Контекст после гет-запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>empty</strong> – yes, если список адресов пуст</p></li>
+<li><p><strong>addresses</strong> – Список адресов</p></li>
+<li><p><strong>form_address</strong> – Форма для редактирования адреса</p></li>
+<li><p><strong>address</strong> – Конкретный адрес, если пользователь хочет просмотреть его</p></li>
+<li><p><strong>id</strong> – ID просматриваемого адреса</p></li>
+</ul>
+</dd>
+</dl>
+<p>Содержание пост-запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id_address</strong> – ID редактируемого адреса</p></li>
+<li><p><strong>city</strong> – Новый город</p></li>
+<li><p><strong>street</strong> – Новая улица</p></li>
+<li><p><strong>building</strong> – Новое строение</p></li>
+<li><p><strong>entrance</strong> – Новый номер подъезда</p></li>
+<li><p><strong>flat</strong> – Новый номер квартиры</p></li>
+<li><p><strong>description</strong> – Новое описание адреса</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.profile_orders">
+<code class="descclassname">core.views.</code><code class="descname">profile_orders</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.profile_orders" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Отображение таблицы заказов данного пользователя</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Обработанная страница для отображения таблицы заказов</p>
+</dd>
+</dl>
+<p>Контекст:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>empty</strong> – yes, если корзина пуста</p></li>
+<li><p><strong>orders</strong> – Список заказов, если он не пуст</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.return_categories_json">
 <code class="descclassname">core.views.</code><code class="descname">return_categories_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.return_categories_json" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>
@@ -489,6 +690,65 @@
 </dd>
 <dt class="field-even">Результат</dt>
 <dd class="field-even"><p>Массив продуктов из искомой категории, удовлетворяющих поисковому запросу</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.signup">
+<code class="descclassname">core.views.</code><code class="descname">signup</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.signup" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Регистрация нового пользователя</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос для регистрации и гет-запрос для отображения страницы</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>После регистрации: перенаправление на главную страницу и отправка письма с подтверждением аккаунта,
+до регистрации: отображение страницы регистрации</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>SignupForm</strong> – В пост-запросе: Данные, необходимые для заполнения формы SignupForm (core.forms.SignupForm)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.view_order">
+<code class="descclassname">core.views.</code><code class="descname">view_order</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.view_order" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Обработка страницы отображения заказа</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Гет-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Обработанная HTML-страница, если все прошло успешно, или ошибка500 при возникновении ошибки</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – ID заказа</p></li>
+<li><p><strong>user</strong> – Пользователь</p></li>
+</ul>
+</dd>
+</dl>
+<p>Контекст:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ids</strong> – Список из ID объектов OrderProduct, входящих в состав заказа</p></li>
+<li><p><strong>order_products</strong> – Список из объектов OrderProduct, входящих в состав заказа</p></li>
+<li><p><strong>order_cost</strong> – Стоимость заказа</p></li>
+<li><p><strong>order_id</strong> – ID заказа</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
