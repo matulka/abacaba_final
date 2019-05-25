@@ -594,6 +594,22 @@ def js_string_to_arr(js_string):
 
 
 def index_page(request):
+    """
+    Обработка главной страницы
+
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
+
+    \nКонтекст:
+
+        \n:param is_category: Надо ли отобразить конкретную категорию\
+        \n:param category_name: Имя категории, которую надо отобразить\
+        \n:param is_search: Надо ли делать поисковой запрос\
+        \n:param search_query: Поисковой запрос, если он имеется\
+        \n:param products: Список продуктов для отображения\
+        \n:param is_empty: Пуст ли список продуктов для отображения\
+
+    """
     context = dict()
     if 'category_id' in request.GET:
         category_id = request.GET.get('category_id')
@@ -635,13 +651,21 @@ def product_names_json(request):
     return JsonResponse(data)
 
 
-"""
-Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
-Если пользователь не авторизован, в контексте лежат OrderProductInformation
-"""
-
-
 def cart_page(request):
+    """
+    Обработка страницы корзины
+
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
+
+    \nКонтекст:
+
+        \n:param ids: Список id объектов OrderProduct из корзины\
+        \n:param order_products: Объекты OrderProduct из корзины\
+        \n:param is_empty: Пуста ли корзина\
+        \n:param is_auth: Зарегистрирован ли текущий пользователь\
+
+    """
     context = dict()
     cart = list()
     if request.user.is_authenticated:
@@ -672,6 +696,28 @@ def cart_page(request):
 
 
 def get_order_product_info_json(request):  # #Передается массив из order_product.id
+    """
+    Возвращение информации об объектах OrderProduct
+
+        \n:param request: Запрос\
+        \n:return: Словарь в виде JSON, содержащий информацию об объектах OrderProduct\
+
+    \nСодержание запроса:
+
+        \n:param order_product_id: Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
+                            посредством метода js_string_to_arr\
+
+    \nСодержание JSON:
+    \nПервым ключем в словаре служит ID соответствующего OrderProduct
+
+        \n:param modifications: Словарь из модификаций продукта\
+        \n:param quantity: Количество продукта в OrderProduct\
+        \n:param max_quantity: Количество продукта на складе\
+        \n:param name: Название продукта\
+        \n:param price: Цена продукта\
+        \n:param image_url: Ссылка на превью-изображение продукта\
+        \n:param stock_product_id: ID соответствующего складового продукта\
+    """
     if request.method != 'POST' or 'order_product_id' not in request.POST:
         raise NotImplementedError
 
@@ -729,7 +775,19 @@ def return_categories():
     return Category.objects.all()
 
 
-def return_categories_json(request):  # #Возвращает данные о категориях в виде JSON
+def return_categories_json(request):
+    """
+    Возвращение информации о категориях в виде JSON
+
+        \n:param request: Запрос\
+        \n:return: Строка с описанием категорий, включенная в JSON-словарь\
+
+    \nСодержание JSON:
+    \n Под ключем '1' хранится строка, содержащая информацию о всех категориях в виде\
+    \n 'category_id, category_name, parent_category_id;', если есть родительская категория, или\
+    \n 'category_id, category_name, None;', если родительской категории нет.\
+
+    """
     string = str()
     for category in Category.objects.all():
         string = string + (str(category.id) + ',' + category.name + ',')
@@ -744,17 +802,40 @@ def return_categories_json(request):  # #Возвращает данные о к
     return JsonResponse(d)
 
 
-def browse_product(request):  # #Возвращает контекст для отображения страницы товара
+def browse_product(request):
+    """
+    Обработка страницы товара
+
+        \n:param request: Запрос\
+        \n:return: Обработанная HTML-страница\
+
+    \nСодержание запроса:
+
+        \n:param id: ID отображаемого продукта\
+
+    \nКонтекст:
+
+        \n:param product: Объект Product, соответствующий отображаемому продукту\
+
+
+    """
     context = dict()
     if request.method == 'GET':
         if 'id' in request.GET:
             product = Product.objects.get(id=request.GET['id'])
             context['product'] = product
             return render(request, 'product_page.html', context)
-    return render(request, 'index.html', context)  # #In case there is no such product or request.method wasn't GET
+    return render(request, 'index.html', context)
 
 
-def return_products(category_id=None, search_query=None):  # #Возвращает список продуктов для главной страницы
+def return_products(category_id=None, search_query=None):
+    """
+    Возвращение продуктов для главной страницы
+
+        \n:param category_id: ID выбранной категории (если есть)\
+        \n:param search_query: Поисковой запрос (если есть)\
+        \n:return: Массив продуктов из искомой категории, удовлетворяющих поисковому запросу\
+    """
     if category_id is None and search_query is None:
         return Product.objects.all()
     if category_id is None:
@@ -767,7 +848,15 @@ def return_products(category_id=None, search_query=None):  # #Возвращае
     return set(found_products).intersection(category_products)
 
 
-def find_modification(product, modification_dict):  # #Ищет конкретную модификацию по набору параметров и продукту
+def find_modification(product, modification_dict):
+    """
+    Поиск конкретной модификации в базе данных по набору параметров и продукту
+
+        \n:param product: Объект Product, к которому привязана модификация\
+        \n:param modification_dict: Словарь вида {parameter: value}, кодирующий модификацию\
+
+        \n:return: Искомая модификация (если она есть) или None (если ее нет)\
+    """
     modifications = Modification.objects.filter(product=product)
     for modification in modifications:
         current_modification_dict = literal_eval(modification.characteristics)
@@ -776,13 +865,40 @@ def find_modification(product, modification_dict):  # #Ищет конкретн
     return None
 
 
-def find_stock_product(product, modification_dict):  # #Ищет сток продукт по набору параметров и продукту
+def find_stock_product(product, modification_dict):
+    """
+    Поиск складового продукта по продукту и словарю модификации
+
+        \n:param product: Продукт, к которому привязан складовой продукт\
+        \n:param modification_dict: Словарь вида {parameter: value}, кодирующий модификацию\
+        \n:return: Складовой продукт (если он найден) или None (если ничего не найдено)
+
+    """
     modification = find_modification(product, modification_dict)
-    stock_product = StockProduct.objects.get(product=product, modification=modification)
+    try:
+        stock_product = StockProduct.objects.get(product=product, modification=modification)
+    except ObjectDoesNotExist:
+        stock_product = None
     return stock_product
 
 
 def get_images_of_stock_product(request):
+    """
+    Получение изображений складового продукта и его количества
+
+        \n:param request: Пост-запрос\
+        \n:return: JSON-словарь с изображениями складового продукта\
+
+    \nСодержание запроса:
+
+        \n:param product_id: ID объекта Product, к которому привязан складовой продукт\
+        \n:param modification_dict_str: Строка, содержащая в себе словарь модификации\
+
+    \nСодержание JSON:
+
+        \n:param images: Массив из ссылок на изображения складового продукта\
+        \n:param quantity: Количество продуктов на складе\
+    """
     if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
         raise NotImplementedError
     product = Product.objects.get(id=request.POST.get('product_id'))
@@ -797,7 +913,13 @@ def get_images_of_stock_product(request):
     return JsonResponse(data)
 
 
-def get_product_modification_parameters(product):  # #Передает параметры модификаций данного продукта
+def get_product_modification_parameters(product):
+    """
+    Возвращение параметров модификации данного продукта
+
+        \n:param product: Объект Product\
+        \n:return: Список из параметров, по которым меняются модификации для данного продукта\
+    """
     sample_modification = product.modifications.all()[0]
     sample_characteristics = sample_modification.characteristics
     sample_char_dict = literal_eval(sample_characteristics)
@@ -807,7 +929,14 @@ def get_product_modification_parameters(product):  # #Передает пара�
     return parameters_list
 
 
-def get_modification_parameter_values(product, parameter):  # #Возвращает все возможные значения параметра модификации
+def get_modification_parameter_values(product, parameter):
+    """
+    Возвращение возможных значения данного параметра модификации
+
+        \n:param product: Объект Product\
+        \n:param parameter: Конкретный параметр модификации\
+        \n:return: Список из всех возможных значения для данного параметра модификации\
+    """
     modifications = product.modifications.all()
     values = []
     for modification in modifications:
@@ -820,7 +949,14 @@ def get_modification_parameter_values(product, parameter):  # #Возвраща�
     return values
 
 
-def get_modifications_dict(product):  # #Возвращает параметры модификации и их возможные значения в виде словаря
+def get_modifications_dict(product):
+    """
+    Возвращение всех параметров модификаций и их значений в виде словаря
+
+        \n:param product: Объект product\
+        \n:return: Словарь, ключами которого служат параметры, а в mod_dict[parameter] лежит список из возможных
+                    значений данного параметра
+    """
     mod_dict = dict()
     parameters = get_product_modification_parameters(product)
     for parameter in parameters:
@@ -828,7 +964,18 @@ def get_modifications_dict(product):  # #Возвращает параметры
     return mod_dict
 
 
-def get_modifications_json(request):  # #Возвращает параметры модификации и их возможные значения в JSON
+def get_modifications_json(request):
+    """
+    Возвращение всех параметров модификаций и их значений в виде JSON
+
+        \n:param request: Гет-запрос\
+        \n:return: JSON-словарь, по структуре аналогичный словарю из get_modifications_dict(product)\
+
+    \nСодержание запроса:
+
+        \n:param product_id: ID объекта Product\
+
+    """
     if not request.method == 'GET' or 'product_id' not in request.GET:
         raise NotImplementedError
     product = Product.objects.get(id=request.GET.get('product_id'))
@@ -837,6 +984,14 @@ def get_modifications_json(request):  # #Возвращает параметры
 
 
 def __add_to_cart_authenticated__(user, quantity, stock_product):
+    """
+    Добавление складового продукта в корзину зарегистрированного пользователя
+
+        \n:param user: Пользователь\
+        \n:param quantity: Количества продукта, которое надо добавить\
+        \n:param stock_product: Объект StockProduct\
+        \n:raises ValueError: Если количество продукта больше, чем есть на складе\
+    """
     try:
         current_cart = user.cart
     except ObjectDoesNotExist:
@@ -863,6 +1018,14 @@ def __add_to_cart_authenticated__(user, quantity, stock_product):
 
 
 def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
+    """
+    Добавление складового продукта в корзину незарегистрированного пользователя
+
+        \n:param quantity: Количество продукта, которое надо добавить\
+        \n:param stock_product: Объект StockProduct\
+        \n:param cart: Список, служащий корзиной для данного пользователя\
+        \n:raises ValueError: Если количество продукта больше, чем есть на складе\
+    """
     order_product_info = OrderProductInformation(quantity=quantity, stock_product=stock_product)
     for products in cart:
         if int(products['stock_product']) == int(stock_product.id):
@@ -876,12 +1039,27 @@ def __add_to_cart_unauthenticated__(quantity, stock_product, cart):
     cart.append(model_to_dict(order_product_info))
 
 
-"""
-В запросе через скрытое поле должне передаваться id продукта
-"""
-
-
 def add_to_cart(request):
+    """
+    Добавление складового продукта в корзину пользователя
+
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success', если добавление прошло удачно, или ошибку500, если количество продукта
+        слишком большое\
+        \n:raises NotImplementedError: Если в запросе не прописаны значения для каждого из параметров модификации\
+
+    \nСодержание запроса:
+
+        \n:param quantity: Количество продукта, которое надо добавить\
+        \n:param product_id: ID объекта Product\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя, хранящаяся в сессии\
+
+        Для каждого параметра модификации:
+
+            \n:param modification_parameter: Значение параметра для модификации, которую надо добавить в корзину\
+
+
+    """
     context = dict()
     if request.method == 'POST':
         quantity = request.POST.get('quantity')
@@ -901,23 +1079,31 @@ def add_to_cart(request):
             try:
                 __add_to_cart_authenticated__(user, quantity, stock_product)
             except ValueError:
-                e_handler500(request)
+                return e_handler500(request)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
             try:
                 __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
             except ValueError:
-                e_handler500(request)
+                return e_handler500(request)
         return HttpResponse('success')
 
 
-"""
-В этот метод необходимо передать id соответствующего StockProduct
-"""
-
-
 def delete_from_cart(request):
+    """
+    Удаление складового продукта из корзины
+
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success', если удаление прошло удачно, или HttpResponse 'failed', если при удалении
+        произошла ошибка\
+
+    \nСодержание запроса:
+
+        \n:param stock_product_id: ID объекта StockProduct, который надо удалить из корзины\
+        \n:param user: Пользователь (если пользователь зарегистрирован)\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя, хранящаяся в сессии\
+    """
     if request.method == 'POST':
         stock_product_id = int(request.POST.get('stock_product_id'))
         try:
@@ -937,6 +1123,14 @@ def delete_from_cart(request):
 
 
 def clear_cart(request):
+    """
+    Отчистка корзины
+
+        \n:param request: Пост-запрос, содержащий текущего пользователя (если он зарегистрирован) и корзину
+        незарегистрированного пользователя в сессии\
+
+        \n:return: HttpResponse 'success', если отчистка прошла удачно\
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             request.user.cart.delete()
@@ -948,11 +1142,6 @@ def clear_cart(request):
             return HttpResponse('success')
 
 
-"""
-Этот метод необходим для того, чтобы перенести корзину из кукей в базу данных
-"""
-
-
 def __cart_from_session_to_db__(current_cart, user):
     for information in current_cart:
         quantity = information['quantity']
@@ -961,6 +1150,20 @@ def __cart_from_session_to_db__(current_cart, user):
 
 
 def change_order_product_quantity(request):
+    """
+    Изменение количества в объекте OrderProduct (для изменения количества товара в корзине)
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success' при удачном изменении, или HttpResponse 'invalid quantity' при неподходящем
+        новом количестве товаров\
+
+        \n:raises NotImplementedError: Если запрос не содержит все необходимые данные\
+
+    \nСодержание запроса:
+
+        \n:param new_quantity: Новое количество товара\
+        \n:param stock_product_id: ID складового продукта, количество которого меняется\
+        \n:param request.session['cart']: Корзина незарегистрированного пользователя в сессии\
+    """
     if request.method != 'POST' or 'new_quantity' not in request.POST or 'stock_product_id' not in request.POST:
         raise NotImplementedError
     new_quantity = int(request.POST['new_quantity'])
@@ -1037,6 +1240,30 @@ def validate_order(request, order):
 
 
 def make_order(request):
+    """
+    Создание заказа
+
+        \n:param request: Пост-запрос
+        \n:return: HttpResponse 'success' или перенаправление на главную страницу, если все прошло успешно
+        \n:raises NotImplementedError: Если запрос не содержит всю необходимую информацию
+        \n:raises ValueError: Если с фронтенда передается неправильная форма
+
+    \nСодержание запроса для зарегистрированного пользователя:
+
+        \n:param user: Пользователь
+        \n:param address_id: ID адреса, выбранного пользователем для доставки
+
+    \nСодержание запроса для незарегистрированного пользователя:
+
+        \n:param request.session['cart']: Корзина, хранящаяся в сессии
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param flat: Номер квартиры
+        \n:param entrance: Номер подъезда
+        \n:param email: Электронная почта пользователя
+
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
@@ -1081,7 +1308,7 @@ def make_order(request):
             email = request.POST.get('email')
             current_cart = request.session['cart']
             if address is None or email is None:
-                raise ValueError # # Лучше переработать
+                raise ValueError
             order = Order(email=email, address=address)
             order.save()
 
@@ -1107,6 +1334,24 @@ def make_order(request):
 
 @login_required
 def view_order(request):
+    """
+    Обработка страницы отображения заказа
+
+        \n:param request: Гет-запрос
+        \n:return: Обработанная HTML-страница, если все прошло успешно, или ошибка500 при возникновении ошибки
+
+    \nСодержание запроса:
+
+        \n:param id: ID заказа
+        \n:param user: Пользователь
+
+    \nКонтекст:
+
+        \n:param ids: Список из ID объектов OrderProduct, входящих в состав заказа
+        \n:param order_products: Список из объектов OrderProduct, входящих в состав заказа
+        \n:param order_cost: Стоимость заказа
+        \n:param order_id: ID заказа
+    """
     if request.method == 'GET':
         if 'id' not in request.GET:
             return e_handler500(request)
@@ -1140,6 +1385,11 @@ def profile_info(request):
 
 @login_required
 def get_addresses_json(request):
+    """
+    Получение адресов пользователя в виде JSON
+        \n:param request: Пост-запрос
+        \n:return: JSON-словарь вида {address_id: address_description}
+    """
     if request.method == 'POST':
         user = request.user
         response = dict()
@@ -1150,6 +1400,25 @@ def get_addresses_json(request):
 
 @login_required
 def add_address(request):
+    """
+    Добавление адреса в список адресов зарегистрированного пользователя на странице создания заказа
+
+        \n:param request: Пост-запрос
+        \n:return: JSON {'result': 'success'} при успешном выполнении, JSON {'result': 'fail'} при возникновении ошибки
+        в процессе выполнения, или JSON {'result': 'found description'}, если адрес с введенным пользователем
+        описанием уже был в списке адресов этого пользователя
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param flat: Номер квартиры
+        \n:param entrance: Номер подъезда
+        \n:param description: Описание адреса
+
+    """
     if request.method == 'POST':
         form = AddressForm(request.POST)
         if form.is_valid():
@@ -1186,7 +1455,22 @@ def add_address(request):
 
 @login_required
 def add_address_user(request):
+    """
+    Добавление адреса в список адресов зарегистрированного пользователя в Личном кабинете
 
+        \n:param request: Пост-запрос
+        \n:return: Перенаправление на страницу адресов в Личном кабинете
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param city: Город
+        \n:param street: Улица
+        \n:param building: Строение
+        \n:param entrance: Номер подъезда
+        \n:param flat: Номер квартиры
+        \n:param description: Описание адреса
+    """
     if request.method == "POST":
         form_address = AddressForm(request.POST)
 
@@ -1212,13 +1496,21 @@ def add_address_user(request):
 
     return redirect('profile_addresses')
 
-'''
-В этот метод необходимо передать id адреса, подлежащего удалению
-'''
-
 
 @login_required
 def delete_address(request):
+    """
+    Удаление адреса
+
+        \n:param request: Пост-запрос
+        \n:return: JSON {'result': 'success'} в случае успешного удаление и JSON {'result': 'permission denied}, если
+        у пользователя нет прав на удаление этого адреса
+
+    \nСодержание запроса:
+
+        \n:param user: Пользователь
+        \n:param id: ID адреса, подлежащего удалению
+    """
     user = request.user
     user_addresses = user.addresses.all()
     if request.method == 'POST':
@@ -1283,6 +1575,17 @@ def activate(request, uidb64, token):
 
 
 def signup(request):
+    """
+    Регистрация нового пользователя
+
+        \n:param request: Пост-запрос для регистрации и гет-запрос для отображения страницы
+        \n:return: После регистрации: перенаправление на главную страницу и отправка письма с подтверждением аккаунта,
+        до регистрации: отображение страницы регистрации
+
+    \nСодержание запроса:
+
+        \n:param SignupForm: В пост-запросе: Данные, необходимые для заполнения формы SignupForm (core.forms.SignupForm)
+    """
     if request.method == 'POST':
         form = SignupForm(request.POST)
         if form.is_valid():
@@ -1312,7 +1615,17 @@ def signup(request):
 
 @login_required
 def profile(request):
+    """
+    Страница с отображением информации о пользователе
 
+        \n:param request: Пост-запрос для изменения данных и гет-запрос для отображения данных
+        \n:return: Возвращает сообщение об успешной смене данных и перенаправляет на исходную страницу
+
+    \nОписание метода:
+
+        Метод позволяет просмотреть текущую информацию о пользователей (имя, фамилия, электронная почта, пароль).
+        Всю эту информацию, кроме электронной почты, можно изменить на этой же странице.
+    """
     if request.method == 'POST':
         if "first_name" in request.POST:
             form_name = ProfileForm(request.POST)
@@ -1344,11 +1657,22 @@ def profile(request):
         form_name.fields["first_name"].initial = request.user.first_name
         form_name.fields["last_name"].initial = request.user.last_name
 
-    return render(request, 'registration/profile.html', {'form_name':form_name, 'form_password':form_password})
+    return render(request, 'registration/profile.html', {'form_name': form_name, 'form_password': form_password})
 
 
 @login_required
 def profile_orders(request):
+    """
+    Отображение таблицы заказов данного пользователя
+
+        \n:param request: Запрос
+        \n:return: Обработанная страница для отображения таблицы заказов
+
+    \nКонтекст:
+
+        \n:param empty: yes, если корзина пуста
+        \n:param orders: Список заказов, если он не пуст
+    """
     user = User.objects.get(username=request.user.username)
     orders = OrderProduct.objects.all().filter(order__author=user)
 
@@ -1360,6 +1684,35 @@ def profile_orders(request):
 
 @login_required
 def profile_addresses(request):
+    """
+    Отображение страницы просмотра и редактирования адресов пользователя
+
+        \n:param request: Гет-запрос для просмотра адресов и пост-запрос для редактирования адресов
+        \n:return: Обработанная страница адресов
+
+    \nСодержание гет-запроса:
+
+        \n:param user: Пользователь
+        \n:param id: ID конкретного адреса, если пользователь хочет его просмотреть
+
+    \nКонтекст после гет-запроса:
+
+        \n:param empty: yes, если список адресов пуст
+        \n:param addresses: Список адресов
+        \n:param form_address: Форма для редактирования адреса
+        \n:param address: Конкретный адрес, если пользователь хочет просмотреть его
+        \n:param id_: ID просматриваемого адреса
+
+    \nСодержание пост-запроса:
+
+        \n:param id_address: ID редактируемого адреса
+        \n:param city: Новый город
+        \n:param street: Новая улица
+        \n:param building: Новое строение
+        \n:param entrance: Новый номер подъезда
+        \n:param flat: Новый номер квартиры
+        \n:param description: Новое описание адреса
+    """
     user = User.objects.get(username=request.user.username)
     addresses = user.addresses.all().filter(customer=user)
 
@@ -1408,17 +1761,6 @@ def profile_addresses(request):
             return redirect('profile_addresses')
 
     return render(request, 'registration/addresses.html', {'addresses': addresses, 'form_address': form_address})
-
-#@login_required
-#def delete_address(request):
-#
-#    if request.method == 'GET':
-#        data = request.GET.dict()
-#        user = request.user
-#        addresses = user.addresses.all()
-#        address = addresses[int(data.get('id'))-1]
-#        address.delete()
-#        return redirect('profile_addresses')
 
 
 @login_required
