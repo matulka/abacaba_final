@@ -1,27 +1,24 @@
-from django.shortcuts import redirect, render, render_to_response
+from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
-from core.models import Product, Category, Cart, OrderProduct, Order,\
+from core.models import Category, Cart, OrderProduct, Order,\
     Addresses, Product, Question, StockProduct, Modification, OrderProductInformation, Image
 from django.core.exceptions import ObjectDoesNotExist
 from ast import literal_eval
-from json import dumps
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib import messages
 from core.forms import SignupForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.contrib.auth.hashers import check_password
 from django.template.loader import render_to_string
 from core.token import account_activation_token, confirm_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.forms.models import model_to_dict
-from django.core import serializers
-from core.forms import AddressForm, ProfileForm, PasswordProfileForm, QuestionForm, ProfileAddressForm, AddImgForm, AddSeveralImgForm
-from django.template import RequestContext
+from core.forms import AddressForm, ProfileForm, PasswordProfileForm, QuestionForm,\
+    ProfileAddressForm, AddImgForm, AddSeveralImgForm
 import itertools
 
 
