@@ -640,7 +640,6 @@ def index_page(request):
     else:
         context['is_empty'] = False
 
-    print('parent: ', Category.objects.get(id=1).parent_category)
     return render(request, 'index.html', context)
 
 
