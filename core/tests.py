@@ -344,6 +344,8 @@ class TestAdmin(TestCase):
                                                 characteristics="{'a': '2', 'b': '3'}")
         self.mod2 = Modification.objects.create(product=self.prod2,
                                                 characteristics="{'a': '3', 'b': '3'}")
+        self.mod3 = Modification.objects.create(product=self.prod3,
+                                                characteristics="{'c': '3'}")
         self.sp = StockProduct.objects.create(product=self.prod1,
                                               modification=self.mod1,
                                               quantity=5)
@@ -454,7 +456,7 @@ class TestAdmin(TestCase):
 
 
     def test_get_categories_names(self):
-        esponse = self.c.post('/form_product',
+        response = self.c.post('/form_product',
                               {'cat[]': ['d', 'b'], 'main': 'd', 'name': 'lol', 'price': 123, 'rating': ''})
         response = self.c.post('/get_categories_by_id',
                                {'id': 4})
@@ -493,8 +495,13 @@ class TestAdmin(TestCase):
         )
 
     def test_have_modifications(self):
-        response = self.c.post('/have_modifications', {'id': 1})
+        response = self.c.post('/have_modifications', {'id': 3})
         self.assertJSONEqual(
             str(response.content, encoding='utf8'),
-            {'have': True, 'char': ['a', 'b'], 'values': [['2'], ['3']]}
+            {'have': True, 'char': ['c'], 'values': [['3']]}
         )
+
+
+    def test_form_stock_product(self):
+        response = self.c.post('/form_stock_products', {'id': 1, 'ids[]': [1], 'qs[]': [3]})
+        self.assertEqual(len(StockProduct.objects.all()), 2)
