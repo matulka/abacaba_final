@@ -595,9 +595,20 @@ def js_string_to_arr(js_string):
 
 def index_page(request):
     """
-    Функция, которая обрабатывает главную страницу
-    \n:param request: Запрос
-    \n:return: Обработанная HTML-страница
+    Обработка главной страницы
+
+        :param request: Запрос
+        :return: Обработанная HTML-страница
+
+    Контекст:
+
+        :is_category: Надо ли отобразить конкретную категорию
+        :category_name: Имя категории, которую надо отобразить
+        :is_search: Надо ли делать поисковой запрос
+        :search_query: Поисковой запрос, если он имеется
+        :products: Список продуктов для отображения
+        :is_empty: Пуст ли список продуктов для отображения
+
     """
     context = dict()
     if 'category_id' in request.GET:
@@ -640,13 +651,21 @@ def product_names_json(request):
     return JsonResponse(data)
 
 
-"""
-Если пользователь авторизован, в контексте лежат записи OrderProduct из базы данных.
-Если пользователь не авторизован, в контексте лежат OrderProductInformation
-"""
-
-
 def cart_page(request):
+    """
+    Обработка страницы корзины
+
+        :param request: Запрос
+        :return: Обработанная HTML-страница
+
+    Контекст:
+
+        :ids: Список id объектов OrderProduct из корзины
+        :order_products: Объекты OrderProduct из корзины
+        :is_empty: Пуста ли корзина
+        :is_auth: Зарегистрирован ли текущий пользователь
+
+    """
     context = dict()
     cart = list()
     if request.user.is_authenticated:
@@ -677,6 +696,28 @@ def cart_page(request):
 
 
 def get_order_product_info_json(request):  # #Передается массив из order_product.id
+    """
+    Возвращение информации об объектах OrderProduct
+
+        :param request: Запрос
+        :return: Словарь в виде JSON, содержащий информацию об объектах OrderProduct
+
+    Содержание запроса:
+
+        :order_product_id: Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
+                            посредством метода js_string_to_arr
+
+    Содержание JSON:
+    \nПервым ключем в словаре служит ID соответствующего OrderProduct
+
+        :modifications: Словарь из модификаций продукта
+        :quantity: Количество продукта в OrderProduct
+        :max_quantity: Количество продукта на складе
+        :name: Название продукта
+        :price: Цена продукта
+        :image_url: Ссылка на превью-изображение продукта
+        :stock_product_id: ID соответствующего складового продукта
+    """
     if request.method != 'POST' or 'order_product_id' not in request.POST:
         raise NotImplementedError
 
@@ -734,7 +775,19 @@ def return_categories():
     return Category.objects.all()
 
 
-def return_categories_json(request):  # #Возвращает данные о категориях в виде JSON
+def return_categories_json(request):
+    """
+    Возвращение информации о категориях в виде JSON
+
+        :param request: Запрос
+        :return: Строка с описанием категорий, включенная в JSON-словарь
+
+    Содержание JSON:
+    \n Под ключем '1' хранится строка, содержащая информацию о всех категориях в виде
+    \n 'category_id, category_name, parent_category_id;', если есть родительская категория, или
+    \n 'category_id, category_name, None;', если родительской категории нет.
+
+    """
     string = str()
     for category in Category.objects.all():
         string = string + (str(category.id) + ',' + category.name + ',')

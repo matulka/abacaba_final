@@ -34,19 +34,151 @@
   <div class="section" id="module-core.views">
 <span id="welcome-to-abacaba-zin-s-documentation"></span><h1>Welcome to ABACABA.zin’s documentation!<a class="headerlink" href="#module-core.views" title="Ссылка на этот заголовок">¶</a></h1>
 <dl class="function">
-<dt id="core.views.index_page">
-<code class="descclassname">core.views.</code><code class="descname">index_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.index_page" title="Ссылка на это определение">¶</a></dt>
-<dd><blockquote>
-<div><p>Функция, которая обрабатывает главную страницу</p>
-</div></blockquote>
-<dl class="field-list simple">
-<dt class="field-odd">Параметры</dt>
-<dd class="field-odd"><p><strong>request</strong> – Запрос</p>
+<dt id="core.views.cart_page">
+<code class="descclassname">core.views.</code><code class="descname">cart_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.cart_page" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Обработка страницы корзины</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param request</dt>
+<dd class="field-odd"><p>Запрос</p>
 </dd>
-<dt class="field-even">Результат</dt>
+<dt class="field-even">return</dt>
 <dd class="field-even"><p>Обработанная HTML-страница</p>
 </dd>
 </dl>
+</div></blockquote>
+<p>Контекст:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">ids</dt>
+<dd class="field-odd"><p>Список id объектов OrderProduct из корзины</p>
+</dd>
+<dt class="field-even">order_products</dt>
+<dd class="field-even"><p>Объекты OrderProduct из корзины</p>
+</dd>
+<dt class="field-odd">is_empty</dt>
+<dd class="field-odd"><p>Пуста ли корзина</p>
+</dd>
+<dt class="field-even">is_auth</dt>
+<dd class="field-even"><p>Зарегистрирован ли текущий пользователь</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.get_order_product_info_json">
+<code class="descclassname">core.views.</code><code class="descname">get_order_product_info_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.get_order_product_info_json" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Возвращение информации об объектах OrderProduct</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param request</dt>
+<dd class="field-odd"><p>Запрос</p>
+</dd>
+<dt class="field-even">return</dt>
+<dd class="field-even"><p>Словарь в виде JSON, содержащий информацию об объектах OrderProduct</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Содержание запроса:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">order_product_id</dt>
+<dd class="field-odd"><p>Строка, кодирующая массив из ID объектов OrderProduct. Преобразуется в массив
+посредством метода js_string_to_arr</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Содержание JSON:</p>
+</div></blockquote>
+<p>Первым ключем в словаре служит ID соответствующего OrderProduct</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">modifications</dt>
+<dd class="field-odd"><p>Словарь из модификаций продукта</p>
+</dd>
+<dt class="field-even">quantity</dt>
+<dd class="field-even"><p>Количество продукта в OrderProduct</p>
+</dd>
+<dt class="field-odd">max_quantity</dt>
+<dd class="field-odd"><p>Количество продукта на складе</p>
+</dd>
+<dt class="field-even">name</dt>
+<dd class="field-even"><p>Название продукта</p>
+</dd>
+<dt class="field-odd">price</dt>
+<dd class="field-odd"><p>Цена продукта</p>
+</dd>
+<dt class="field-even">image_url</dt>
+<dd class="field-even"><p>Ссылка на превью-изображение продукта</p>
+</dd>
+<dt class="field-odd">stock_product_id</dt>
+<dd class="field-odd"><p>ID соответствующего складового продукта</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.index_page">
+<code class="descclassname">core.views.</code><code class="descname">index_page</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.index_page" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Обработка главной страницы</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param request</dt>
+<dd class="field-odd"><p>Запрос</p>
+</dd>
+<dt class="field-even">return</dt>
+<dd class="field-even"><p>Обработанная HTML-страница</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Контекст:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">is_category</dt>
+<dd class="field-odd"><p>Надо ли отобразить конкретную категорию</p>
+</dd>
+<dt class="field-even">category_name</dt>
+<dd class="field-even"><p>Имя категории, которую надо отобразить</p>
+</dd>
+<dt class="field-odd">is_search</dt>
+<dd class="field-odd"><p>Надо ли делать поисковой запрос</p>
+</dd>
+<dt class="field-even">search_query</dt>
+<dd class="field-even"><p>Поисковой запрос, если он имеется</p>
+</dd>
+<dt class="field-odd">products</dt>
+<dd class="field-odd"><p>Список продуктов для отображения</p>
+</dd>
+<dt class="field-even">is_empty</dt>
+<dd class="field-even"><p>Пуст ли список продуктов для отображения</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.return_categories_json">
+<code class="descclassname">core.views.</code><code class="descname">return_categories_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.return_categories_json" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Возвращение информации о категориях в виде JSON</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param request</dt>
+<dd class="field-odd"><p>Запрос</p>
+</dd>
+<dt class="field-even">return</dt>
+<dd class="field-even"><p>Строка с описанием категорий, включенная в JSON-словарь</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Содержание JSON:</p>
+</div></blockquote>
+<p>Под ключем „1“ хранится строка, содержащая информацию о всех категориях в виде</p>
+<p>„category_id, category_name, parent_category_id;“, если есть родительская категория, или</p>
+<p>„category_id, category_name, None;“, если родительской категории нет.</p>
 </dd></dl>
 
 <div class="toctree-wrapper compound">
