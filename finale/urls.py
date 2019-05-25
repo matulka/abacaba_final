@@ -63,6 +63,7 @@ urlpatterns = [
     path('cart', views.cart_page),
     path('form_product', views.form_product),
     path('form_category', views.form_category),
+    path('delete_category', views.delete_category),
     path('add_address', views.add_address),
     path('del_address', views.delete_address),
     path('get_addresses', views.get_addresses_json),

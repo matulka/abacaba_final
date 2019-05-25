@@ -168,6 +168,14 @@ def change_category(request):
         return redirect('/')
 
 
+def delete_category(request):
+    if request.method == 'POST' and 'category_name' in request.POST:
+        category_name = request.POST.get('category_name')
+        category = Category.objects.filter(name=category_name)[0]
+        category.delete()
+        return JsonResponse({'result': 'success'})
+
+
 def get_category_id(request):
     if request.method == 'POST':
         id = request.POST.get('id')
@@ -631,6 +639,8 @@ def index_page(request):
         context['is_empty'] = True
     else:
         context['is_empty'] = False
+
+    print('parent: ', Category.objects.get(id=1).parent_category)
     return render(request, 'index.html', context)
 
 

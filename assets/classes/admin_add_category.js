@@ -1,7 +1,7 @@
 categories = [];
 string_to_add = "";
 
-$(document).ready(function(){
+$('document').ready(function(){
     window.counter_categories = -1;
     window.click = false;
     $.ajax({
@@ -70,7 +70,7 @@ function valid_form(){
                  break;
             }
         }
-        if (!founded){
+        if (!founded && $('#par-cat').val() != ''){
            has_errors = true;
            $('#par-lab').text("Такой категории не существует!")
         }
