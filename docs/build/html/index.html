@@ -408,6 +408,51 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="core.views.make_order">
+<code class="descclassname">core.views.</code><code class="descname">make_order</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.make_order" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Создание заказа</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>HttpResponse „success“ или перенаправление на главную страницу, если все прошло успешно</p>
+</dd>
+<dt class="field-odd">Исключение</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>NotImplementedError</strong> – Если запрос не содержит всю необходимую информацию</p></li>
+<li><p><strong>ValueError</strong> – Если с фронтенда передается неправильная форма</p></li>
+</ul>
+</dd>
+</dl>
+<p>Содержание запроса для зарегистрированного пользователя:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – Пользователь</p></li>
+<li><p><strong>address_id</strong> – ID адреса, выбранного пользователем для доставки</p></li>
+</ul>
+</dd>
+</dl>
+<p>Содержание запроса для незарегистрированного пользователя:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request.session</strong><strong>[</strong><strong>'cart'</strong><strong>]</strong> – Корзина, хранящаяся в сессии</p></li>
+<li><p><strong>city</strong> – Город</p></li>
+<li><p><strong>street</strong> – Улица</p></li>
+<li><p><strong>building</strong> – Строение</p></li>
+<li><p><strong>flat</strong> – Номер квартиры</p></li>
+<li><p><strong>entrance</strong> – Номер подъезда</p></li>
+<li><p><strong>email</strong> – Электронная почта пользователя</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.return_categories_json">
 <code class="descclassname">core.views.</code><code class="descname">return_categories_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.return_categories_json" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>

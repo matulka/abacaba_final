@@ -1240,6 +1240,30 @@ def validate_order(request, order):
 
 
 def make_order(request):
+    """
+    Создание заказа
+
+        \n:param request: Пост-запрос\
+        \n:return: HttpResponse 'success' или перенаправление на главную страницу, если все прошло успешно\
+        \n:raises NotImplementedError: Если запрос не содержит всю необходимую информацию\
+        \n:raises ValueError: Если с фронтенда передается неправильная форма\
+
+    \nСодержание запроса для зарегистрированного пользователя:
+
+        \n:param user: Пользователь\
+        \n:param address_id: ID адреса, выбранного пользователем для доставки\
+
+    \nСодержание запроса для незарегистрированного пользователя:
+
+        \n:param request.session['cart']: Корзина, хранящаяся в сессии\
+        \n:param city: Город\
+        \n:param street: Улица\
+        \n:param building: Строение\
+        \n:param flat: Номер квартиры\
+        \n:param entrance: Номер подъезда\
+        \n:param email: Электронная почта пользователя\
+
+    """
     if request.method == 'POST':
         if request.user.is_authenticated:
             user = request.user
@@ -1284,7 +1308,7 @@ def make_order(request):
             email = request.POST.get('email')
             current_cart = request.session['cart']
             if address is None or email is None:
-                raise ValueError # # Лучше переработать
+                raise ValueError
             order = Order(email=email, address=address)
             order.save()
 
