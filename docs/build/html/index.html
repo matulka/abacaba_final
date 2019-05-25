@@ -118,6 +118,63 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="core.views.find_stock_product">
+<code class="descclassname">core.views.</code><code class="descname">find_stock_product</code><span class="sig-paren">(</span><em>product</em>, <em>modification_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.find_stock_product" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Поиск складового продукта по продукту и словарю модификации</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>product</strong> – Продукт, к которому привязан складовой продукт</p></li>
+<li><p><strong>modification_dict</strong> – Словарь вида {parameter: value}, кодирующий модификацию</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>Складовой продукт (если он найден) или None (если ничего не найдено)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.views.get_images_of_stock_product">
+<code class="descclassname">core.views.</code><code class="descname">get_images_of_stock_product</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.get_images_of_stock_product" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div><p>Получение изображений складового продукта</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры</dt>
+<dd class="field-odd"><p><strong>request</strong> – Пост-запрос</p>
+</dd>
+<dt class="field-even">Результат</dt>
+<dd class="field-even"><p>JSON-словарь с изображениями складового продукта</p>
+</dd>
+</dl>
+<p>Содержание запроса:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">product_id</dt>
+<dd class="field-odd"><p>ID объекта Product, к которому привязан складовой продукт</p>
+</dd>
+<dt class="field-even">modification_dict_str</dt>
+<dd class="field-even"><p>Строка, содержащая в себе словарь модификации</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Содержание JSON:</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">images</dt>
+<dd class="field-odd"><p>Массив из ссылок на изображения складового продукта</p>
+</dd>
+<dt class="field-even">quantity</dt>
+<dd class="field-even"><p>Количество продуктов на складе</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="function">
 <dt id="core.views.get_order_product_info_json">
 <code class="descclassname">core.views.</code><code class="descname">get_order_product_info_json</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.get_order_product_info_json" title="Ссылка на это определение">¶</a></dt>
 <dd><blockquote>

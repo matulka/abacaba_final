@@ -865,13 +865,40 @@ def find_modification(product, modification_dict):
     return None
 
 
-def find_stock_product(product, modification_dict):  # #Ищет сток продукт по набору параметров и продукту
+def find_stock_product(product, modification_dict):
+    """
+    Поиск складового продукта по продукту и словарю модификации
+
+        \n:param product: Продукт, к которому привязан складовой продукт\
+        \n:param modification_dict: Словарь вида {parameter: value}, кодирующий модификацию\
+        \n:return: Складовой продукт (если он найден) или None (если ничего не найдено)
+
+    """
     modification = find_modification(product, modification_dict)
-    stock_product = StockProduct.objects.get(product=product, modification=modification)
+    try:
+        stock_product = StockProduct.objects.get(product=product, modification=modification)
+    except ObjectDoesNotExist:
+        stock_product = None
     return stock_product
 
 
 def get_images_of_stock_product(request):
+    """
+    Получение изображений складового продукта и его количества
+
+        \n:param request: Пост-запрос\
+        \n:return: JSON-словарь с изображениями складового продукта\
+
+    \nСодержание запроса:
+
+        :product_id: ID объекта Product, к которому привязан складовой продукт
+        :modification_dict_str: Строка, содержащая в себе словарь модификации
+
+    \nСодержание JSON:
+
+        :images: Массив из ссылок на изображения складового продукта
+        :quantity: Количество продуктов на складе
+    """
     if request.method != 'POST' or 'product_id' not in request.POST or 'modification_dict_str' not in request.POST:
         raise NotImplementedError
     product = Product.objects.get(id=request.POST.get('product_id'))
@@ -990,14 +1017,14 @@ def add_to_cart(request):
             try:
                 __add_to_cart_authenticated__(user, quantity, stock_product)
             except ValueError:
-                e_handler500(request)
+                return e_handler500(request)
         else:
             if 'cart' not in request.session:
                 request.session['cart'] = []
             try:
                 __add_to_cart_unauthenticated__(quantity, stock_product, request.session['cart'])
             except ValueError:
-                e_handler500(request)
+                return e_handler500(request)
         return HttpResponse('success')
 
 
