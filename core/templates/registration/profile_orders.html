@@ -18,9 +18,9 @@
                     {% for key in orders %}
                         <tr>
                             <th scope="row" style="overflow: hidden;">{{ key.id }}</th>
-                            <th scope="row" style="overflow: hidden;">{{ key.order.status }}</th>
-                            <th scope="row" style="overflow: hidden;">{{ key.order.order_date }}</th>
-                            <th scope="row" style="overflow: hidden;">{{ key.order.address.description }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.status }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.order_date }}</th>
+                            <th scope="row" style="overflow: hidden;">{{ key.address }}</th>
                             <th scope="row" style="overflow: hidden;">
                                 <a class="btn btn-primary btn-sm" href="/order?id={{ key.id }}">Перейти к заказу</a>
                             </th>

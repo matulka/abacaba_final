@@ -1690,7 +1690,7 @@ def profile_orders(request):
         \n:param orders: Список заказов, если он не пуст
     """
     user = User.objects.get(username=request.user.username)
-    orders = OrderProduct.objects.all().filter(order__author=user)
+    orders = Order.objects.filter(author=user)
 
     if orders.count() == 0:
         return render(request, 'registration/profile_orders.html', {'empty': 'yes'})
