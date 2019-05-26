@@ -203,3 +203,18 @@ function valid_form(){
         window.location.replace('/admin/product_page/')
     }
 }
+
+
+function delete_product(){
+    $.ajax({
+        url: '/delete_product',
+        type: "POST",
+            data: {
+                 id: get_product_id(),
+                 csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+            },
+        success: function (response) {
+            window.location.replace('/admin/product_page/')
+        }
+    });
+}

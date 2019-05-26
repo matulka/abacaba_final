@@ -54,6 +54,7 @@ urlpatterns = [
     path('find_prod_sps', views.get_product_stock_products),
     path('admin/find_prod_for_img', views.find_prod_for_img),
     path('form_stock_products', views.form_stock_products),
+    path('delete_product', views.delete_product),
     path('del_img', views.del_img),
     path('find_sp_images', views.find_sp_images),
     path('change_exist_product', views.change_exist_product),

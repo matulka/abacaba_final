@@ -351,14 +351,16 @@ def form_stock_products(request):
         prod = Product.objects.get(id=request.POST.get('id'))
         ids = request.POST.getlist('ids[]')
         q = request.POST.getlist('qs[]')
-        prod.stock_products.clear()
         for i in range(len(ids)):
             mod = Modification.objects.get(id=ids[i])
             if hasattr(mod, 'stock_product'):
-                mod.stock_product.delete()
-            sp = StockProduct(product=prod, modification=mod, quantity=q[i])
-            sp.save()
-            print('IIIIIIIIDDDDDDDD:  ' +  str(prod))
+                sp = mod.stock_product
+                sp.quantity = q[i]
+                sp.product = prod
+                sp.save()
+            else:
+                sp = StockProduct(product=prod, modification=mod, quantity=q[i])
+                sp.save()
         return HttpResponse('Gacha')
     return redirect('/')
 
@@ -413,7 +415,7 @@ def stock_product_images(request):
                 for img in imags:
                     image = Image(image=img, stock_product=sp)
                     image.save()
-                return HttpResponseRedirect('/')
+                return HttpResponseRedirect('/admin/stock_products/img?id='+str(sp.product.id))
         else:
             form = AddSeveralImgForm()
         return render(request, 'admin/stock_product_img.html', {'form': form, 'sp': sp, 'img': has_img, 'images': images})
@@ -430,6 +432,14 @@ def find_sp_images(request):
             data['urls'].append(img.image.url)
             data['ids'].append(img.id)
         return JsonResponse(data)
+    return redirect('/')
+
+
+def delete_product(request):
+    if request.method == 'POST':
+        prod = Product.objects.get(id=request.POST.get('id'))
+        prod.delete()
+        return HttpResponse('Gacha')
     return redirect('/')
 
 
