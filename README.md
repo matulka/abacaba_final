@@ -6,6 +6,7 @@ An prototype of an online shopping website.
 Project language: Russian
 
 In order to run the server, type
+
 python manage.py runserver
 
 Requirements to run the project are specified in requirements.txt
