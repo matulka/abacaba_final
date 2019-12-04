@@ -1371,13 +1371,14 @@ def view_order(request):
     if request.method == 'GET':
         if 'id' not in request.GET:
             return e_handler500(request)
-        order_id = request.GET.get('id')
+        order_id = int(request.GET.get('id'))
         has_permission = False
         user = request.user
         if user.is_superuser:
             has_permission = True
         else:
             for order in user.orders.all():
+                print(order.id, order_id)
                 if order.id == order_id:
                     has_permission = True
         if not has_permission:
