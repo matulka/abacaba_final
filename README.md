@@ -10,3 +10,5 @@ In order to run the server, type:
 python manage.py runserver
 
 Requirements to run the project are specified in requirements.txt
+To install the requirements, run
+pip3 install -r requirements.txt
