@@ -13,3 +13,6 @@ Requirements to run the project are specified in requirements.txt.
 To install the requirements, create a new virtualenv and run:
 
 pip3 install -r requirements.txt
+
+
+To log in as an administrator, login: admin password: admin
