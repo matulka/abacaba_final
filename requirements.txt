@@ -1,5 +1,5 @@
 django-widget-tweaks==1.4.3
-Jinja2==2.10
+Jinja2==2.11.3
 django==2.1.4
 Pillow==6.0.0
 pycodestyle==2.5.0
